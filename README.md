@@ -21,20 +21,11 @@ Welcome to the **Revolutic Invoice Mobile App**! This application is a comprehen
 | Framework | React Native / Expo |
 | Routing | Expo Router |
 | Styling | NativeWind (Tailwind CSS for React Native) |
-| State Management | Redux (User app) |
-| Payments | Stripe React Native SDK |
-
-### Backend
-
-| Concern | Technology |
-| :--- | :--- |
-| Runtime | Node.js |
-| Framework | Express.js |
-| Database | MongoDB (Mongoose) |
-| Authentication | Express Session + Connect-Mongo |
-| File Uploads | Multer |
-| Payments | Stripe API |
-| Email | Nodemailer |
+| Data Fetching / API | Axios |
+| UI & Typography | Expo Vector Icons & Google Fonts |
+| Charts & Analytics | Gifted Charts & Chart Kit |
+| Rich Text Editor | React Native CN Quill |
+| PDF Generation | Expo Print & HTML to PDF |
 
 ## Prerequisites
 
