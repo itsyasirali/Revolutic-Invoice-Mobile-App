@@ -37,21 +37,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
     handleSubmit,
   } = useItemForm(item, onCancel);
 
-  const [paddingBottom, setPaddingBottom] = useState(10);
 
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      setPaddingBottom(300);
-    });
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-      setPaddingBottom(10);
-    });
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
 
   const units = ["Hour", "Daily", "Monthly", "Project Base", "Contract"];
 
@@ -59,7 +45,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
     <ScrollView
       className="flex-1 bg-slate-50"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom }}
+      contentContainerStyle={{ paddingBottom: 20 }}
     >
       {/* Header */}
       <View

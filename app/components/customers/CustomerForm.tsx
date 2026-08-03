@@ -50,26 +50,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     handleSubmit,
   } = useCustomerForm(customer, onCancel);
 
-  const [paddingBottom, setPaddingBottom] = useState(10);
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      setPaddingBottom(300);
-    });
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-      setPaddingBottom(10);
-    });
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
 
   return (
     <ScrollView
       className="flex-1 bg-slate-50"
-      contentContainerStyle={{ paddingBottom }}
+      contentContainerStyle={{ paddingBottom: 20 }}
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="none"
       nestedScrollEnabled

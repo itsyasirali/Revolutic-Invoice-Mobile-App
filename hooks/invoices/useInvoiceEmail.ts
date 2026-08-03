@@ -33,17 +33,7 @@ export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
     });
 
     const [availableEmails, setAvailableEmails] = useState<string[]>([]);
-    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-    // Keyboard listeners
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-        return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
-        };
-    }, []);
 
     // Initialize data
     useEffect(() => {
@@ -183,19 +173,28 @@ ${companyName}`;
                 // Create invoice first
                 if (!invoice) throw new Error("No invoice data to save");
 
+                const extractedCustomerId = typeof invoice.customerId === 'object' ? invoice.customerId?.id : invoice.customerId;
                 const payload = {
-                    ...invoice,
-                    status: (invoice.status === 'Paid' || invoice.status === 'Partially Paid') ? invoice.status : 'Sent', // Mark as sent unless already paid
-                    customerId: invoice.customerId?.id || invoice.customerId, // Ensure ID format
-                    items: invoice.items.map((item: any) => ({
-                        itemId: item.itemId?.id || item.itemId || (item.id && typeof item.id === 'string' && item.id.length > 10 ? item.id : undefined), // Try to resolve item ID
+                    invoiceNumber: invoice.invoiceNumber,
+                    invoiceDate: invoice.invoiceDate,
+                    dueDate: invoice.dueDate,
+                    subTotal: invoice.subTotal,
+                    total: invoice.total,
+                    currency: invoice.currency,
+                    notes: invoice.notes,
+                    discountPercent: invoice.discountPercent,
+                    templateId: typeof invoice.templateId === 'object' ? invoice.templateId?.id : invoice.templateId,
+                    status: (invoice.status === 'Paid' || invoice.status === 'Partially Paid') ? invoice.status : 'Sent',
+                    customerId: Number(extractedCustomerId),
+                    items: invoice.items?.map((item: any) => ({
+                        itemId: typeof item.itemId === 'object' ? item.itemId?.id : item.itemId,
                         title: item.title,
                         description: item.description,
-                        quantity: item.quantity,
-                        rate: item.rate,
-                        amount: item.amount,
+                        quantity: Number(item.quantity || 1),
+                        rate: Number(item.rate || 0),
+                        amount: Number(item.amount || 0),
                         unit: item.unit
-                    })).filter((i: any) => i.itemId) // Ensure we have valid items
+                    })).filter((i: any) => i.itemId)
                 };
 
                 // If item logic is complex, might be better to just pass what we have if the backend handles it, 
@@ -205,10 +204,10 @@ ${companyName}`;
                 }
 
                 // Clean payload
-                delete payload.id;
-                delete payload.createdAt;
-                delete payload.updatedAt;
-                delete payload.__v;
+                delete (payload as any).id;
+                delete (payload as any).createdAt;
+                delete (payload as any).updatedAt;
+                delete (payload as any).__v;
 
                 const createRes = await axios.post('/api/invoices', payload);
                 targetId = createRes.data.invoice?.id || createRes.data.id;
@@ -260,7 +259,6 @@ ${companyName}`;
         sending,
         emailData,
         availableEmails,
-        isKeyboardVisible,
         handleSend,
         addEmail,
         removeEmail,

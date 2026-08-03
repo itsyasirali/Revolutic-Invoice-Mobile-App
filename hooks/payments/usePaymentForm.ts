@@ -183,9 +183,9 @@ export const usePaymentForm = (initialPayment?: any) => {
             const appliedInvoicesPayload = Object.entries(appliedAmounts)
                 .filter(([, amount]) => amount > 0)
                 .map(([invoiceId, amount]) => {
-                    const invoice = unpaidInvoices.find(inv => inv.id === invoiceId);
+                    const invoice = unpaidInvoices.find(inv => inv.id === Number(invoiceId));
                     return {
-                        invoiceId,
+                        invoiceId: Number(invoiceId),
                         amount: Number(amount),
                         invoiceNumber: invoice?.invoiceNumber,
                         invoiceAmount: invoice?.total,
@@ -283,9 +283,9 @@ export const usePaymentForm = (initialPayment?: any) => {
         const appliedInvoicesPayload = Object.entries(appliedAmounts)
             .filter(([, amount]) => amount > 0)
             .map(([invoiceId, amount]) => {
-                const invoice = unpaidInvoices.find(inv => inv.id === invoiceId);
+                const invoice = unpaidInvoices.find(inv => inv.id === Number(invoiceId));
                 return {
-                    invoiceId,
+                    invoiceId: Number(invoiceId),
                     amount: Number(amount),
                     invoiceNumber: invoice?.invoiceNumber,
                     invoiceAmount: invoice?.total,

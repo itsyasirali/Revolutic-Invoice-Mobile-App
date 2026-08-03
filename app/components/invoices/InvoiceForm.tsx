@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useInvoiceForm } from '@/hooks/invoices/useInvoiceForm';
@@ -41,16 +41,6 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
   const [showInvoiceDatePicker, setShowInvoiceDatePicker] = useState(false);
   const [showDueDatePicker, setShowDueDatePicker] = useState(false);
 
-  const [paddingBottom, setPaddingBottom] = useState(10);
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => setPaddingBottom(300));
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => setPaddingBottom(10));
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
-
   const handleDateChange = (event: any, selectedDate: any) => {
     const currentDate = selectedDate || new Date();
     if (showInvoiceDatePicker) {
@@ -66,6 +56,10 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
 
 
   const handlePreview = () => {
+    if (!customer) {
+      Alert.alert("Validation Error", "Please select a customer before previewing the invoice.");
+      return;
+    }
     try {
       const payload = preparePayload();
       const previewData = {
@@ -103,7 +97,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         <Text className="font-bold text-lg text-slate-800">
           {initialData ? 'Edit Invoice' : 'New Invoice'}
         </Text>
-        <Pressable onPress={() => handleSubmit('Draft')} disabled={loading}>
+        <Pressable style={{ opacity: customer ? 1 : 0.3 }} onPress={() => handleSubmit('Draft')} disabled={loading || !customer}>
           {loading ? <ActivityIndicator size="small" color="#0891B2" /> : <Text className="text-primary font-bold">Save</Text>}
         </Pressable>
       </View>
@@ -112,7 +106,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         className="flex-1 p-4"
         nestedScrollEnabled={true}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom }}
+        contentContainerStyle={{ paddingBottom: 20 }}
       >
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
           <Text className="font-bold text-base mb-3 text-slate-800">
@@ -160,7 +154,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
               else setCustomer(null);
             }}>
               <Picker.Item label="Select Customer" value="" color="#94a3b8" />
-              {customers.map(c => <Picker.Item key={c.id} label={c.displayName} value={c.id} style={{ fontSize: 14 }} />)}
+              {customers.map(c => <Picker.Item key={c.id || Math.random().toString()} label={c.displayName || 'Unknown Customer'} value={c.id || ''} style={{ fontSize: 14 }} />)}
             </Picker>
           </View>
         </View>
@@ -177,7 +171,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
               <View className="bg-slate-50 rounded-xl border border-slate-200 mb-2 overflow-hidden">
                 <Picker selectedValue={item.itemId} onValueChange={(value) => handleItemSelect(item.id, value, itemOptions)}>
                   <Picker.Item label="Select Item" value="" color="#94a3b8" />
-                  {itemOptions.map(i => <Picker.Item key={i.id} label={i.name} value={i.id} style={{ fontSize: 14 }} />)}
+                  {itemOptions.map(i => <Picker.Item key={i.id || Math.random().toString()} label={i.name || 'Unnamed Item'} value={i.id || ''} style={{ fontSize: 14 }} />)}
                 </Picker>
               </View>
 
@@ -245,7 +239,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           <View className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
             <Picker selectedValue={templateId} onValueChange={setTemplateId}>
               <Picker.Item label="Select Template" value="" color="#94a3b8" />
-              {templates.map(t => <Picker.Item key={t.id} label={t.name} value={t.id} style={{ fontSize: 14 }} />)}
+              {templates.map(t => <Picker.Item key={t.id || Math.random().toString()} label={t.name || 'Unnamed Template'} value={t.id || ''} style={{ fontSize: 14 }} />)}
             </Picker>
           </View>
         </View>
@@ -273,12 +267,12 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
             <>
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-gray-500 text-sm font-semibold">Previous Due</Text>
-                <Text className="text-slate-800 text-sm font-bold">{previousDue.toFixed(2)}</Text>
+                <Text className="text-slate-800 text-sm font-bold">{Number(previousDue || 0).toFixed(2)}</Text>
               </View>
               <View className="flex-row justify-between items-center mb-2 px-1 pt-2 border-t border-slate-200">
                 <Text className="text-slate-800 font-bold text-base">Grand Total</Text>
                 <Text className="text-red-600 font-extrabold text-base">
-                  {(previousDue + calculateTotalAmount()).toFixed(2)} {customer.currency || 'PKR'}
+                  {(Number(previousDue || 0) + calculateTotalAmount()).toFixed(2)} {customer.currency || 'PKR'}
                 </Text>
               </View>
             </>
@@ -286,9 +280,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         </View>
 
         <Pressable
-          className="bg-cyan-600 p-4 rounded-xl items-center mb-12"
+          className={`p-4 rounded-xl items-center mb-12 ${customer ? 'bg-cyan-600' : 'bg-gray-300'}`}
           onPress={handlePreview}
-          disabled={loading}
+          disabled={loading || !customer}
         >
           <Text className="text-white font-bold text-base">Preview Invoice</Text>
         </Pressable>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, TouchableOpacity } from 'react-native';
+import { Modal, View, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface StandardModalProps {
@@ -38,12 +38,14 @@ const StandardModal: React.FC<StandardModalProps> = ({
                         className="w-full bg-white shadow-lg rounded-t-3xl overflow-hidden"
                         style={height !== 'auto' ? { height: height as any } : {}}
                     >
-                        <SafeAreaView
-                            className={height === 'auto' ? '' : 'flex-1'}
-                            edges={['bottom', 'left', 'right']}
-                        >
-                            {children}
-                        </SafeAreaView>
+                        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'padding'} style={height !== 'auto' ? { flex: 1 } : {}}>
+                            <SafeAreaView
+                                className={height === 'auto' ? '' : 'flex-1'}
+                                edges={['bottom', 'left', 'right']}
+                            >
+                                {children}
+                            </SafeAreaView>
+                        </KeyboardAvoidingView>
                     </View>
                 </TouchableOpacity>
             </TouchableOpacity>

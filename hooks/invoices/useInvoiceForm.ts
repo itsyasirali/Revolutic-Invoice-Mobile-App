@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Alert } from 'react-native';
 import axios from '@/services/api';
 import { useCustomerList } from '@/hooks/customers/useCustomerList';
 
@@ -136,6 +137,10 @@ export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) 
     };
 
     const handleSubmit = async (status: 'Draft' | 'Sent' = 'Draft') => {
+        if (!customer) {
+            Alert.alert("Validation Error", "Please select a customer before saving the invoice.");
+            return { success: false, error: "No customer selected" };
+        }
         setLoading(true);
         try {
             // Determine effective status

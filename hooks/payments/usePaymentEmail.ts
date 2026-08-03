@@ -31,16 +31,6 @@ export const usePaymentEmail = (paymentId: string, paymentDataParam?: any) => {
     });
 
     const [availableEmails, setAvailableEmails] = useState<string[]>([]);
-    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-        return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
-        };
-    }, []);
 
     useEffect(() => {
         const fetchPayment = async () => {
@@ -183,7 +173,6 @@ ${companyName}`;
         sending,
         emailData,
         availableEmails,
-        isKeyboardVisible,
         handleSend,
         addEmail,
         removeEmail,

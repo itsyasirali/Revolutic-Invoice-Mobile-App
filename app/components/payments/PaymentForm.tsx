@@ -41,17 +41,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
 
   const paymentMethods = ['Cash', 'Bank Transfer', 'Credit Card', 'Check', 'Other'];
 
-  const [paddingBottom, setPaddingBottom] = useState(20);
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => setPaddingBottom(350));
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => setPaddingBottom(20));
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
-
   return (
     <View className="flex-1 bg-slate-50">
       {/* Header */}
@@ -67,7 +56,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
         </Pressable>
       </View>
 
-      <ScrollView className="flex-1 p-4" contentContainerStyle={{ paddingBottom }} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 p-4" contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
         {/* 1. Customer Selection */}
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm">
@@ -89,9 +78,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
               <Picker.Item label="Select Customer" value="" color="#94a3b8" />
               {filteredCustomers.map((customer: any) => (
                 <Picker.Item
-                  key={customer.id}
-                  label={customer.displayName || customer.companyName}
-                  value={customer.id}
+                  key={customer.id || Math.random().toString()}
+                  label={customer.displayName || customer.companyName || 'Unknown Customer'}
+                  value={customer.id || ''}
                   color={paymentData.customerId === customer.id ? "#0891B2" : "#334155"}
                 />
               ))}
@@ -125,7 +114,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
                   size={24}
                   color="#0891B2"
                 />
-                <Text className="ml-2 text-slate-700 font-medium">Receive full amount ({unpaidInvoices.reduce((sum, inv) => sum + inv.remaining, 0).toFixed(2)})</Text>
+                <Text className="ml-2 text-slate-700 font-medium">Receive full amount ({unpaidInvoices.reduce((sum, inv) => sum + Number(inv.remaining || 0), 0).toFixed(2)})</Text>
               </Pressable>
             )}
 
@@ -249,7 +238,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
               >
                 <Picker.Item label="Select Template" value="" color="#94a3b8" />
                 {templates.map((template: any) => (
-                  <Picker.Item key={template.id} label={template.name} value={template.id} />
+                  <Picker.Item key={template.id || Math.random().toString()} label={template.name || 'Unnamed Template'} value={template.id || ''} />
                 ))}
               </Picker>
             </View>
