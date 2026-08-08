@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, Modal, TextInput, ScrollView, Alert, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { usePaymentList } from '@/hooks/payments/usePaymentList';
 import { useRouter } from 'expo-router';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import PaymentForm from './PaymentForm';
 import RefreshableScrollView from '../ui/RefreshableScrollView';
 import StandardModal from '../ui/StandardModal';
 import InputField from '../ui/InputField';
+import ListPageHeader from '../ui/ListPageHeader';
 
 const PaymentList = () => {
   const {
@@ -35,12 +36,12 @@ const PaymentList = () => {
     const normalizedStatus = (status || '').toLowerCase();
     switch (normalizedStatus) {
       // Payment Modes
-      case 'cash': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'cash' as const, hex: '#0891B2' };
-      case 'bank transfer': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'business' as const, hex: '#0891B2' };
-      case 'credit card': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'card' as const, hex: '#0891B2' };
-      case 'check': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'document-text' as const, hex: '#0891B2' };
-      case 'other': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'pricetag' as const, hex: '#0891B2' };
-      default: return { bg: 'bg-primary/10', text: 'text-primary', icon: 'help-circle' as const, hex: '#0891B2' };
+      case 'cash': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'cash' as const, hex: '#1AA3FF' };
+      case 'bank transfer': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'business' as const, hex: '#1AA3FF' };
+      case 'credit card': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'card' as const, hex: '#1AA3FF' };
+      case 'check': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'document-text' as const, hex: '#1AA3FF' };
+      case 'other': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'pricetag' as const, hex: '#1AA3FF' };
+      default: return { bg: 'bg-primary/10', text: 'text-primary', icon: 'help-circle' as const, hex: '#1AA3FF' };
     }
   };
 
@@ -53,6 +54,8 @@ const PaymentList = () => {
 
   return (
     <View className="flex-1 bg-slate-50">
+      <ListPageHeader title="Payments" onAddPress={() => setShowAddForm(true)} />
+
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-50">
         <InputField
@@ -105,7 +108,7 @@ const PaymentList = () => {
       <View className="flex-1 bg-slate-50">
         {loading && payments.length === 0 ? (
           <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#0891B2" />
+            <ActivityIndicator size="large" color="#1AA3FF" />
           </View>
         ) : (
           <FlatList
@@ -116,8 +119,8 @@ const PaymentList = () => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={refreshPayments}
-                tintColor="#0891B2"
-                colors={["#0891B2"]}
+                tintColor="#1AA3FF"
+                colors={["#1AA3FF"]}
               />
             }
             ListEmptyComponent={
@@ -143,7 +146,7 @@ const PaymentList = () => {
                   <View className="flex-row items-center justify-between mb-3">
                     <View className="flex-row items-center flex-1">
                       <View className="w-12 h-12 items-center justify-center rounded-full mr-3 bg-primary/10">
-                        <Ionicons name="card-outline" size={24} color="#0891B2" />
+                        <Ionicons name="card-outline" size={24} color="#1AA3FF" />
                       </View>
                       <View className="flex-1">
                         <Text className="text-lg font-bold text-slate-800">
@@ -190,14 +193,6 @@ const PaymentList = () => {
           />
         )}
       </View>
-
-      {/* Add Button */}
-      < Pressable
-        onPress={() => setShowAddForm(true)}
-        className="p-4 rounded-full absolute right-5 bottom-8 bg-primary shadow-lg elevation-4"
-      >
-        <MaterialIcons name="add" size={28} color="white" />
-      </Pressable >
 
       {/* Modals */}
       <StandardModal

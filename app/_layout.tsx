@@ -1,7 +1,13 @@
 import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
+import { LogBox } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import '../global.css';
+
+LogBox.ignoreLogs([
+  "Couldn't find a navigation context",
+  'setLayoutAnimationEnabledExperimental',
+]);
 
 import { useAuth } from '../hooks/auth/useAuth';
 import {
@@ -52,38 +58,10 @@ export default function RootLayout() {
 
     const inAuthGroup = segments[0] === 'auth';
     const inScreensGroup = segments[0] === 'screens';
+    const atOnboarding = segments[0] === undefined;
 
-    // Startup Permissions Request
-    if (Platform.OS === 'android') {
-      const requestAllPermissions = async () => {
-        try {
-          const permissionsToRequest = [
-            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          ];
 
-          const results = await PermissionsAndroid.requestMultiple(permissionsToRequest);
-
-          // Check if storage is denied
-          const resultsTyped = results as Record<string, string>;
-          const writeStatus = resultsTyped[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE];
-          const readStatus = resultsTyped[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE];
-
-          if (writeStatus === 'denied' || readStatus === 'denied' || writeStatus === 'never_ask_again' || readStatus === 'never_ask_again') {
-            Alert.alert(
-              "Enable Memory Access",
-              "This app needs storage access to save invoice PDFs. Please allow storage permissions to use the download feature.",
-              [{ text: "OK" }]
-            );
-          }
-        } catch (err) {
-          console.warn('Startup permission error:', err);
-        }
-      };
-      requestAllPermissions();
-    }
-
-    if (!user && !inAuthGroup) {
+    if (!user && !inAuthGroup && !atOnboarding) {
       router.replace('/auth');
     } else if (user && inAuthGroup) {
       router.replace('/screens/home');
@@ -96,9 +74,12 @@ export default function RootLayout() {
   if (loading) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="auth" />
-      <Stack.Screen name="screens" />
-    </Stack>
+    <SafeAreaProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="screens" />
+      </Stack>
+    </SafeAreaProvider>
   );
 }

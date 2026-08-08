@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import { Alert } from 'react-native';
-import { savePDFToDevice } from '@/app/utils/fileSystem';
-import { generatePaymentHTML } from '@/app/utils/generatePaymentHTML';
+import { savePDFToDevice } from '@/utils/fileSystem';
+import { generatePaymentHTML } from '@/utils/generatePaymentHTML';
 import axios from '@/services/api';
 
 export const usePaymentPreview = () => {

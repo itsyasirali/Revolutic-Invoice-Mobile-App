@@ -98,7 +98,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           {initialData ? 'Edit Invoice' : 'New Invoice'}
         </Text>
         <Pressable style={{ opacity: customer ? 1 : 0.3 }} onPress={() => handleSubmit('Draft')} disabled={loading || !customer}>
-          {loading ? <ActivityIndicator size="small" color="#0891B2" /> : <Text className="text-primary font-bold">Save</Text>}
+          {loading ? <ActivityIndicator size="small" color="#1AA3FF" /> : <Text className="text-primary font-bold">Save</Text>}
         </Pressable>
       </View>
 
@@ -215,7 +215,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           ))}
 
           <Pressable onPress={addItemRow} className="bg-primary/10 border border-primary/20 p-3 rounded-xl items-center flex-row justify-center mt-2">
-            <Ionicons name="add-circle-outline" size={20} color="#0891B2" />
+            <Ionicons name="add-circle-outline" size={20} color="#1AA3FF" />
             <Text className="text-primary font-bold ml-2">Add Item</Text>
           </Pressable>
         </View>
@@ -280,7 +280,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         </View>
 
         <Pressable
-          className={`p-4 rounded-xl items-center mb-12 ${customer ? 'bg-cyan-600' : 'bg-gray-300'}`}
+          className={`p-4 rounded-xl items-center mb-12 ${customer ? 'bg-primary' : 'bg-gray-300'}`}
           onPress={handlePreview}
           disabled={loading || !customer}
         >

@@ -1,13 +1,8 @@
-import React from 'react'
-import SidebarLayout from '../components/layout/sidebar'
-import Dashboard from '../components/home/Dashboard'
+import React from 'react';
+import Dashboard from '../components/home/Dashboard';
 
 const Home = () => {
-  return (
-    <SidebarLayout subtitle='Dashboard'>
-      <Dashboard />
-    </SidebarLayout>
-  )
-}
+  return <Dashboard />;
+};
 
-export default Home
+export default Home;

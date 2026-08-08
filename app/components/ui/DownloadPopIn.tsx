@@ -55,7 +55,7 @@ const DownloadPopIn: React.FC<DownloadPopInProps> = ({ visible, fileName, onHide
             className="bg-slate-900 mx-4 rounded-2xl p-4 shadow-xl border border-slate-800"
         >
             <View className="flex-row items-center">
-                <View className="bg-cyan-500 p-2 rounded-full mr-3">
+                <View className="bg-primary p-2 rounded-full mr-3">
                     <Ionicons name="checkmark-done" size={20} color="white" />
                 </View>
                 <View className="flex-1">

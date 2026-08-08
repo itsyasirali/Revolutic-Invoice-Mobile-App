@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable, ActivityIndicator, SafeAreaView } from "react-native";
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
-import { generateInvoiceHTML } from "@/app/utils/generateInvoiceHTML";
+import { generateInvoiceHTML } from "@/utils/generateInvoiceHTML";
 import { useInvoicePreview } from "@/hooks/invoices/useInvoicePreview";
 import DownloadPopIn from "../ui/DownloadPopIn";
 
@@ -24,7 +24,7 @@ const PreviewScreen = () => {
   if (fetching && !displayInvoice) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#0891B2" />
+        <ActivityIndicator size="large" color="#1AA3FF" />
       </View>
     );
   }

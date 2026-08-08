@@ -26,7 +26,7 @@ const PaymentDetail: React.FC = () => {
     if (!paymentData) {
         return (
             <View className="flex-1 p-4 bg-slate-50 items-center justify-center">
-                <ActivityIndicator size="large" color="#0891B2" />
+                <ActivityIndicator size="large" color="#1AA3FF" />
             </View>
         );
     }

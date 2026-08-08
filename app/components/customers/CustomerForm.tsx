@@ -88,12 +88,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
               <MaterialIcons
                 name={customerType === 'Business' ? 'domain' : 'person'}
                 size={16}
-                color="#0891B2"
+                color="#1AA3FF"
               />
               <Text className="ml-2 font-semibold text-primary">
                 {customerType}
               </Text>
-              <MaterialIcons name="lock" size={14} color="#0891B2" style={{ marginLeft: 6 }} />
+              <MaterialIcons name="lock" size={14} color="#1AA3FF" style={{ marginLeft: 6 }} />
             </View>
           ) : (
             <View className="flex-row">

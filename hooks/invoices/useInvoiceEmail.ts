@@ -115,7 +115,7 @@ export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
         const previousRemaining = Number(invoiceData.previousRemaining) || 0;
         const totalBalanceDue = currentInvoiceAmount + previousRemaining;
 
-        const customerName = invoiceData.customerDisplayName || invoiceData.customerName || invoiceData.customerId?.displayName || 'Customer';
+        const customerName = invoiceData.customer?.displayName || invoiceData.customerDisplayName || invoiceData.customerName || invoiceData.customerId?.displayName || 'Customer';
 
         let formattedDate = 'N/A';
         try {

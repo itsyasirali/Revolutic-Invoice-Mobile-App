@@ -19,7 +19,7 @@ const PaymentPreview = () => {
     if (fetching && !displayPayment) {
         return (
             <View className="flex-1 justify-center items-center bg-white">
-                <ActivityIndicator size="large" color="#0891B2" />
+                <ActivityIndicator size="large" color="#1AA3FF" />
             </View>
         );
     }

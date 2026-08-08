@@ -43,7 +43,7 @@ const InvoiceEmailCompose = () => {
         return (
             <SafeAreaView className="flex-1 bg-white">
                 <View className="flex-1 justify-center items-center">
-                    <ActivityIndicator size="large" color="#0891B2" />
+                    <ActivityIndicator size="large" color="#1AA3FF" />
                 </View>
             </SafeAreaView>
         );
@@ -73,9 +73,9 @@ const InvoiceEmailCompose = () => {
                     <Text className="text-xl font-bold">Email</Text>
                     <Pressable onPress={handleSend} disabled={sending}>
                         {sending ? (
-                            <ActivityIndicator size="small" color="#0891B2" />
+                            <ActivityIndicator size="small" color="#1AA3FF" />
                         ) : (
-                            <Ionicons name="send" size={24} color="#0891B2" />
+                            <Ionicons name="send" size={24} color="#1AA3FF" />
                         )}
                     </Pressable>
                 </View>
@@ -100,16 +100,16 @@ const InvoiceEmailCompose = () => {
                             <Text className="text-gray-600">To</Text>
                             <View className="flex-1 flex-row flex-wrap mx-3">
                                 {emailData.to.map((email, idx) => (
-                                    <View key={idx} className="bg-teal-100 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                                    <View key={idx} className="bg-primary/10 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
                                         <Text className="text-primary text-sm">{email}</Text>
                                         <Pressable onPress={() => removeEmail('to', idx)} className="ml-2">
-                                            <Ionicons name="close-circle" size={16} color="#0891B2" />
+                                            <Ionicons name="close-circle" size={16} color="#1AA3FF" />
                                         </Pressable>
                                     </View>
                                 ))}
                             </View>
-                            <Pressable onPress={() => openEmailSelector('to')} className="bg-teal-100 p-2 rounded-full">
-                                <Ionicons name="add" size={20} color="#0891B2" />
+                            <Pressable onPress={() => openEmailSelector('to')} className="bg-primary/10 p-2 rounded-full">
+                                <Ionicons name="add" size={20} color="#1AA3FF" />
                             </Pressable>
                         </View>
                     </View>
@@ -120,16 +120,16 @@ const InvoiceEmailCompose = () => {
                             <Text className="text-gray-600">Cc</Text>
                             <View className="flex-1 flex-row flex-wrap mx-3">
                                 {emailData.cc.map((email, idx) => (
-                                    <View key={idx} className="bg-teal-100 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                                    <View key={idx} className="bg-primary/10 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
                                         <Text className="text-primary text-sm">{email}</Text>
                                         <Pressable onPress={() => removeEmail('cc', idx)} className="ml-2">
-                                            <Ionicons name="close-circle" size={16} color="#0891B2" />
+                                            <Ionicons name="close-circle" size={16} color="#1AA3FF" />
                                         </Pressable>
                                     </View>
                                 ))}
                             </View>
-                            <Pressable onPress={() => openEmailSelector('cc')} className="bg-teal-100 p-2 rounded-full">
-                                <Ionicons name="add" size={20} color="#0891B2" />
+                            <Pressable onPress={() => openEmailSelector('cc')} className="bg-primary/10 p-2 rounded-full">
+                                <Ionicons name="add" size={20} color="#1AA3FF" />
                             </Pressable>
                         </View>
                     </View>
@@ -140,16 +140,16 @@ const InvoiceEmailCompose = () => {
                             <Text className="text-gray-600">Bcc</Text>
                             <View className="flex-1 flex-row flex-wrap mx-3">
                                 {emailData.bcc.map((email, idx) => (
-                                    <View key={idx} className="bg-teal-100 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                                    <View key={idx} className="bg-primary/10 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
                                         <Text className="text-primary text-sm">{email}</Text>
                                         <Pressable onPress={() => removeEmail('bcc', idx)} className="ml-2">
-                                            <Ionicons name="close-circle" size={16} color="#0891B2" />
+                                            <Ionicons name="close-circle" size={16} color="#1AA3FF" />
                                         </Pressable>
                                     </View>
                                 ))}
                             </View>
-                            <Pressable onPress={() => openEmailSelector('bcc')} className="bg-teal-100 p-2 rounded-full">
-                                <Ionicons name="add" size={20} color="#0891B2" />
+                            <Pressable onPress={() => openEmailSelector('bcc')} className="bg-primary/10 p-2 rounded-full">
+                                <Ionicons name="add" size={20} color="#1AA3FF" />
                             </Pressable>
                         </View>
                     </View>

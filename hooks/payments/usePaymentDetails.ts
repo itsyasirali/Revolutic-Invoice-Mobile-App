@@ -4,8 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import * as Print from 'expo-print';
 import { usePaymentDelete } from './usePaymentDelete';
-import { generatePaymentHTML } from '@/app/utils/generatePaymentHTML';
-import { savePDFToDevice } from '@/app/utils/fileSystem';
+import { generatePaymentHTML } from '@/utils/generatePaymentHTML';
+import { savePDFToDevice } from '@/utils/fileSystem';
 import useTemplatesList from '../templates/useTemplatesList';
 
 export const usePaymentDetails = () => {

@@ -52,7 +52,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
           {isEditMode ? 'Edit Payment' : 'Record Payment'}
         </Text>
         <Pressable style={{ opacity: paymentData.customerId ? 1 : 0.3 }} onPress={() => onSubmit()} disabled={isLoading || !paymentData.customerId}>
-          {isLoading ? <ActivityIndicator size="small" color="#0891B2" /> : <Text className="text-primary font-bold">Save</Text>}
+          {isLoading ? <ActivityIndicator size="small" color="#1AA3FF" /> : <Text className="text-primary font-bold">Save</Text>}
         </Pressable>
       </View>
 
@@ -81,7 +81,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
                   key={customer.id || Math.random().toString()}
                   label={customer.displayName || customer.companyName || 'Unknown Customer'}
                   value={customer.id || ''}
-                  color={paymentData.customerId === customer.id ? "#0891B2" : "#334155"}
+                  color={paymentData.customerId === customer.id ? "#1AA3FF" : "#334155"}
                 />
               ))}
             </Picker>
@@ -112,7 +112,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
                 <MaterialIcons
                   name={payAllRemaining ? "check-box" : "check-box-outline-blank"}
                   size={24}
-                  color="#0891B2"
+                  color="#1AA3FF"
                 />
                 <Text className="ml-2 text-slate-700 font-medium">Receive full amount ({unpaidInvoices.reduce((sum, inv) => sum + Number(inv.remaining || 0), 0).toFixed(2)})</Text>
               </Pressable>
@@ -157,7 +157,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
                     key={method}
                     onPress={() => handleInputChange('paymentMethod', method)}
                     className={`px-4 py-2 rounded-md mr-2 border ${paymentData.paymentMethod === method
-                      ? 'bg-cyan-600 border-cyan-600'
+                      ? 'bg-primary border-primary'
                       : 'bg-slate-50 border-slate-200'
                       }`}
                   >
@@ -195,7 +195,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
                       inputStyle="text-right text-sm py-1"
                     />
                     <Pressable onPress={() => handlePayInFull(invoice.id, invoice.remaining)} className="ml-3">
-                      <Text className="text-cyan-600 font-bold text-xs uppercase">Pay Full</Text>
+                      <Text className="text-primary font-bold text-xs uppercase">Pay Full</Text>
                     </Pressable>
                   </View>
                 </View>

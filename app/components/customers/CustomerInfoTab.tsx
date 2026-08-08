@@ -47,13 +47,13 @@ const CustomerInfoTab: React.FC<CustomerInfoTabProps> = ({
                 <View className="flex-row justify-around pt-4">
                     <Pressable className="items-center" onPress={() => handleCall(firstContact?.contact)}>
                         <View className="w-10 h-10 bg-primary/10 rounded-full items-center justify-center mb-1">
-                            <MaterialIcons name="smartphone" size={20} color="#0891B2" />
+                            <MaterialIcons name="smartphone" size={20} color="#1AA3FF" />
                         </View>
                         <Text className="text-sm text-primary font-medium">Call</Text>
                     </Pressable>
                     <Pressable className="items-center" onPress={() => handleEmail(firstContact?.email)}>
                         <View className="w-10 h-10 bg-primary/10 rounded-full items-center justify-center mb-1">
-                            <MaterialIcons name="email" size={20} color="#0891B2" />
+                            <MaterialIcons name="email" size={20} color="#1AA3FF" />
                         </View>
                         <Text className="text-sm text-primary font-medium">Email</Text>
                     </Pressable>

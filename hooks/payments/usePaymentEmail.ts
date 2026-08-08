@@ -69,7 +69,7 @@ export const usePaymentEmail = (paymentId: string, paymentDataParam?: any) => {
                 const customerName = customer?.displayName || paymentData.customerDisplayName || customer?.firstName || 'Customer';
                 const defaultMessage = `Dear ${customerName},
 
-Thank you for your payment. We have received ${paymentData.currency} ${(paymentData.amountReceived ?? paymentData.amount ?? 0).toFixed(2)}.
+Thank you for your payment. We have received ${paymentData.currency} ${Number(paymentData.amountReceived ?? paymentData.amount ?? 0).toFixed(2)}.
 
 Please find attached the payment receipt for your records.
 

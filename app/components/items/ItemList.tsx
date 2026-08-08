@@ -13,6 +13,7 @@ import ItemForm from "./ItemForm";
 import RefreshableScrollView from "../ui/RefreshableScrollView";
 import InputField from "../ui/InputField";
 import StandardModal from "../ui/StandardModal";
+import ListPageHeader from "../ui/ListPageHeader";
 
 const ItemList: React.FC = () => {
   const {
@@ -31,6 +32,8 @@ const ItemList: React.FC = () => {
 
   return (
     <>
+      <ListPageHeader title="Items" onAddPress={() => setShowAddForm(true)} />
+
       <View className="px-4 py-3 bg-slate-50">
         <InputField
           placeholder="Search items..."
@@ -66,7 +69,7 @@ const ItemList: React.FC = () => {
       <View className="flex-1 bg-slate-50">
         {loading && displayItems.length === 0 ? (
           <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#0891B2" />
+            <ActivityIndicator size="large" color="#1AA3FF" />
           </View>
         ) : (
           <FlatList
@@ -77,8 +80,8 @@ const ItemList: React.FC = () => {
               <RefreshControl
                 refreshing={loading}
                 onRefresh={refetch}
-                tintColor="#0891B2"
-                colors={["#0891B2"]}
+                tintColor="#1AA3FF"
+                colors={["#1AA3FF"]}
               />
             }
             ListEmptyComponent={
@@ -146,13 +149,6 @@ const ItemList: React.FC = () => {
           />
         )}
       </View>
-
-      <Pressable
-        onPress={() => setShowAddForm(true)}
-        className="p-4 rounded-full absolute right-5 bottom-8 bg-primary shadow-lg elevation-4"
-      >
-        <MaterialIcons name="add" size={28} color="white" />
-      </Pressable>
 
       <StandardModal
         visible={showAddForm}

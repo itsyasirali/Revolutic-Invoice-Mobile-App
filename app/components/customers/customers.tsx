@@ -6,6 +6,7 @@ import RefreshableScrollView from '../ui/RefreshableScrollView';
 import { useCustomerList } from '@/hooks/customers/useCustomerList';
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
+import ListPageHeader from '../ui/ListPageHeader';
 
 const CustomerList = () => {
   const {
@@ -24,6 +25,8 @@ const CustomerList = () => {
 
   return (
     <>
+      <ListPageHeader title="Customers" onAddPress={() => setShowAddForm(true)} />
+
       <View
         className="px-4 py-3 bg-slate-50"
       >
@@ -61,7 +64,7 @@ const CustomerList = () => {
       <View className="flex-1 bg-slate-50">
         {loading && displayCustomers.length === 0 ? (
           <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#0891B2" />
+            <ActivityIndicator size="large" color="#1AA3FF" />
           </View>
         ) : (
           <FlatList
@@ -72,8 +75,8 @@ const CustomerList = () => {
               <RefreshControl
                 refreshing={loading}
                 onRefresh={refetch}
-                tintColor="#0891B2"
-                colors={["#0891B2"]}
+                tintColor="#1AA3FF"
+                colors={["#1AA3FF"]}
               />
             }
             ListEmptyComponent={
@@ -143,13 +146,6 @@ const CustomerList = () => {
           />
         )}
       </View>
-
-      <Pressable
-        onPress={() => setShowAddForm(true)}
-        className="p-4 rounded-full absolute right-5 bottom-8 bg-primary shadow-lg elevation-4"
-      >
-        <MaterialIcons name="add" size={28} color="white" />
-      </Pressable>
 
       <StandardModal
         visible={showAddForm}

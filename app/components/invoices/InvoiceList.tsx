@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { useRouter } from 'expo-router';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import InvoiceForm from './InvoiceForm';
 
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
+import ListPageHeader from '../ui/ListPageHeader';
 
 const InvoiceList = () => {
     const {
@@ -41,6 +42,8 @@ const InvoiceList = () => {
 
     return (
         <View className="flex-1 bg-slate-50">
+            <ListPageHeader title="Invoices" onAddPress={() => setShowAddForm(true)} />
+
             {/* Search Bar */}
             <View className="px-4 py-3 bg-slate-50">
                 <InputField
@@ -94,7 +97,7 @@ const InvoiceList = () => {
             <View className="flex-1 bg-slate-50">
                 {loading && invoices.length === 0 ? (
                     <View className="flex-1 justify-center items-center">
-                        <ActivityIndicator size="large" color="#0891B2" />
+                        <ActivityIndicator size="large" color="#1AA3FF" />
                         <Text className="text-center text-slate-600 mt-2">Loading...</Text>
                     </View>
                 ) : (
@@ -106,13 +109,13 @@ const InvoiceList = () => {
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={refreshInvoices}
-                                tintColor="#0891B2"
-                                colors={['#0891B2']}
+                                tintColor="#1AA3FF"
+                                colors={['#1AA3FF']}
                             />
                         }
                         ListEmptyComponent={
                             <View className="py-8 items-center">
-                                <Ionicons name="document-text-outline" size={48} color="#94a3b8" />
+                                <Ionicons name="receipt-outline" size={48} color="#94a3b8" />
                                 <Text className="text-center text-lg mt-2 text-slate-500">
                                     No {filter === 'all' ? '' : filter} invoices found
                                 </Text>
@@ -138,7 +141,7 @@ const InvoiceList = () => {
                                     <View className="flex-row items-center justify-between mb-3">
                                         <View className="flex-row items-center flex-1">
                                             <View className="w-12 h-12 items-center justify-center rounded-full mr-3 bg-primary/10">
-                                                <Ionicons name="receipt-outline" size={24} color="#0891B2" />
+                                                <Ionicons name="receipt-outline" size={24} color="#1AA3FF" />
                                             </View>
                                             <View className="flex-1">
                                                 <Text className="text-lg font-bold text-slate-800">
@@ -184,14 +187,6 @@ const InvoiceList = () => {
                     />
                 )}
             </View>
-
-            {/* Add Button */}
-            <Pressable
-                onPress={() => setShowAddForm(true)}
-                className="p-4 rounded-full absolute right-5 bottom-8 bg-primary shadow-lg elevation-4"
-            >
-                <MaterialIcons name="add" size={28} color="white" />
-            </Pressable>
 
             {/* Modals */}
             <StandardModal visible={showAddForm} onClose={handleCancel}>

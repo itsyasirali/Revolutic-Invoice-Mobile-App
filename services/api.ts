@@ -29,16 +29,16 @@ axios.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.error('Response error:', error.response?.status, error.response?.data);
-
-    // Handle specific error cases
-    if (error.response?.status === 404) {
-      console.error('404 Error - Route not found:', error.config.url);
-    } else if (error.response?.status === 401) {
-      console.error('401 Error - Unauthorized');
+    if (error.response?.status === 401) {
       await clearStoredToken();
-    } else if (error.response?.status === 500) {
-      console.error('500 Error - Server error:', error.response.data);
+    } else {
+      console.error('Response error:', error.response?.status, error.response?.data);
+
+      if (error.response?.status === 404) {
+        console.error('404 Error - Route not found:', error.config.url);
+      } else if (error.response?.status === 500) {
+        console.error('500 Error - Server error:', error.response.data);
+      }
     }
 
     return Promise.reject(error);

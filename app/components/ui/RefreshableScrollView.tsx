@@ -31,7 +31,7 @@ const RefreshableScrollView: React.FC<RefreshableScrollViewProps> = ({
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0891B2" />
+        <ActivityIndicator size="large" color="#1AA3FF" />
         <Text className="mt-4 text-slate-500">
           Loading...
         </Text>
@@ -64,8 +64,8 @@ const RefreshableScrollView: React.FC<RefreshableScrollViewProps> = ({
         <RefreshControl
           refreshing={refreshing || isRefreshing}
           onRefresh={handleRefresh}
-          tintColor="#0891B2"
-          colors={['#0891B2']}
+          tintColor="#1AA3FF"
+          colors={['#1AA3FF']}
           progressBackgroundColor="#f8fafc"
         />
       }

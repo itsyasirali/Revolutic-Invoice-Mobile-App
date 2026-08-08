@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Print from "expo-print";
-import { savePDFToDevice } from "@/app/utils/fileSystem";
+import { savePDFToDevice } from "@/utils/fileSystem";
 import axios from "@/services/api";
-import { generateInvoiceHTML } from "@/app/utils/generateInvoiceHTML";
+import { generateInvoiceHTML } from "@/utils/generateInvoiceHTML";
 
 export const useInvoicePreview = () => {
     const { id, invoiceData, template: templateParam } = useLocalSearchParams();

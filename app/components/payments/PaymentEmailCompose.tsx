@@ -49,7 +49,7 @@ const PaymentEmailCompose = () => {
     if (loading) {
         return (
             <SafeAreaView className="flex-1 bg-white justify-center items-center">
-                <ActivityIndicator size="large" color="#0891B2" />
+                <ActivityIndicator size="large" color="#1AA3FF" />
             </SafeAreaView>
         );
     }
@@ -77,7 +77,7 @@ const PaymentEmailCompose = () => {
                     </Pressable>
                     <Text className="text-xl font-bold text-slate-800">Email Receipt</Text>
                     <Pressable onPress={handleSend} disabled={sending}>
-                        {sending ? <ActivityIndicator size="small" color="#0891B2" /> : <Ionicons name="send" size={24} color="#0891B2" />}
+                        {sending ? <ActivityIndicator size="small" color="#1AA3FF" /> : <Ionicons name="send" size={24} color="#1AA3FF" />}
                     </Pressable>
                 </View>
 
@@ -88,16 +88,16 @@ const PaymentEmailCompose = () => {
                             <Text className="text-slate-500 mt-2 font-medium w-8">To</Text>
                             <View className="flex-1 flex-row flex-wrap mx-2">
                                 {emailData.to.map((email, idx) => (
-                                    <View key={idx} className="bg-teal-50 border border-teal-100 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
-                                        <Text className="text-teal-700 text-sm">{email}</Text>
+                                    <View key={idx} className="bg-primary/10 border border-primary/20 px-3 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                                        <Text className="text-primary text-sm">{email}</Text>
                                         <Pressable onPress={() => removeEmail('to', idx)} className="ml-2">
                                             <Ionicons name="close-circle" size={16} color="#0f766e" />
                                         </Pressable>
                                     </View>
                                 ))}
                             </View>
-                            <Pressable onPress={() => openEmailSelector('to')} className="bg-teal-50 p-2 rounded-full">
-                                <Ionicons name="add" size={20} color="#0891B2" />
+                            <Pressable onPress={() => openEmailSelector('to')} className="bg-primary/10 p-2 rounded-full">
+                                <Ionicons name="add" size={20} color="#1AA3FF" />
                             </Pressable>
                         </View>
                     </View>

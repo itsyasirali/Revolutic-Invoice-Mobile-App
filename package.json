@@ -46,7 +46,7 @@
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.10",
-    "nativewind": "^4.2.0",
+    "nativewind": "4.2.6",
     "picker": "^0.1.4",
     "ramda": "^0.27.2",
     "react": "19.1.0",

@@ -22,9 +22,8 @@ export const useInvoiceList = () => {
 
             const mapped = data.map((inv: any) => ({
                 id: inv.id,
-                id: inv.id,
                 invoiceNumber: inv.invoiceNumber,
-                customerName: inv.customerDisplayName || inv.customerId?.displayName || inv.customerName || 'Unknown',
+                customerName: inv.customer?.displayName || inv.customerDisplayName || inv.customerId?.displayName || inv.customerName || 'Unknown',
                 date: inv.invoiceDate,
                 dueDate: inv.dueDate,
                 amount: inv.total || 0,

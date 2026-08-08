@@ -37,10 +37,10 @@ export const useAuthForm = () => {
         if (response.data?.token) {
           await setStoredToken(response.data.token);
         }
+        // Emit auth.changed so useProfile refetches the user, which causes
+        // the auth guard in _layout.tsx to navigate to /screens/home automatically.
         DeviceEventEmitter.emit('auth.changed');
-        // Wait for the router to push to the home screen after login
         resetForm();
-        router.replace('/screens/home');
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Login failed. Try again.';

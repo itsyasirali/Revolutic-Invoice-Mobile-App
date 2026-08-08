@@ -4,10 +4,10 @@ import axios from '@/services/api';
 import { Invoice } from '@/types/invoice';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Alert, useWindowDimensions, Platform, PermissionsAndroid } from 'react-native';
-import { savePDFToDevice } from "@/app/utils/fileSystem";
+import { savePDFToDevice } from "@/utils/fileSystem";
 import { useInvoiceDelete } from './useInvoiceDelete';
 import * as Print from "expo-print";
-import { generateInvoiceHTML } from "@/app/utils/generateInvoiceHTML";
+import { generateInvoiceHTML } from "@/utils/generateInvoiceHTML";
 
 
 export const useInvoiceDetails = () => {
