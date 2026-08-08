@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, DeviceEventEmitter } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from '@/services/api';
+import { setStoredToken } from '@/utils/authToken';
 
 export const useAuthForm = () => {
   const [isSignup, setIsSignup] = useState(false);
@@ -33,6 +34,9 @@ export const useAuthForm = () => {
       const response = await axios.post('/api/auth/login', { email, password });
 
       if (response.data?.user) {
+        if (response.data?.token) {
+          await setStoredToken(response.data.token);
+        }
         DeviceEventEmitter.emit('auth.changed');
         // Wait for the router to push to the home screen after login
         resetForm();

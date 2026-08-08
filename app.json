@@ -45,7 +45,9 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [],
+    "plugins": [
+      "expo-secure-store"
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

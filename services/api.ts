@@ -1,14 +1,18 @@
 import axios from 'axios';
 import { IP } from '@/utils/IP';
+import { getStoredToken, clearStoredToken } from '@/utils/authToken';
 
 // Configure axios defaults
 axios.defaults.baseURL = IP;
-axios.defaults.withCredentials = true; // This is crucial for sending cookies
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
-// Add request interceptor for debugging
+// Attach the stored bearer token (if any) to every outgoing request
 axios.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    const token = await getStoredToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     console.log('Making request to:', config.url);
     return config;
   },
@@ -24,18 +28,19 @@ axios.interceptors.response.use(
     console.log('Response received:', response.status, response.config.url);
     return response;
   },
-  (error) => {
+  async (error) => {
     console.error('Response error:', error.response?.status, error.response?.data);
-    
+
     // Handle specific error cases
     if (error.response?.status === 404) {
       console.error('404 Error - Route not found:', error.config.url);
     } else if (error.response?.status === 401) {
       console.error('401 Error - Unauthorized');
+      await clearStoredToken();
     } else if (error.response?.status === 500) {
       console.error('500 Error - Server error:', error.response.data);
     }
-    
+
     return Promise.reject(error);
   }
 );
