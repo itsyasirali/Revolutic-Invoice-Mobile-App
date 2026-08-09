@@ -5,7 +5,7 @@ export const generatePaymentHTML = (payment: any, templateConfig: any) => {
 
     // --- 1. Settings Extraction ---
     // Colors
-    const primaryColor = config.primaryColor || '#FF9608';
+    const primaryColor = config.primaryColor || '#1AA3FF';
     const secondaryColor = config.secondaryColor || '#075056';
     const accentColor = config.accentColor || '#FBBF24';
     const textColor = config.textColor || '#1f2937';

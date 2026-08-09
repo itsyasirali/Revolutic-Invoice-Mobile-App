@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, Keyboard } from 'react-native';
-import { Customer } from '@/types/customer';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useCustomerForm } from '@/hooks/customers/useCustomerForm';
-import InputField from '../ui/InputField';
-import StandardButton from '../ui/StandardButton';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  Keyboard,
+} from "react-native";
+import { Customer } from "@/types/customer";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useCustomerForm } from "@/hooks/customers/useCustomerForm";
+import InputField from "../ui/InputField";
+import StandardButton from "../ui/StandardButton";
 
 interface CustomerFormProps {
   customer?: Customer | null;
-  onSave?: (customerData: Partial<Customer>) => Promise<{ success: boolean; error?: string }>;
+  onSave?: (
+    customerData: Partial<Customer>,
+  ) => Promise<{ success: boolean; error?: string }>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -50,7 +59,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     handleSubmit,
   } = useCustomerForm(customer, onCancel);
 
-
   return (
     <ScrollView
       className="flex-1 bg-slate-50"
@@ -69,14 +77,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
           {isEditing ? "Edit Customer" : "Add Customer"}
         </Text>
         <Pressable onPress={handleSubmit} disabled={loading}>
-          <Text className={`font-semibold text-base ${loading ? "text-slate-400" : "text-primary"}`}>
+          <Text
+            className={`font-semibold text-base ${loading ? "text-slate-400" : "text-primary"}`}
+          >
             {loading ? "Saving..." : "Save"}
           </Text>
         </Pressable>
       </View>
 
       <View className="px-4 py-6">
-
         {/* Customer Type */}
         <View className="mb-6">
           <Text className="text-sm font-semibold mb-3 text-slate-800">
@@ -86,34 +95,55 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
           {isEditing ? (
             <View className="self-start flex-row items-center px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <MaterialIcons
-                name={customerType === 'Business' ? 'domain' : 'person'}
+                name={customerType === "Business" ? "domain" : "person"}
                 size={16}
                 color="#1AA3FF"
               />
               <Text className="ml-2 font-semibold text-primary">
                 {customerType}
               </Text>
-              <MaterialIcons name="lock" size={14} color="#1AA3FF" style={{ marginLeft: 6 }} />
+              <MaterialIcons
+                name="lock"
+                size={14}
+                color="#1AA3FF"
+                style={{ marginLeft: 6 }}
+              />
             </View>
           ) : (
             <View className="flex-row">
               <Pressable
-                className={`flex-1 p-3 rounded-xl mr-2 border ${customerType === 'Business' ? 'bg-primary/10 border-primary' : 'bg-slate-50 border-slate-200'
-                  }`}
-                onPress={() => setCustomerType('Business')}
+                className={`flex-1 p-3 rounded-xl mr-2 border ${
+                  customerType === "Business"
+                    ? "bg-primary/10 border-primary"
+                    : "bg-slate-50 border-slate-200"
+                }`}
+                onPress={() => setCustomerType("Business")}
               >
-                <Text className={`text-center font-semibold ${customerType === 'Business' ? 'text-primary' : 'text-slate-600'
-                  }`}>
+                <Text
+                  className={`text-center font-semibold ${
+                    customerType === "Business"
+                      ? "text-primary"
+                      : "text-slate-600"
+                  }`}
+                >
                   Business
                 </Text>
               </Pressable>
               <Pressable
-                className={`flex-1 p-3 rounded-xl ml-2 border ${customerType === 'Individual' ? 'bg-primary/10 border-primary' : 'bg-slate-50 border-slate-200'
-                  }`}
-                onPress={() => setCustomerType('Individual')}
+                className={`flex-1 p-3 rounded-xl ml-2 border ${
+                  customerType === "Individual"
+                    ? "bg-primary/10 border-primary"
+                    : "bg-slate-50 border-slate-200"
+                }`}
+                onPress={() => setCustomerType("Individual")}
               >
-                <Text className={`text-center font-semibold ${customerType === 'Individual' ? 'text-primary' : 'text-slate-600'
-                  }`}>
+                <Text
+                  className={`text-center font-semibold ${
+                    customerType === "Individual"
+                      ? "text-primary"
+                      : "text-slate-600"
+                  }`}
+                >
                   Individual
                 </Text>
               </Pressable>
@@ -126,7 +156,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
             Basic Information
           </Text>
 
-          {customerType === 'Business' && (
+          {customerType === "Business" && (
             <InputField
               label="Company Name *"
               value={companyName}
@@ -171,7 +201,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
             {showCurrencyDropdown && (
               <View
                 className="absolute left-0 right-0 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg z-50 max-h-60"
-                style={{ top: '100%' }}
+                style={{ top: "100%" }}
               >
                 <ScrollView
                   nestedScrollEnabled
@@ -190,7 +220,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
                         className="p-3 border-b border-slate-100"
                         onPress={() => {
                           handleCurrencySelect(c.code);
-                          setTimeout(() => currencyInputRef.current?.focus(), 0);
+                          setTimeout(
+                            () => currencyInputRef.current?.focus(),
+                            0,
+                          );
                         }}
                       >
                         <Text className="text-slate-800">
@@ -205,9 +238,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
                   onPress={() => setShowCurrencyDropdown(false)}
                   className="p-3 rounded-b-xl bg-slate-50 border-t border-slate-200"
                 >
-                  <Text className="text-center text-slate-500">
-                    Close
-                  </Text>
+                  <Text className="text-center text-slate-500">Close</Text>
                 </Pressable>
               </View>
             )}
@@ -281,12 +312,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
               </View>
             </View>
 
-            <StandardButton
-              title="Add Contact"
-              onPress={addContact}
-            />
+            <StandardButton title="Add Contact" onPress={addContact} />
           </View>
-
 
           {/* Existing Contacts */}
           {contacts.map((contact, index) => (
@@ -308,8 +335,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
             </View>
           ))}
         </View>
-
-
       </View>
     </ScrollView>
   );
