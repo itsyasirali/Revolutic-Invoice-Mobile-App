@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { View, ScrollView, RefreshControl } from 'react-native';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { useReceivables } from '@/hooks/invoices/useReceivables';
@@ -11,8 +11,6 @@ const Dashboard: React.FC = () => {
   const { user } = useProfile();
   const { allInvoices = [], loading: invoicesLoading, refreshing, refreshInvoices } = useInvoiceList();
   const { totalReceipts } = useReceivables();
-
-  const [selectedFilter, setSelectedFilter] = useState('This Month');
 
   // --- REAL DATA CALCULATIONS ---
 
@@ -31,9 +29,9 @@ const Dashboard: React.FC = () => {
   // Formatted Revenue String
   const formattedRevenue = useMemo(() => {
     if (realTotalRevenue === 0 && allInvoices.length === 0) {
-      return '$25,680.00'; // Default placeholder when database has no data yet
+      return 'RS 25,680.00'; // Default placeholder when database has no data yet
     }
-    return `$${realTotalRevenue.toLocaleString('en-US', {
+    return `RS ${realTotalRevenue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
@@ -152,8 +150,6 @@ const Dashboard: React.FC = () => {
         <RevenueHeroCard
           userInitial={userInitial}
           formattedRevenue={formattedRevenue}
-          selectedFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
         />
 
         {/* MAIN CONTENT BODY */}

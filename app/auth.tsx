@@ -79,10 +79,9 @@ const AuthScreen = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          onScrollBeginDrag={Keyboard.dismiss}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingBottom: isKeyboardVisible ? 300 : 40,
+            paddingBottom: isKeyboardVisible ? 380 : 50,
           }}
         >
           <View className="flex-1 px-6 pt-4">

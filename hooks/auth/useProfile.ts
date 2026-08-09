@@ -23,9 +23,9 @@ export const useProfile = (): UseProfileReturn => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchProfile = async () => {
+    const fetchProfile = async (opts?: { silent?: boolean }) => {
         try {
-            setLoading(true);
+            if (!opts?.silent) setLoading(true);
             setError(null);
 
             const response = await axios.get('/api/auth/me');
@@ -41,14 +41,19 @@ export const useProfile = (): UseProfileReturn => {
                 setError(err.response?.data?.message || 'Failed to fetch user profile');
             }
         } finally {
-            setLoading(false);
+            if (!opts?.silent) setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchProfile();
 
-        const subscription = DeviceEventEmitter.addListener('auth.changed', fetchProfile);
+        // Silent: login/logout transitions shouldn't flip the app-wide loading
+        // state, which would unmount/remount the root navigator and briefly
+        // flash back to the first declared screen (index) mid-transition.
+        const subscription = DeviceEventEmitter.addListener('auth.changed', () =>
+            fetchProfile({ silent: true })
+        );
 
         return () => {
             subscription.remove();
