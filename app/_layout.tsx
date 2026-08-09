@@ -1,8 +1,9 @@
 import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
 import { LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../global.css';
+import CustomSplashScreen from './components/CustomSplashScreen';
 
 LogBox.ignoreLogs([
   "Couldn't find a navigation context",
@@ -26,13 +27,14 @@ import {
   Roboto_900Black_Italic,
 } from '@expo-google-fonts/roboto';
 
-// Keep splash up until we know auth state
-SplashScreen.preventAutoHideAsync().catch(() => { });
+// Keep native splash screen visible while loading resources
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
+  const [isReady, setIsReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
     Roboto_100Thin,
@@ -52,26 +54,36 @@ export default function RootLayout() {
   const loading = authLoading || !fontsLoaded;
 
   useEffect(() => {
+    // Hide native splash screen as soon as component mounts
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (loading) return;
 
-    SplashScreen.hideAsync().catch(() => { });
+    // Small delay for smooth animated splash experience
+    const timer = setTimeout(() => {
+      setIsReady(true);
 
-    const inAuthGroup = segments[0] === 'auth';
-    const inScreensGroup = segments[0] === 'screens';
-    const atOnboarding = segments[0] === undefined;
+      const inAuthGroup = segments[0] === 'auth';
+      const inScreensGroup = segments[0] === 'screens';
 
+      if (!user && !inAuthGroup) {
+        // Not authenticated -> redirect to /auth
+        router.replace('/auth');
+      } else if (user && (!inScreensGroup || inAuthGroup)) {
+        // Authenticated -> redirect to Dashboard (/screens/home)
+        router.replace('/screens/home');
+      }
+    }, 800);
 
-    if (!user && !inAuthGroup && !atOnboarding) {
-      router.replace('/auth');
-    } else if (user && inAuthGroup) {
-      router.replace('/screens/home');
-    } else if (user && !inScreensGroup && !inAuthGroup) {
-      router.replace('/screens/home');
-    }
+    return () => clearTimeout(timer);
   }, [user, loading, segments, router]);
 
-  // While loading, keep rendering nothing (splash is visible)
-  if (loading) return null;
+  // Show custom splash screen while checking authentication and loading fonts
+  if (loading || !isReady) {
+    return <CustomSplashScreen />;
+  }
 
   return (
     <SafeAreaProvider>
