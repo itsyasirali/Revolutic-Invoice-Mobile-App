@@ -12,6 +12,7 @@ export default function ScreensLayout() {
                     <Stack.Screen name="Invoice" />
                     <Stack.Screen name="Items" />
                     <Stack.Screen name="customer" />
+                    <Stack.Screen name="settings" />
                 </Stack>
             </View>
             <BottomNav />

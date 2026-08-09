@@ -235,14 +235,14 @@ export const generateInvoiceHTML = (invoice: any, templateConfig: any) => {
             <div class="bill-to-block">
                 <div style="font-weight: bold; color: ${config.billToColor || secondaryColor}; margin-bottom: 4px; font-size: ${labelFontSize}px;">${labels.billTo}</div>
                 <div style="font-weight: 600; font-size: ${fontSize + 1}px;">
-                    ${invoice.customerName || invoice.customerDisplayName || invoice.customerId?.displayName || invoice.customerId?.name || 'Customer'}
+                    ${invoice.customer?.displayName || invoice.customer?.companyName || invoice.customerDisplayName || invoice.customerName || 'Customer'}
                 </div>
                 ${config.showCustomerAddress !== false ?
       `<div style="max-width: 250px; margin-top: 2px;">
-                        ${invoice.customerAddress || (invoice.customerId?.billingAddress ? `${invoice.customerId.billingAddress.addressLine1 || ''} ${invoice.customerId.billingAddress.city || ''}` : '') || invoice.customerId?.address || ''}
+                        ${invoice.customerAddress || invoice.customer?.address || ''}
                     </div>` : ''}
-                ${config.showCustomerEmail !== false && (invoice.customerEmail || invoice.customerId?.email) ? `<div>${invoice.customerEmail || invoice.customerId?.email}</div>` : ''}
-                ${config.showCustomerPhone !== false && (invoice.customerPhone || invoice.customerId?.phone) ? `<div>${invoice.customerPhone || invoice.customerId?.phone}</div>` : ''}
+                ${config.showCustomerEmail !== false && (invoice.customerEmail || invoice.customer?.contacts?.[0]?.email) ? `<div>${invoice.customerEmail || invoice.customer?.contacts?.[0]?.email}</div>` : ''}
+                ${config.showCustomerPhone !== false && (invoice.customerPhone || invoice.customer?.contacts?.[0]?.contact) ? `<div>${invoice.customerPhone || invoice.customer?.contacts?.[0]?.contact}</div>` : ''}
             </div>
 
             <div class="dates-block">

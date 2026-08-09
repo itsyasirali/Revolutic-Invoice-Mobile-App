@@ -85,8 +85,8 @@ export const generatePaymentHTML = (payment: any, templateConfig: any) => {
         const bg = isAlt ? tableRowColor : tableAltRowColor;
 
         // Handle both flattened (API transformed) and nested structure if necessary
-        const invoiceNum = item.invoiceNumber || item.invoiceId || '—';
-        const invoiceAmt = item.invoiceAmount || 0;
+        const invoiceNum = item.invoice?.invoiceNumber || item.invoiceNumber || item.invoiceId || '—';
+        const invoiceAmt = item.invoice?.total ?? item.invoiceAmount ?? 0;
         const amount = item.amount || 0;
 
         return `

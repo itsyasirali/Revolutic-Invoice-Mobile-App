@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useLogout } from "@/hooks/auth/useLogout";
+import { useRouter } from "expo-router";
 
 interface RevenueHeroCardProps {
   userInitial: string;
@@ -25,7 +25,7 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = ({
   onFilterChange,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const { logout } = useLogout();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
@@ -46,9 +46,17 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = ({
             <View className="w-2.5 h-2.5 rounded-full bg-white absolute top-2 right-2 border border-primary" />
           </Pressable>
 
-          {/* Profile Avatar (tap to logout) */}
+          {/* Settings */}
           <Pressable
-            onPress={logout}
+            onPress={() => router.push('/screens/settings')}
+            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+          >
+            <Ionicons name="settings-outline" size={20} color="white" />
+          </Pressable>
+
+          {/* Profile Avatar (tap to open settings) */}
+          <Pressable
+            onPress={() => router.push('/screens/settings')}
             className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 bg-white/20 items-center justify-center"
           >
             <Text className="text-white font-bold text-sm">{userInitial}</Text>
