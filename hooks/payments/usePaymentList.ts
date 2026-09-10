@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import axios from '@/services/api';
 import { Payment } from '@/types/Payment';
 
@@ -97,6 +98,56 @@ export const usePaymentList = () => {
         fetchPayments();
     }, [fetchPayments]);
 
+    const router = useRouter();
+
+    const filterTabs = [
+        { key: 'all', label: 'All' },
+        { key: 'Cash', label: 'Cash' },
+        { key: 'Bank Transfer', label: 'Bank Transfer' },
+        { key: 'Credit Card', label: 'Credit Card' },
+        { key: 'Check', label: 'Check' },
+        { key: 'Other', label: 'Other' },
+    ];
+
+    const getStatusStyle = (status: string) => {
+        const normalizedStatus = (status || '').toLowerCase();
+        switch (normalizedStatus) {
+            case 'cash': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'cash' as const, hex: '#1AA3FF' };
+            case 'bank transfer': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'business' as const, hex: '#1AA3FF' };
+            case 'credit card': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'card' as const, hex: '#1AA3FF' };
+            case 'check': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'document-text' as const, hex: '#1AA3FF' };
+            case 'other': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'pricetag' as const, hex: '#1AA3FF' };
+            default: return { bg: 'bg-primary/10', text: 'text-primary', icon: 'help-circle' as const, hex: '#1AA3FF' };
+        }
+    };
+
+    const getCustomerName = (payment: any) => {
+        if (payment.customer) {
+            return payment.customer.displayName || payment.customer.companyName || payment.customer.firstName || 'Unknown Customer';
+        }
+        return 'Unknown Customer';
+    };
+
+    const handleOpenAdd = () => {
+        setShowAddForm(true);
+    };
+
+    const handleCloseAdd = () => {
+        setShowAddForm(false);
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditForm(false);
+        setEditingPayment(null);
+    };
+
+    const handlePaymentPress = (payment: Payment) => {
+        router.push({
+            pathname: "/screens/payments/detail",
+            params: { payment: JSON.stringify(payment) }
+        });
+    };
+
     return {
         payments: filteredPayments, // Return filtered list
         allPayments: payments, // Return raw list if needed
@@ -118,6 +169,13 @@ export const usePaymentList = () => {
         formLoading,
         setFormLoading, // Kept for compatibility, though likely unused by form now
         handleSaveSuccess,
-        handleEditPayment
+        handleEditPayment,
+        filterTabs,
+        getStatusStyle,
+        getCustomerName,
+        handleOpenAdd,
+        handleCloseAdd,
+        handleCloseEdit,
+        handlePaymentPress,
     };
 };

@@ -120,6 +120,94 @@ const usePaymentDetails = () => {
         });
     };
 
+    const getStatusStyle = (status: string) => {
+        const normalizedStatus = (status || "").toLowerCase();
+        switch (normalizedStatus) {
+            case "cash":
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "cash" as const,
+                    hex: "#047857",
+                };
+            case "bank transfer":
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "business" as const,
+                    hex: "#1d4ed8",
+                };
+            case "credit card":
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "card" as const,
+                    hex: "#7e22ce",
+                };
+            case "check":
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "document-text" as const,
+                    hex: "#0f766e",
+                };
+            case "other":
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "pricetag" as const,
+                    hex: "#374151",
+                };
+            default:
+                return {
+                    bg: "bg-primary/10",
+                    text: "text-primary",
+                    icon: "help-circle" as const,
+                    hex: "#374151",
+                };
+        }
+    };
+
+    const statusStyle = getStatusStyle(paymentData?.paymentMode);
+
+    const customerDisplayName =
+        paymentData?.customerDisplayName ||
+        paymentData?.customer?.displayName ||
+        "Unknown Customer";
+
+    const customerInitial = (
+        paymentData?.customerDisplayName ||
+        paymentData?.customer?.id ||
+        "C"
+    )?.charAt(0).toUpperCase();
+
+    const customerEmail =
+        paymentData?.customerEmail ||
+        (typeof paymentData?.customerId === "object"
+            ? paymentData?.customerId?.email ||
+              paymentData?.customerId?.contacts?.[0]?.email
+            : "");
+
+    const formattedAmount = Number(paymentData?.amountReceived || 0).toFixed(2);
+    const formattedPaymentDate = paymentData?.paymentDate ? new Date(paymentData.paymentDate).toLocaleDateString() : "";
+
+    const handleOpenEdit = () => {
+        setShowMenu(false);
+        setShowEditForm(true);
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditForm(false);
+    };
+
+    const handleOpenMenu = () => {
+        setShowMenu(true);
+    };
+
+    const handleCloseMenu = () => {
+        setShowMenu(false);
+    };
+
     const goBack = () => router.back();
 
     return {
@@ -131,6 +219,16 @@ const usePaymentDetails = () => {
         setShowMenu,
         expandMoreInfo,
         setExpandMoreInfo,
+        statusStyle,
+        customerDisplayName,
+        customerInitial,
+        customerEmail,
+        formattedAmount,
+        formattedPaymentDate,
+        handleOpenEdit,
+        handleCloseEdit,
+        handleOpenMenu,
+        handleCloseMenu,
         handleSaveSuccess,
         handleDelete,
         handleDownloadReceipt,

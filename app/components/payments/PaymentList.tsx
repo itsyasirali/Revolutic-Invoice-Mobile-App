@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { usePaymentList } from '@/hooks/payments/usePaymentList';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PaymentForm from './PaymentForm';
 import StandardModal from '../ui/StandardModal';
@@ -19,40 +18,22 @@ const PaymentList = () => {
     searchQuery,
     setSearchQuery,
     showAddForm,
-    setShowAddForm,
     showEditForm,
-    setShowEditForm,
     editingPayment,
-    setEditingPayment,
     formLoading,
     handleSaveSuccess,
+    filterTabs,
+    getStatusStyle,
+    getCustomerName,
+    handleOpenAdd,
+    handleCloseAdd,
+    handleCloseEdit,
+    handlePaymentPress,
   } = usePaymentList();
-
-  const router = useRouter();
-
-  const getStatusStyle = (status: string) => {
-    const normalizedStatus = (status || '').toLowerCase();
-    switch (normalizedStatus) {
-      // Payment Modes
-      case 'cash': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'cash' as const, hex: '#1AA3FF' };
-      case 'bank transfer': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'business' as const, hex: '#1AA3FF' };
-      case 'credit card': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'card' as const, hex: '#1AA3FF' };
-      case 'check': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'document-text' as const, hex: '#1AA3FF' };
-      case 'other': return { bg: 'bg-primary/10', text: 'text-primary', icon: 'pricetag' as const, hex: '#1AA3FF' };
-      default: return { bg: 'bg-primary/10', text: 'text-primary', icon: 'help-circle' as const, hex: '#1AA3FF' };
-    }
-  };
-
-  const getCustomerName = (payment: any) => {
-    if (payment.customer) {
-      return payment.customer.displayName
-    }
-    return 'Unknown Customer';
-  };
 
   return (
     <View className="flex-1 bg-slate-50">
-      <ListPageHeader title="Payments" onAddPress={() => setShowAddForm(true)} />
+      <ListPageHeader title="Payments" onAddPress={handleOpenAdd} />
 
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-50">
@@ -74,14 +55,7 @@ const PaymentList = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
         >
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'Cash', label: 'Cash' },
-            { key: 'Bank Transfer', label: 'Bank Transfer' },
-            { key: 'Credit Card', label: 'Credit Card' },
-            { key: 'Check', label: 'Check' },
-            { key: 'Other', label: 'Other' },
-          ].map((tab) => {
+          {filterTabs.map((tab) => {
             const isActive = filter.toLowerCase() === tab.key.toLowerCase();
             return (
               <Pressable
@@ -101,7 +75,6 @@ const PaymentList = () => {
         </ScrollView>
       </View>
 
-      {/* List */}
       {/* List */}
       <View className="flex-1 bg-slate-50">
         {loading && payments.length === 0 ? (
@@ -133,12 +106,7 @@ const PaymentList = () => {
               const statusStyle = getStatusStyle(item.paymentMode || item.status);
               return (
                 <Pressable
-                  onPress={() => {
-                    router.push({
-                      pathname: "/screens/payments/detail",
-                      params: { payment: JSON.stringify(item) }
-                    });
-                  }}
+                  onPress={() => handlePaymentPress(item)}
                   className="bg-white rounded-xl mb-4 p-5 shadow-sm border border-slate-100"
                 >
                   <View className="flex-row items-center justify-between mb-3">
@@ -195,26 +163,23 @@ const PaymentList = () => {
       {/* Modals */}
       <StandardModal
         visible={showAddForm}
-        onClose={() => setShowAddForm(false)}
+        onClose={handleCloseAdd}
       >
         <PaymentForm
           onSave={handleSaveSuccess}
-          onCancel={() => setShowAddForm(false)}
+          onCancel={handleCloseAdd}
           loading={formLoading}
         />
       </StandardModal>
 
       <StandardModal
         visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
+        onClose={handleCloseEdit}
       >
         <PaymentForm
           payment={editingPayment}
           onSave={handleSaveSuccess}
-          onCancel={() => {
-            setShowEditForm(false);
-            setEditingPayment(null);
-          }}
+          onCancel={handleCloseEdit}
           loading={formLoading}
         />
       </StandardModal>

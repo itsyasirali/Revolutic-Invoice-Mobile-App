@@ -1,126 +1,64 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useInvoiceForm } from '@/hooks/invoices/useInvoiceForm';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import InputField from '../ui/InputField';
 import SearchableDropdown from '../ui/SearchableDropdown';
-import useCustomerList from '@/hooks/customers/useCustomerList';
-import { useItemList } from '@/hooks/items/useItemList';
-import useTemplatesList from '@/hooks/templates/useTemplatesList';
 import { InvoiceFormProps } from '@/types/invoice';
 
 const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSaveSuccess }) => {
-  const router = useRouter();
-
   const {
-    invoiceNumber, setInvoiceNumber,
-    invoiceDate, setInvoiceDate,
-    dueDate, setDueDate,
-    customer, setCustomer,
-    templateId, setTemplateId,
-    discountPercent, setDiscountPercent,
-    notes, setNotes,
+    isEditing,
+    invoiceNumber,
+    setInvoiceNumber,
+    invoiceDate,
+    dueDate,
+    customer,
+    templateId,
+    discountPercent,
+    setDiscountPercent,
+    notes,
+    setNotes,
     items,
-    previousDue,
     loading,
-    handleSubmit,
-    calculateSubTotal,
-    calculateTotalAmount,
-    preparePayload,
+    customerOptions,
+    itemDropdownOptions,
+    templateOptions,
+    showInvoiceDatePicker,
+    setShowInvoiceDatePicker,
+    showDueDatePicker,
+    setShowDueDatePicker,
+    handleDateChange,
+    handleCustomerSelect,
+    handleClearCustomer,
+    handleTemplateSelect,
     handleItemSelect,
     handleItemChange,
-    addItemRow
+    addItemRow,
+    handleSubmit,
+    handlePreview,
+    subTotalFormatted,
+    grandTotalFormatted,
+    previousDueFormatted,
   } = useInvoiceForm(initialData, onSaveSuccess);
-
-  const { customers } = useCustomerList();
-  const { items: itemOptions } = useItemList();
-  const { templates } = useTemplatesList();
-
-  const customerOptions = useMemo(() => {
-    return customers.map(c => ({
-      label: c.displayName || c.companyName || 'Unknown Customer',
-      value: c.id,
-      sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
-    }));
-  }, [customers]);
-
-  const itemDropdownOptions = useMemo(() => {
-    return itemOptions.map(i => ({
-      label: i.name || 'Unnamed Item',
-      value: i.id,
-      sublabel: i.sellingPrice ? `Price: PKR ${i.sellingPrice} | Unit: ${i.unit || '-'}` : undefined,
-    }));
-  }, [itemOptions]);
-
-  const templateOptions = useMemo(() => {
-    return templates.map(t => ({
-      label: t.name || 'Unnamed Template',
-      value: t.id,
-      sublabel: t.paperSize ? `Paper: ${t.paperSize} | ${t.orientation || 'portrait'}` : undefined,
-    }));
-  }, [templates]);
-
-  const [showInvoiceDatePicker, setShowInvoiceDatePicker] = useState(false);
-  const [showDueDatePicker, setShowDueDatePicker] = useState(false);
-
-  const handleDateChange = (event: any, selectedDate: any) => {
-    const currentDate = selectedDate || new Date();
-    if (showInvoiceDatePicker) {
-      setInvoiceDate(currentDate.toISOString().slice(0, 10));
-      setShowInvoiceDatePicker(false);
-    } else if (showDueDatePicker) {
-      setDueDate(currentDate.toISOString().slice(0, 10));
-      setShowDueDatePicker(false);
-    }
-  };
-
-  const handlePreview = () => {
-    if (!customer) {
-      Alert.alert("Validation Error", "Please select a customer before previewing the invoice.");
-      return;
-    }
-
-    const payload = preparePayload();
-    if (!payload) return;
-
-    const previewInvoiceData = {
-      ...payload,
-      id: initialData?.id || "preview-temp-id",
-      invoiceNumber: invoiceNumber,
-      invoiceDate: invoiceDate,
-      dueDate: dueDate,
-      customer: customer,
-      templateId: templateId || undefined,
-    };
-
-    router.push({
-      pathname: "/screens/Invoice/preview",
-      params: {
-        invoiceData: JSON.stringify(previewInvoiceData),
-        templateId: templateId || undefined,
-      },
-    });
-  };
 
   return (
     <View className="flex-1 bg-slate-50">
-      <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10">
+      <View className="px-4 py-5 bg-white border-b border-slate-200 flex-row justify-between items-center z-10">
         <Pressable onPress={onCancel}>
           <Text className="text-primary font-semibold text-base">Cancel</Text>
         </Pressable>
         <Text className="font-bold text-lg text-slate-800">
-          {initialData ? "Edit Invoice" : "Create Invoice"}
+          {isEditing ? 'Edit Invoice' : 'New Invoice'}
         </Text>
-        <Pressable onPress={() => handleSubmit()} disabled={loading}>
+        <Pressable onPress={handleSubmit} disabled={loading}>
           {loading ? (
             <ActivityIndicator size="small" color="#1AA3FF" />
           ) : (
             <Text className="text-primary font-bold text-base">Save</Text>
           )}
         </Pressable>
-
       </View>
 
       <ScrollView
@@ -176,13 +114,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
             searchPlaceholder="Search customers by name, company..."
             value={customer?.id || ''}
             options={customerOptions}
-            onSelect={(opt) => {
-              const c = customers.find(cus => String(cus.id) === String(opt.value));
-              if (c) setCustomer(c);
-              else setCustomer(null);
-            }}
+            onSelect={handleCustomerSelect}
             clearable
-            onClear={() => setCustomer(null)}
+            onClear={handleClearCustomer}
             leftIcon={<Ionicons name="person-outline" size={18} color="#1AA3FF" />}
             containerStyle="mb-0"
           />
@@ -202,7 +136,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
                 searchPlaceholder="Search items..."
                 value={item.itemId || ''}
                 options={itemDropdownOptions}
-                onSelect={(opt) => handleItemSelect(item.id, String(opt.value), itemOptions)}
+                onSelect={(opt) => handleItemSelect(item.id, String(opt.value))}
                 containerStyle="mb-2"
                 leftIcon={<Ionicons name="cube-outline" size={18} color="#1AA3FF" />}
               />
@@ -273,7 +207,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
             searchPlaceholder="Search templates..."
             value={templateId || ''}
             options={templateOptions}
-            onSelect={(opt) => setTemplateId(String(opt.value))}
+            onSelect={handleTemplateSelect}
             leftIcon={<Ionicons name="document-text-outline" size={18} color="#1AA3FF" />}
             containerStyle="mb-0"
           />
@@ -296,18 +230,18 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           </View>
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-gray-500 text-sm font-semibold">Subtotal</Text>
-            <Text className="text-slate-800 text-sm font-bold">{Number(calculateSubTotal() || 0).toFixed(2)}</Text>
+            <Text className="text-slate-800 text-sm font-bold">{subTotalFormatted}</Text>
           </View>
           {customer && (
             <>
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-gray-500 text-sm font-semibold">Previous Due</Text>
-                <Text className="text-slate-800 text-sm font-bold">{Number(previousDue || 0).toFixed(2)}</Text>
+                <Text className="text-slate-800 text-sm font-bold">{previousDueFormatted}</Text>
               </View>
               <View className="flex-row justify-between items-center mb-2 px-1 pt-2 border-t border-slate-200">
                 <Text className="text-slate-800 font-bold text-base">Grand Total</Text>
                 <Text className="text-red-600 font-extrabold text-base">
-                  {(Number(previousDue || 0) + calculateTotalAmount()).toFixed(2)} {customer.currency || 'PKR'}
+                  {grandTotalFormatted} {customer.currency || 'PKR'}
                 </Text>
               </View>
             </>

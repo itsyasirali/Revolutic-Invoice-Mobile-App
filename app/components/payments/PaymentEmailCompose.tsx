@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, SafeAreaView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,34 +17,19 @@ const PaymentEmailCompose = () => {
         sending,
         emailData,
         availableEmails,
+        showRecipientModal,
+        newEmailInput,
+        setNewEmailInput,
+        openEmailSelector,
+        closeRecipientModal,
+        handleAddCustomEmail,
+        handleAddEmailFromList,
+        handleGoBack,
         handleSend,
-        addEmail,
         removeEmail,
         updateSubject,
         updateMessage,
-        router
     } = usePaymentEmail(paymentId as string, paymentData);
-
-    const [showRecipientModal, setShowRecipientModal] = useState(false);
-    const [addingTo, setAddingTo] = useState<'to' | 'cc' | 'bcc'>('to');
-    const [newEmailInput, setNewEmailInput] = useState('');
-
-    const openEmailSelector = (type: 'to' | 'cc' | 'bcc') => {
-        setAddingTo(type);
-        setShowRecipientModal(true);
-    };
-
-    const handleAddCustomEmail = () => {
-        if (newEmailInput.trim() && newEmailInput.includes('@')) {
-            addEmail(addingTo, newEmailInput.trim());
-            setNewEmailInput('');
-            setShowRecipientModal(false);
-        }
-    };
-
-    const handleAddEmailFromList = (email: string) => {
-        addEmail(addingTo, email);
-    };
 
     if (loading) {
         return (
@@ -60,7 +45,7 @@ const PaymentEmailCompose = () => {
                 <Text className="text-red-500 text-lg">Payment not found</Text>
                 <StandardButton
                     title="Go Back"
-                    onPress={() => router.back()}
+                    onPress={handleGoBack}
                     variant="secondary"
                     className="mt-4"
                 />
@@ -72,7 +57,7 @@ const PaymentEmailCompose = () => {
         <SafeAreaView className="flex-1 bg-white">
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <View className="flex-row items-center justify-between px-4 pt-8 py-3 border-b border-gray-100 bg-white">
-                    <Pressable onPress={() => router.back()}>
+                    <Pressable onPress={handleGoBack}>
                         <Ionicons name="arrow-back" size={24} color="#1e293b" />
                     </Pressable>
                     <Text className="text-xl font-bold text-slate-800">Email Receipt</Text>
@@ -139,12 +124,12 @@ const PaymentEmailCompose = () => {
                 {/* Email Selector Modal */}
                 <StandardModal
                     visible={showRecipientModal}
-                    onClose={() => setShowRecipientModal(false)}
+                    onClose={closeRecipientModal}
                 >
                     <View className="flex-1 p-6">
                         <View className="flex-row items-center justify-between mb-6">
                             <Text className="text-xl font-bold text-slate-800">Add Email</Text>
-                            <Pressable onPress={() => setShowRecipientModal(false)}>
+                            <Pressable onPress={closeRecipientModal}>
                                 <Ionicons name="close" size={24} color="#1e293b" />
                             </Pressable>
                         </View>
@@ -176,10 +161,7 @@ const PaymentEmailCompose = () => {
                                     {availableEmails.map((email, idx) => (
                                         <Pressable
                                             key={idx}
-                                            onPress={() => {
-                                                handleAddEmailFromList(email);
-                                                setShowRecipientModal(false);
-                                            }}
+                                            onPress={() => handleAddEmailFromList(email)}
                                             className="border-b border-gray-100 py-3.5 px-2 active:bg-slate-50 rounded-lg"
                                         >
                                             <Text className="text-slate-700 text-base">{email}</Text>

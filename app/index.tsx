@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useWelcomeScreen } from "@/hooks/common/useWelcomeScreen";
 
 const IndexScreen = () => {
-  const goToAuth = () => router.push("/auth");
+  const { handleGetStarted } = useWelcomeScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -45,7 +45,7 @@ const IndexScreen = () => {
         {/* 4. Button */}
         <View className="flex-1 justify-end pb-8">
           <Pressable
-            onPress={goToAuth}
+            onPress={handleGetStarted}
             className="w-full py-5 rounded-2xl bg-primary-light items-center justify-center shadow-sm"
           >
             <Text className="text-white font-bold text-base tracking-wide">

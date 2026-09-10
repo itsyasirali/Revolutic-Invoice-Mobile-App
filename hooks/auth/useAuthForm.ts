@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Alert, DeviceEventEmitter } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { Alert, BackHandler, DeviceEventEmitter, Keyboard } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import axios from '@/services/api';
 import { setStoredToken } from '@/utils/authToken';
@@ -13,8 +14,51 @@ export const useAuthForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const showListener = Keyboard.addListener("keyboardDidShow", () =>
+      setKeyboardVisible(true),
+    );
+    const hideListener = Keyboard.addListener("keyboardDidHide", () =>
+      setKeyboardVisible(false),
+    );
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
+
+  const handleBack = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  }, [router]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (router.canGoBack()) {
+          router.back();
+          return true;
+        }
+        Alert.alert("Exit App", "Are you sure you want to exit?", [
+          { text: "Cancel", style: "cancel" },
+          { text: "OK", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+      return () => backHandler.remove();
+    }, [router]),
+  );
 
   const resetForm = () => {
     setName('');
@@ -37,8 +81,6 @@ export const useAuthForm = () => {
         if (response.data?.token) {
           await setStoredToken(response.data.token);
         }
-        // Emit auth.changed so useProfile refetches the user, which causes
-        // the auth guard in _layout.tsx to navigate to /screens/home automatically.
         DeviceEventEmitter.emit('auth.changed');
         resetForm();
       }
@@ -59,8 +101,6 @@ export const useAuthForm = () => {
     setLoading(true);
     try {
       await axios.post('/api/auth/signup', { name, email, password });
-
-      // Automatically Log in after signup
       await handleLogin();
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Signup failed. Try again.';
@@ -77,6 +117,11 @@ export const useAuthForm = () => {
     }
   };
 
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmVisibility = () => setShowConfirm((prev) => !prev);
+  const switchToLogin = () => setIsSignup(false);
+  const switchToSignup = () => setIsSignup(true);
+
   return {
     // states
     isSignup,
@@ -87,8 +132,9 @@ export const useAuthForm = () => {
     showPassword,
     showConfirm,
     loading,
+    isKeyboardVisible,
 
-    // setters
+    // setters & actions
     setIsSignup,
     setName,
     setEmail,
@@ -96,10 +142,14 @@ export const useAuthForm = () => {
     setConfirmPassword,
     setShowPassword,
     setShowConfirm,
-
-    // actions
+    togglePasswordVisibility,
+    toggleConfirmVisibility,
+    switchToLogin,
+    switchToSignup,
+    handleBack,
     handleSubmit,
     resetForm,
     router,
   };
 };
+

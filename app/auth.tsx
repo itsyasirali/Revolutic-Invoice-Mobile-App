@@ -1,11 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import React, { useCallback, useState, useEffect } from "react";
+import React from "react";
 import {
-  Alert,
-  BackHandler,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,12 +7,12 @@ import {
   Pressable,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuthForm } from "@/hooks/auth/useAuthForm";
 import InputField from "./components/ui/InputField";
 import StandardButton from "./components/ui/StandardButton";
 
 const AuthScreen = () => {
-  const router = useRouter();
   const {
     isSignup,
     name,
@@ -28,59 +22,18 @@ const AuthScreen = () => {
     showPassword,
     showConfirm,
     loading,
-    setIsSignup,
+    isKeyboardVisible,
     setName,
     setEmail,
     setPassword,
     setConfirmPassword,
-    setShowPassword,
-    setShowConfirm,
+    togglePasswordVisibility,
+    toggleConfirmVisibility,
+    switchToLogin,
+    switchToSignup,
+    handleBack,
     handleSubmit,
   } = useAuthForm();
-
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const showListener = Keyboard.addListener("keyboardDidShow", () =>
-      setKeyboardVisible(true),
-    );
-    const hideListener = Keyboard.addListener("keyboardDidHide", () =>
-      setKeyboardVisible(false),
-    );
-    return () => {
-      showListener.remove();
-      hideListener.remove();
-    };
-  }, []);
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace("/");
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        if (router.canGoBack()) {
-          router.back();
-          return true;
-        }
-        Alert.alert("Exit App", "Are you sure you want to exit?", [
-          { text: "Cancel", style: "cancel" },
-          { text: "OK", onPress: () => BackHandler.exitApp() },
-        ]);
-        return true;
-      };
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress,
-      );
-      return () => backHandler.remove();
-    }, [router]),
-  );
 
   return (
     <View className="flex-1 bg-white pt-10">
@@ -118,7 +71,7 @@ const AuthScreen = () => {
             {/* Tab Toggle */}
             <View className="flex-row bg-gray-100 rounded-xl p-1 mb-6">
               <Pressable
-                onPress={() => setIsSignup(false)}
+                onPress={switchToLogin}
                 className={`flex-1 py-3 rounded-lg items-center ${!isSignup ? "bg-primary-light" : ""}`}
               >
                 <Text
@@ -129,7 +82,7 @@ const AuthScreen = () => {
                 </Text>
               </Pressable>
               <Pressable
-                onPress={() => setIsSignup(true)}
+                onPress={switchToSignup}
                 className={`flex-1 py-3 rounded-lg items-center ${
                   isSignup ? "bg-primary-light" : ""
                 }`}
@@ -187,7 +140,7 @@ const AuthScreen = () => {
                 />
               }
               rightIcon={
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Pressable onPress={togglePasswordVisibility}>
                   <Ionicons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
                     size={18}
@@ -225,7 +178,7 @@ const AuthScreen = () => {
                   />
                 }
                 rightIcon={
-                  <Pressable onPress={() => setShowConfirm(!showConfirm)}>
+                  <Pressable onPress={toggleConfirmVisibility}>
                     <Ionicons
                       name={showConfirm ? "eye-off-outline" : "eye-outline"}
                       size={18}
@@ -286,3 +239,4 @@ const AuthScreen = () => {
 };
 
 export default AuthScreen;
+

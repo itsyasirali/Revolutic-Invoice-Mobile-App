@@ -86,6 +86,21 @@ export const useItemList = () => {
         );
     });
 
+    const handleOpenAdd = () => {
+        setShowAddForm(true);
+    };
+
+    const handleSaveSuccess = () => {
+        setShowAddForm(false);
+        fetchItems(true);
+    };
+
+    const filterTabs = [
+        { key: 'all', label: 'All' },
+        { key: 'active', label: 'Active' },
+        { key: 'inactive', label: 'Inactive' },
+    ] as const;
+
     return {
         // State
         items,
@@ -95,6 +110,7 @@ export const useItemList = () => {
         showAddForm,
         searchQuery,
         displayItems,
+        filterTabs,
 
         // Setters
         setFilter,
@@ -105,5 +121,8 @@ export const useItemList = () => {
         refetch: () => fetchItems(true),
         handleItemPress,
         handleCancelAdd,
+        handleOpenAdd,
+        handleSaveSuccess,
     };
 };
+

@@ -6,7 +6,11 @@ import useCustomerList from '../customers/useCustomerList';
 import { PaymentFormData } from '@/types/Payment'; // Ensure this type exists or use any for now if broken
 import useTemplatesList from '../templates/useTemplatesList';
 
-const usePaymentForm = (initialPayment?: any) => {
+const usePaymentForm = (
+    initialPayment?: any,
+    onSave?: (data: any) => Promise<any>,
+    onCancel?: () => void
+) => {
     const params = useLocalSearchParams();
     const id = params.id as string || initialPayment?.id;
     const isEditMode = Boolean(id);
@@ -327,6 +331,31 @@ const usePaymentForm = (initialPayment?: any) => {
         });
     };
 
+    const customerOptions = customers.map((c: any) => ({
+        label: c.displayName || c.companyName || 'Unknown Customer',
+        value: c.id,
+        sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
+    }));
+
+    const templateOptions = templates.map((t: any) => ({
+        label: t.name || 'Unnamed Template',
+        value: t.id,
+    }));
+
+    const paymentMethods = ['Cash', 'Bank Transfer', 'Credit Card', 'Check', 'Other'];
+
+    const handleSelectCustomerOption = (opt: any) => {
+        const selected = customers.find((c: any) => c.id === opt.value);
+        if (selected) selectCustomer(selected);
+    };
+
+    const handleSelectTemplateOption = (opt: any) => {
+        handleInputChange('templateId', String(opt.value));
+    };
+
+    const handleSubmit = () => submitPayment(onSave, onCancel);
+    const handlePreview = () => previewPayment(onSave, onCancel);
+
     return {
         isEditMode,
         paymentData,
@@ -345,11 +374,17 @@ const usePaymentForm = (initialPayment?: any) => {
         setPayAllRemaining,
         isSubmitting,
         isSaving,
+        isLoading: isSubmitting || isSaving,
         filteredCustomers,
+        customerOptions,
+        templateOptions,
+        paymentMethods,
         totalApplied,
         amountInExcess,
         selectCustomer,
         clearCustomer,
+        handleSelectCustomerOption,
+        handleSelectTemplateOption,
         handlePayAllRemainingToggle,
         handleAppliedAmountChange,
         handlePayInFull,
@@ -357,6 +392,8 @@ const usePaymentForm = (initialPayment?: any) => {
         handleInputChange,
         submitPayment,
         previewPayment,
+        handleSubmit,
+        handlePreview,
         customersLoading,
         templates,
     };

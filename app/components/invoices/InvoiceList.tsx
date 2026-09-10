@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import InvoiceForm from './InvoiceForm';
-
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
 import ListPageHeader from '../ui/ListPageHeader';
@@ -18,31 +16,21 @@ const InvoiceList = () => {
         setFilter,
         searchQuery,
         setSearchQuery,
+        filterTabs,
         refreshInvoices,
         showAddForm,
-        setShowAddForm,
         showEditForm,
         editingInvoice,
-        handleCancel
+        handleCancel,
+        handleOpenAdd,
+        handleSaveSuccess,
+        handleInvoicePress,
+        getStatusStyle,
     } = useInvoiceList();
-
-    const router = useRouter();
-
-    const getStatusStyle = (status: string) => {
-        const s = status.toLowerCase();
-        switch (s) {
-            case 'paid': return { bg: 'bg-primary/10', text: 'text-primary' };
-            case 'sent': return { bg: 'bg-primary/10', text: 'text-primary' };
-            case 'draft': return { bg: 'bg-primary/10', text: 'text-primary' };
-            case 'overdue': return { bg: 'bg-red-100', text: 'text-red-700' };
-            case 'cancelled': return { bg: 'bg-red-100', text: 'text-red-700' };
-            default: return { bg: 'bg-gray-100', text: 'text-gray-700' };
-        }
-    };
 
     return (
         <View className="flex-1 bg-slate-50">
-            <ListPageHeader title="Invoices" onAddPress={() => setShowAddForm(true)} />
+            <ListPageHeader title="Invoices" onAddPress={handleOpenAdd} />
 
             {/* Search Bar */}
             <View className="px-4 py-3 bg-slate-50">
@@ -64,15 +52,7 @@ const InvoiceList = () => {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
                 >
-                    {[
-                        { key: 'all', label: 'All' },
-                        { key: 'Draft', label: 'Draft' },
-                        { key: 'Sent', label: 'Sent' },
-                        { key: 'Paid', label: 'Paid' },
-                        { key: 'Partially Paid', label: 'Partially Paid' },
-                        { key: 'Overdue', label: 'Overdue' },
-                        { key: 'Cancelled', label: 'Cancelled' },
-                    ].map((tab) => {
+                    {filterTabs.map((tab) => {
                         const isActive = filter === tab.key;
                         return (
                             <Pressable
@@ -92,7 +72,6 @@ const InvoiceList = () => {
                 </ScrollView>
             </View>
 
-            {/* List */}
             {/* List */}
             <View className="flex-1 bg-slate-50">
                 {loading && invoices.length === 0 ? (
@@ -125,17 +104,7 @@ const InvoiceList = () => {
                             const statusStyle = getStatusStyle(item.status);
                             return (
                                 <Pressable
-                                    onPress={() => {
-                                        const invoice = item as any;
-                                        const templateData = (invoice.raw?.templateId && typeof invoice.raw.templateId === 'object') ? invoice.raw.templateId : null;
-                                        router.push({
-                                            pathname: "/screens/Invoice/detail",
-                                            params: {
-                                                invoiceData: JSON.stringify(invoice.raw || invoice),
-                                                template: templateData ? JSON.stringify(templateData) : undefined
-                                            }
-                                        });
-                                    }}
+                                    onPress={() => handleInvoicePress(item)}
                                     className="bg-white rounded-xl mb-4 p-5 shadow-sm border border-slate-100"
                                 >
                                     <View className="flex-row items-center justify-between mb-3">
@@ -192,10 +161,7 @@ const InvoiceList = () => {
             <StandardModal visible={showAddForm} onClose={handleCancel}>
                 <InvoiceForm
                     onCancel={handleCancel}
-                    onSaveSuccess={() => {
-                        handleCancel();
-                        refreshInvoices();
-                    }}
+                    onSaveSuccess={handleSaveSuccess}
                 />
             </StandardModal>
 
@@ -204,15 +170,13 @@ const InvoiceList = () => {
                     <InvoiceForm
                         initialData={editingInvoice}
                         onCancel={handleCancel}
-                        onSaveSuccess={() => {
-                            handleCancel();
-                            refreshInvoices();
-                        }}
+                        onSaveSuccess={handleSaveSuccess}
                     />
                 )}
             </StandardModal>
         </View>
     );
-}
+};
 
 export default InvoiceList;
+

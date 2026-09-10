@@ -1,47 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useProfile } from '@/hooks/auth/useProfile';
-import useProfileSettings from '@/hooks/settings/useProfileSettings';
+import { useProfileSettingsForm } from '@/hooks/settings/useProfileSettingsForm';
 import InputField from '../ui/InputField';
 import StandardButton from '../ui/StandardButton';
 
 const ProfileSettings: React.FC = () => {
-  const router = useRouter();
-  const { user, loading, refetch } = useProfile();
-  const { saving, updateProfile } = useProfileSettings();
-  const insets = useSafeAreaInsets();
-
-  const [name, setName] = useState(user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || '');
-  const [email, setEmail] = useState(user?.email || '');
-
-  useEffect(() => {
-    if (user) {
-      setName(user.name || [user.firstName, user.lastName].filter(Boolean).join(' ') || '');
-      setEmail(user.email || '');
-    }
-  }, [user]);
-
-  const handleSave = async () => {
-    if (!name.trim()) {
-      Alert.alert('Error', 'Name is required');
-      return;
-    }
-    const result = await updateProfile({ name: name.trim(), email: email.trim() });
-    if (result.success) {
-      await refetch();
-      Alert.alert('Success', 'Profile updated successfully');
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace('/screens/settings');
-      }
-    } else {
-      Alert.alert('Error', result.message || 'Failed to update profile');
-    }
-  };
+  const {
+    user,
+    loading,
+    saving,
+    name,
+    setName,
+    email,
+    setEmail,
+    insets,
+    handleBack,
+    handleSave,
+  } = useProfileSettingsForm();
 
   return (
     <View className="flex-1 bg-white">
@@ -50,13 +26,7 @@ const ProfileSettings: React.FC = () => {
         style={{ paddingTop: insets.top + 12 }}
       >
         <Pressable
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/screens/settings');
-            }
-          }}
+          onPress={handleBack}
           className="w-9 h-9 rounded-full items-center justify-center active:bg-slate-100 -ml-2"
         >
           <Ionicons name="arrow-back" size={22} color="#1e293b" />

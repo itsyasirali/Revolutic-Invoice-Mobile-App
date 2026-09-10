@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Linking, Alert } from 'react-native';
 import { Customer } from '@/types/customer';
 import axios from '@/services/api';
+import useCustomerDelete from './useCustomerDelete';
 
 const useCustomerDetails = () => {
     const { customer } = useLocalSearchParams();
@@ -77,7 +78,7 @@ const useCustomerDetails = () => {
         setShowNewInvoiceForm(false);
     }, [customerData]);
 
-    // Derived sorted data for views (memoized to avoid re-sorting & mutations on every render)
+    // Derived sorted data for views
     const invoices = useMemo(() => {
         return [...(customerData?.invoices || [])].sort((a: any, b: any) => {
             const dateA = new Date(a.dueDate || a.invoiceDate || a.createdAt || a.date).getTime();
@@ -92,6 +93,42 @@ const useCustomerDetails = () => {
         );
     }, [customerData?.payments]);
 
+    const { deleteCustomer, deleteLoading } = useCustomerDelete();
+
+    const handleDelete = useCallback(() => {
+        if (!customerData) return;
+        setShowMenu(false);
+        Alert.alert(
+            "Delete Customer",
+            "Are you sure you want to delete this customer?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                        const res = await deleteCustomer(customerData.id);
+                        if (res.success) {
+                            router.back();
+                        } else {
+                            Alert.alert("Error", res.error || "Failed to delete customer");
+                        }
+                    },
+                },
+            ],
+        );
+    }, [customerData, deleteCustomer, router]);
+
+    const handleOpenEdit = useCallback(() => setShowEditForm(true), []);
+    const handleCloseEdit = useCallback(() => setShowEditForm(false), []);
+    const handleOpenNewInvoice = useCallback(() => setShowNewInvoiceForm(true), []);
+    const handleCloseNewInvoice = useCallback(() => setShowNewInvoiceForm(false), []);
+    const handleOpenMenu = useCallback(() => setShowMenu(true), []);
+    const handleCloseMenu = useCallback(() => setShowMenu(false), []);
+    const handleNavigateBack = useCallback(() => router.back(), [router]);
+    const toggleExpandMoreInfo = useCallback(() => setExpandMoreInfo(prev => !prev), []);
+    const toggleExpandContacts = useCallback(() => setExpandContacts(prev => !prev), []);
+
     return {
         // State
         customerData,
@@ -105,6 +142,7 @@ const useCustomerDetails = () => {
         firstContact,
         invoices,
         payments,
+        deleteLoading,
 
         // Setters
         setActiveTab,
@@ -120,9 +158,18 @@ const useCustomerDetails = () => {
         handleStatusToggle,
         handleCreateInvoice,
         handleEditFormCancel,
+        handleDelete,
+        handleOpenEdit,
+        handleCloseEdit,
+        handleOpenNewInvoice,
+        handleCloseNewInvoice,
+        handleOpenMenu,
+        handleCloseMenu,
+        handleNavigateBack,
+        toggleExpandMoreInfo,
+        toggleExpandContacts,
         router,
     };
 };
 
 export default useCustomerDetails;
-

@@ -168,22 +168,37 @@ export const useInvoicePreview = () => {
             pathname: '/screens/Invoice/email',
             params: {
                 invoiceId: displayInvoice.id || 'preview',
-                invoiceData: JSON.stringify(displayInvoice)
-            }
+                invoiceData: JSON.stringify(displayInvoice),
+            },
         });
     };
+
+    const handleCloseDownloadPopIn = () => {
+
+        setDownloadSuccess(false);
+    };
+
+    const handleGoBack = () => {
+        router.back();
+    };
+
+    const invoiceHTML = displayInvoice ? generateInvoiceHTML(displayInvoice, template) : '';
 
     return {
         displayInvoice,
         template,
         fetching,
         isSaving,
+        invoiceHTML,
         handleGeneratePDF,
         handleSendEmail,
         handleSaveDraft,
+        handleGoBack,
+        handleCloseDownloadPopIn,
         router,
         downloadSuccess,
         setDownloadSuccess,
         downloadFileName,
     };
 };
+

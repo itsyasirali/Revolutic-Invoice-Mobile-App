@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import usePaymentForm from '@/hooks/payments/usePaymentForm';
@@ -17,44 +17,25 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
   const {
     isEditMode,
     paymentData,
-    filteredCustomers,
-    selectCustomer,
     clearCustomer,
     payAllRemaining,
     handlePayAllRemainingToggle,
-    isSubmitting,
-    isSaving,
     unpaidInvoices,
     appliedAmounts,
     handleAppliedAmountChange,
     handlePayInFull,
-    templates,
     handleInputChange,
-    submitPayment,
-    previewPayment,
-  } = usePaymentForm(payment);
+    handleSubmit,
+    handlePreview,
+    customerOptions,
+    templateOptions,
+    paymentMethods,
+    handleSelectCustomerOption,
+    handleSelectTemplateOption,
+    isLoading: isFormLoading,
+  } = usePaymentForm(payment, onSave, onCancel);
 
-  const customerOptions = useMemo(() => {
-    return filteredCustomers.map((c: any) => ({
-      label: c.displayName || c.companyName || 'Unknown Customer',
-      value: c.id,
-      sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
-    }));
-  }, [filteredCustomers]);
-
-  const templateOptions = useMemo(() => {
-    return templates.map((t: any) => ({
-      label: t.name || 'Unnamed Template',
-      value: t.id,
-    }));
-  }, [templates]);
-
-  const onSubmit = () => submitPayment(onSave, onCancel);
-  const onPreview = () => previewPayment(onSave, onCancel);
-
-  const isLoading = loading || isSubmitting || isSaving;
-
-  const paymentMethods = ['Cash', 'Bank Transfer', 'Credit Card', 'Check', 'Other'];
+  const isActionLoading = loading || isFormLoading;
 
   return (
     <View className="flex-1 bg-slate-50">
@@ -66,8 +47,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
         <Text className="font-bold text-lg text-slate-800">
           {isEditMode ? 'Edit Payment' : 'Record Payment'}
         </Text>
-        <Pressable style={{ opacity: paymentData.customerId ? 1 : 0.3 }} onPress={() => onSubmit()} disabled={isLoading || !paymentData.customerId}>
-          {isLoading ? <ActivityIndicator size="small" color="#1AA3FF" /> : <Text className="text-primary font-bold">Save</Text>}
+        <Pressable
+          style={{ opacity: paymentData.customerId ? 1 : 0.3 }}
+          onPress={handleSubmit}
+          disabled={isActionLoading || !paymentData.customerId}
+        >
+          {isActionLoading ? (
+            <ActivityIndicator size="small" color="#1AA3FF" />
+          ) : (
+            <Text className="text-primary font-bold">Save</Text>
+          )}
         </Pressable>
       </View>
 
@@ -86,10 +75,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
             searchPlaceholder="Search customers by name, company, email..."
             value={paymentData.customerId}
             options={customerOptions}
-            onSelect={(opt) => {
-              const selected = filteredCustomers.find((c: any) => c.id === opt.value);
-              if (selected) selectCustomer(selected);
-            }}
+            onSelect={handleSelectCustomerOption}
             clearable
             onClear={clearCustomer}
             leftIcon={<Ionicons name="person-outline" size={18} color="#1AA3FF" />}
@@ -246,7 +232,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
               searchPlaceholder="Search templates..."
               value={paymentData.templateId}
               options={templateOptions}
-              onSelect={(opt) => handleInputChange('templateId', String(opt.value))}
+              onSelect={handleSelectTemplateOption}
               leftIcon={<Ionicons name="document-text-outline" size={18} color="#1AA3FF" />}
               containerStyle="mb-0"
             />
@@ -256,8 +242,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
           {/* 6. Preview Button (Bottom) */}
           <StandardButton
             title="Preview Payment"
-            onPress={onPreview}
-            disabled={isSubmitting || isSaving}
+            onPress={handlePreview}
+            disabled={isActionLoading}
             className={`mb-12 ${paymentData.customerId ? 'opacity-100' : 'opacity-30'}`}
             variant="primary"
           />

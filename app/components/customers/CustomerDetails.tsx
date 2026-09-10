@@ -4,14 +4,12 @@ import {
   Text,
   Pressable,
   Modal,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import CustomerForm from "./CustomerForm";
 import InvoiceForm from "../invoices/InvoiceForm";
 import useCustomerDetails from "@/hooks/customers/useCustomerDetails";
-import useCustomerDelete from "@/hooks/customers/useCustomerDelete";
 import CustomerInfoTab from "./CustomerInfoTab";
 import CustomerInvoicesTab from "./CustomerInvoicesTab";
 import CustomerPaymentsTab from "./CustomerPaymentsTab";
@@ -26,52 +24,35 @@ const CustomerDetails: React.FC = () => {
     activeTab,
     setActiveTab,
     showEditForm,
-    setShowEditForm,
     showNewInvoiceForm,
-    setShowNewInvoiceForm,
     showMenu,
-    setShowMenu,
     expandMoreInfo,
-    setExpandMoreInfo,
     expandContacts,
+    setExpandMoreInfo,
     setExpandContacts,
     currency,
     firstContact,
+    invoices,
+    payments,
+    deleteLoading,
     handleCall,
     handleEmail,
     handleStatusToggle,
     handleCreateInvoice,
     handleEditFormCancel,
+    handleDelete,
+    handleOpenEdit,
+    handleCloseEdit,
+    handleOpenNewInvoice,
+    handleCloseNewInvoice,
+    handleOpenMenu,
+    handleCloseMenu,
+    handleNavigateBack,
+    toggleExpandMoreInfo,
+    toggleExpandContacts,
     router,
-    invoices,
-    payments,
   } = useCustomerDetails();
 
-  const { deleteCustomer, deleteLoading } = useCustomerDelete();
-
-  const handleDelete = () => {
-    if (!customerData) return;
-    setShowMenu(false);
-    Alert.alert(
-      "Delete Customer",
-      "Are you sure you want to delete this customer?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            const res = await deleteCustomer(customerData.id);
-            if (res.success) {
-              router.back();
-            } else {
-              Alert.alert("Error", res.error || "Failed to delete customer");
-            }
-          },
-        },
-      ],
-    );
-  };
 
   if (!customerData) {
     return (
@@ -125,10 +106,11 @@ const CustomerDetails: React.FC = () => {
       {/* Top Header */}
       <DetailPageHeader
         title={customerData.displayName}
-        onBack={() => router.back()}
-        onEdit={() => setShowEditForm(true)}
-        onMenu={() => setShowMenu(true)}
+        onBack={handleNavigateBack}
+        onEdit={handleOpenEdit}
+        onMenu={handleOpenMenu}
       />
+
 
       {renderHeaderStats()}
 
@@ -172,12 +154,12 @@ const CustomerDetails: React.FC = () => {
 
       <StandardModal
         visible={showNewInvoiceForm}
-        onClose={() => setShowNewInvoiceForm(false)}
+        onClose={handleCloseNewInvoice}
       >
         <InvoiceForm
           initialData={{ customerId: customerData }}
           onSaveSuccess={handleCreateInvoice}
-          onCancel={() => setShowNewInvoiceForm(false)}
+          onCancel={handleCloseNewInvoice}
         />
       </StandardModal>
 
@@ -185,21 +167,18 @@ const CustomerDetails: React.FC = () => {
         visible={showMenu}
         transparent
         animationType="fade"
-        onRequestClose={() => setShowMenu(false)}
+        onRequestClose={handleCloseMenu}
       >
         <Pressable
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.1)" }}
-          onPress={() => setShowMenu(false)}
+          onPress={handleCloseMenu}
         >
           <View
             className="absolute right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]"
             style={{ top: insets.top + 8 }}
           >
             <Pressable
-              onPress={() => {
-                setShowMenu(false);
-                setShowNewInvoiceForm(true);
-              }}
+              onPress={handleOpenNewInvoice}
               className="flex-row items-center justify-between px-4 py-3.5 hover:bg-slate-50"
             >
               <Text className="text-base text-slate-800">New Transaction</Text>
@@ -208,13 +187,14 @@ const CustomerDetails: React.FC = () => {
 
             <Pressable
               onPress={() => {
-                setShowMenu(false);
+                handleCloseMenu();
                 handleEmail(firstContact?.email);
               }}
               className="px-4 py-3.5"
             >
               <Text className="text-base text-slate-800">Email</Text>
             </Pressable>
+
 
             <View className="h-[1px] bg-slate-100 my-1" />
 

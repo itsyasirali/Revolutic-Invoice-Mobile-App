@@ -1,52 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useProfileSettings from '@/hooks/settings/useProfileSettings';
+import { useChangePasswordForm } from '@/hooks/settings/useChangePasswordForm';
 import InputField from '../ui/InputField';
 import StandardButton from '../ui/StandardButton';
 
 const ChangePassword: React.FC = () => {
-  const router = useRouter();
-  const { saving, changePassword } = useProfileSettings();
-  const insets = useSafeAreaInsets();
-
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-
-  const handleSave = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-    if (newPassword.length < 6) {
-      Alert.alert('Error', 'New password must be at least 6 characters');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    const result = await changePassword({ currentPassword, newPassword });
-    if (result.success) {
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      Alert.alert('Success', 'Password updated successfully');
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace('/screens/settings');
-      }
-    } else {
-      Alert.alert('Error', result.message || 'Failed to change password');
-    }
-  };
+  const {
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showCurrent,
+    showNew,
+    toggleShowCurrent,
+    toggleShowNew,
+    saving,
+    insets,
+    handleBack,
+    handleSave,
+  } = useChangePasswordForm();
 
   return (
     <View className="flex-1 bg-white">
@@ -55,13 +30,7 @@ const ChangePassword: React.FC = () => {
         style={{ paddingTop: insets.top + 12 }}
       >
         <Pressable
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/screens/settings');
-            }
-          }}
+          onPress={handleBack}
           className="w-9 h-9 rounded-full items-center justify-center active:bg-slate-100 -ml-2"
         >
           <Ionicons name="arrow-back" size={22} color="#1e293b" />
@@ -77,7 +46,7 @@ const ChangePassword: React.FC = () => {
           placeholder="Enter current password"
           secureTextEntry={!showCurrent}
           rightIcon={
-            <Pressable onPress={() => setShowCurrent(!showCurrent)}>
+            <Pressable onPress={toggleShowCurrent}>
               <Ionicons name={showCurrent ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9ca3af" />
             </Pressable>
           }
@@ -90,7 +59,7 @@ const ChangePassword: React.FC = () => {
           placeholder="Enter new password"
           secureTextEntry={!showNew}
           rightIcon={
-            <Pressable onPress={() => setShowNew(!showNew)}>
+            <Pressable onPress={toggleShowNew}>
               <Ionicons name={showNew ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9ca3af" />
             </Pressable>
           }

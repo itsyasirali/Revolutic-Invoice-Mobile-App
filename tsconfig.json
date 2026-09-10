@@ -14,5 +14,10 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "hooks/templates/useCloneTemplate.ts",
+    "hooks/templates/useTemplateActions.ts",
+    "hooks/templates/useTemplateForm.ts"
   ]
 }

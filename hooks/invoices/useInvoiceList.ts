@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import axios from '@/services/api';
 import { UIInvoiceListItem } from '@/types/invoice';
 
@@ -20,7 +21,30 @@ export const removeInvoiceFromCache = (id: string) => {
     invoiceCache = invoiceCache.filter(i => i.id !== id);
 };
 
+export const INVOICE_FILTER_TABS = [
+    { key: 'all', label: 'All' },
+    { key: 'Draft', label: 'Draft' },
+    { key: 'Sent', label: 'Sent' },
+    { key: 'Paid', label: 'Paid' },
+    { key: 'Partially Paid', label: 'Partially Paid' },
+    { key: 'Overdue', label: 'Overdue' },
+    { key: 'Cancelled', label: 'Cancelled' },
+] as const;
+
+export const getInvoiceStatusStyle = (status: string) => {
+    const s = (status || '').toLowerCase();
+    switch (s) {
+        case 'paid': return { bg: 'bg-primary/10', text: 'text-primary' };
+        case 'sent': return { bg: 'bg-primary/10', text: 'text-primary' };
+        case 'draft': return { bg: 'bg-primary/10', text: 'text-primary' };
+        case 'overdue': return { bg: 'bg-red-100', text: 'text-red-700' };
+        case 'cancelled': return { bg: 'bg-red-100', text: 'text-red-700' };
+        default: return { bg: 'bg-gray-100', text: 'text-gray-700' };
+    }
+};
+
 export const useInvoiceList = () => {
+    const router = useRouter();
     // Instant initialization from memory cache
     const [invoices, setInvoices] = useState<UIInvoiceListItem[]>(invoiceCache);
     // Loader is ONLY shown on cold first launch when cache is completely empty
@@ -99,6 +123,27 @@ export const useInvoiceList = () => {
         setEditingInvoice(null);
     };
 
+    const handleOpenAdd = () => {
+        setShowAddForm(true);
+    };
+
+    const handleSaveSuccess = () => {
+        handleCancel();
+        refreshInvoices();
+    };
+
+    const handleInvoicePress = (item: UIInvoiceListItem) => {
+        const invoice = item as any;
+        const templateData = (invoice.raw?.templateId && typeof invoice.raw.templateId === 'object') ? invoice.raw.templateId : null;
+        router.push({
+            pathname: "/screens/Invoice/detail",
+            params: {
+                invoiceData: JSON.stringify(invoice.raw || invoice),
+                template: templateData ? JSON.stringify(templateData) : undefined
+            }
+        });
+    };
+
     return {
         // Data
         invoices: filteredInvoices,
@@ -111,10 +156,12 @@ export const useInvoiceList = () => {
         setFilter,
         searchQuery,
         setSearchQuery,
+        filterTabs: INVOICE_FILTER_TABS,
 
         // Actions
         refreshInvoices,
         refetch: fetchInvoices,
+        getStatusStyle: getInvoiceStatusStyle,
 
         // UI State & Actions
         showAddForm,
@@ -124,6 +171,10 @@ export const useInvoiceList = () => {
         editingInvoice,
         setEditingInvoice,
         handleEdit,
-        handleCancel
+        handleCancel,
+        handleOpenAdd,
+        handleSaveSuccess,
+        handleInvoicePress,
     };
 };
+

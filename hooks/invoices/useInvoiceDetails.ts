@@ -131,6 +131,97 @@ const useInvoiceDetails = () => {
         }
     };
 
+    const handleOpenEdit = () => {
+        setShowMenu(false);
+        setShowEditForm(true);
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditForm(false);
+    };
+
+    const handleOpenMenu = () => {
+        setShowMenu(true);
+    };
+
+    const handleCloseMenu = () => {
+        setShowMenu(false);
+    };
+
+    const handleHideDownloadPopIn = () => {
+        setDownloadSuccess(false);
+    };
+
+    const handleNavigateBack = () => {
+        router.back();
+    };
+
+    const handleOpenEmail = () => {
+        if (!invoiceData) return;
+        setShowMenu(false);
+        router.push({
+            pathname: "/screens/Invoice/email",
+            params: {
+                invoiceId: invoiceData.id,
+                invoiceData: JSON.stringify(invoiceData),
+            },
+        });
+    };
+
+    const handleOpenPreview = () => {
+        if (!invoiceData) return;
+        setShowMenu(false);
+        const templateData =
+            invoiceData.templateId && typeof invoiceData.templateId === "object"
+                ? invoiceData.templateId
+                : undefined;
+        router.push({
+            pathname: "/screens/Invoice/preview",
+            params: {
+                invoiceId: invoiceData.id,
+                invoiceData: JSON.stringify(invoiceData),
+                template: templateData ? JSON.stringify(templateData) : undefined,
+            },
+        });
+    };
+
+    const getStatusStyle = (status: string) => {
+        const s = (status || '').toLowerCase();
+        switch (s) {
+            case "paid":
+                return { bg: "bg-primary/10", text: "text-primary" };
+            case "sent":
+                return { bg: "bg-primary/10", text: "text-primary" };
+            case "draft":
+                return { bg: "bg-primary/10", text: "text-primary" };
+            case "overdue":
+                return { bg: "bg-red-100", text: "text-red-700" };
+            case "cancelled":
+                return { bg: "bg-red-100", text: "text-red-700" };
+            default:
+                return { bg: "bg-gray-100", text: "text-gray-700" };
+        }
+    };
+
+    const statusStyle = invoiceData ? getStatusStyle(invoiceData.status) : { bg: "bg-gray-100", text: "text-gray-700" };
+
+    const customerDisplayName = invoiceData ? (
+        invoiceData.customer?.displayName ||
+        invoiceData.customerDisplayName ||
+        invoiceData.customerName ||
+        (typeof invoiceData.customerId === "object" ? invoiceData.customerId?.displayName : "Unknown")
+    ) : "";
+
+    const customerInitial = customerDisplayName ? customerDisplayName.charAt(0).toUpperCase() : "C";
+
+    const customerEmail = invoiceData ? (
+        invoiceData.customer?.contacts?.[0]?.email ||
+        invoiceData.customerEmail ||
+        (typeof invoiceData.customerId === "object"
+            ? invoiceData.customerId?.email || invoiceData.customerId?.contacts?.[0]?.email
+            : "")
+    ) : "";
+
     return {
         // State
         invoiceData,
@@ -140,23 +231,38 @@ const useInvoiceDetails = () => {
         showMenu,
         expandMoreInfo,
 
+        // Status & Derived
+        downloadSuccess,
+        downloadFileName,
+        statusStyle,
+        customerDisplayName,
+        customerInitial,
+        customerEmail,
+
         // Setters
         setShowEditForm,
         setShowMenu,
         setExpandMoreInfo,
         setDownloadSuccess,
 
-        // Status
-        downloadSuccess,
-        downloadFileName,
-
         // Actions
         handleSaveSuccess,
         handleDelete,
         handleDownloadPDF,
-        router, // for back nav
+        onDownloadPress: handleDownloadPDF,
+        handleOpenEdit,
+        handleCloseEdit,
+        handleOpenMenu,
+        handleCloseMenu,
+        handleHideDownloadPopIn,
+        handleNavigateBack,
+        handleOpenEmail,
+        handleOpenPreview,
+        getStatusStyle,
+        router,
         width: useWindowDimensions().width
     };
 };
 
 export default useInvoiceDetails;
+

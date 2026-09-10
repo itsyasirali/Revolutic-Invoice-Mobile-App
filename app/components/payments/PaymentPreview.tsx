@@ -7,7 +7,7 @@ const PaymentPreview = () => {
     const {
         payment: displayPayment,
         loading: fetching,
-        generateHTML,
+        paymentHTML,
         handleGeneratePDF,
         handleEdit,
         handleSendEmailContext,
@@ -44,7 +44,7 @@ const PaymentPreview = () => {
                 </Pressable>
                 <Text className="font-bold text-lg text-slate-800">Payment Preview</Text>
                 {isDraft ? (
-                    <Pressable onPress={() => handleSave()}>
+                    <Pressable onPress={handleSave}>
                         <Text className="text-primary font-bold">Save</Text>
                     </Pressable>
                 ) : (
@@ -57,7 +57,7 @@ const PaymentPreview = () => {
             <View className="flex-1 bg-slate-50 relative">
                 <WebView
                     originWhitelist={['*']}
-                    source={{ html: generateHTML() }}
+                    source={{ html: paymentHTML }}
                     style={{ flex: 1, backgroundColor: 'transparent' }}
                     scalesPageToFit={true}
                     javaScriptEnabled={true}

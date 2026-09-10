@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import useCustomerForm from "@/hooks/customers/useCustomerForm";
 import InputField from "../ui/InputField";
 import StandardButton from "../ui/StandardButton";
 import SearchableDropdown from "../ui/SearchableDropdown";
-import currenciesData from "@/data/CurrencyData";
 
 interface CustomerFormProps {
   customer?: Customer | null;
@@ -20,10 +19,11 @@ interface CustomerFormProps {
     customerData: Partial<Customer>,
   ) => Promise<{ success: boolean; error?: string }>;
   onCancel: () => void;
+  onSaveSuccess?: () => void;
   loading?: boolean;
 }
 
-const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
+const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveSuccess }) => {
   const {
     isEditing,
     customerType,
@@ -38,8 +38,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     contactEmail,
     contactPhone,
     loading,
+    currencyOptions,
 
-    setCustomerType,
     setCompanyName,
     setDisplayName,
     setAddress,
@@ -49,19 +49,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     setContactEmail,
     setContactPhone,
 
+    handleSelectBusiness,
+    handleSelectIndividual,
     handleCurrencySelect,
     addContact,
     removeContact,
     handleSubmit,
-  } = useCustomerForm(customer, onCancel);
-
-  const currencyOptions = useMemo(() => {
-    return currenciesData.map((c) => ({
-      label: `${c.code} — ${c.name}`,
-      value: c.code,
-      badge: c.code,
-    }));
-  }, []);
+  } = useCustomerForm(customer, onSaveSuccess || onCancel);
 
 
   return (
@@ -121,7 +115,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
                     ? "bg-primary/10 border-primary"
                     : "bg-slate-50 border-slate-200"
                 }`}
-                onPress={() => setCustomerType("Business")}
+                onPress={handleSelectBusiness}
               >
                 <Text
                   className={`text-center font-semibold ${
@@ -139,7 +133,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
                     ? "bg-primary/10 border-primary"
                     : "bg-slate-50 border-slate-200"
                 }`}
-                onPress={() => setCustomerType("Individual")}
+                onPress={handleSelectIndividual}
               >
                 <Text
                   className={`text-center font-semibold ${

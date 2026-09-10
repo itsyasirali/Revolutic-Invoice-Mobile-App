@@ -58,6 +58,53 @@ export const useItemDetails = () => {
         setShowMenu(false);
     };
 
+    const handleOpenEdit = () => {
+        setShowMenu(false);
+        setShowEditForm(true);
+    };
+
+    const handleCloseEdit = () => {
+        setShowEditForm(false);
+    };
+
+    const handleOpenClone = () => {
+        setShowMenu(false);
+        setShowCloneForm(true);
+    };
+
+    const handleCloseClone = () => {
+        setShowCloneForm(false);
+    };
+
+    const handleOpenMenu = () => {
+        setShowMenu(true);
+    };
+
+    const handleCloseMenu = () => {
+        setShowMenu(false);
+    };
+
+    const handleNavigateBack = () => {
+        router.back();
+    };
+
+    const toggleExpandMoreInfo = () => {
+        setExpandMoreInfo(prev => !prev);
+    };
+
+    const handleSaveSuccess = (updatedItem: any) => {
+        if (updatedItem) setItemData(updatedItem);
+        setShowEditForm(false);
+    };
+
+    const handleCloneSuccess = () => {
+        setShowCloneForm(false);
+        router.back();
+    };
+
+    const statusColor = itemData?.status === "Active" ? "bg-green-100" : "bg-orange-100";
+    const statusTextColor = itemData?.status === "Active" ? "text-green-700" : "text-orange-700";
+
     return {
         // State
         itemData,
@@ -65,6 +112,8 @@ export const useItemDetails = () => {
         showCloneForm,
         showMenu,
         expandMoreInfo,
+        statusColor,
+        statusTextColor,
 
         // Setters
         setShowEditForm,
@@ -72,9 +121,21 @@ export const useItemDetails = () => {
         setShowMenu,
         setExpandMoreInfo,
         setItemData,
+
         // Actions
         handleStatusToggle,
         handleDelete,
+        handleOpenEdit,
+        handleCloseEdit,
+        handleOpenClone,
+        handleCloseClone,
+        handleOpenMenu,
+        handleCloseMenu,
+        handleNavigateBack,
+        toggleExpandMoreInfo,
+        handleSaveSuccess,
+        handleCloneSuccess,
         router,
     };
 };
+

@@ -1,43 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, SafeAreaView, ActivityIndicator, Modal, KeyboardAvoidingView, Platform } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useInvoiceEmail } from '@/hooks/invoices/useInvoiceEmail';
 
 const InvoiceEmailCompose = () => {
-    const params = useLocalSearchParams();
-    const invoiceId = Array.isArray(params.invoiceId) ? params.invoiceId[0] : params.invoiceId;
-    const initialData = params.invoiceData;
-
     const {
         invoice,
         loading,
         sending,
         emailData,
+        showRecipientModal,
+        newEmailInput,
+        setNewEmailInput,
+        openEmailSelector,
+        closeRecipientModal,
+        handleAddCustomEmail,
         handleSend,
-        addEmail,
         removeEmail,
         updateMessage,
         toggleAttachPDF,
-        router
-    } = useInvoiceEmail(invoiceId, initialData);
-
-    const [showRecipientModal, setShowRecipientModal] = useState(false);
-    const [newEmailInput, setNewEmailInput] = useState('');
-    const [addingTo, setAddingTo] = useState<'to' | 'cc' | 'bcc'>('to');
-
-    const openEmailSelector = (type: 'to' | 'cc' | 'bcc') => {
-        setAddingTo(type);
-        setShowRecipientModal(true);
-    };
-
-    const handleAddCustomEmail = () => {
-        if (newEmailInput.trim() && newEmailInput.includes('@')) {
-            addEmail(addingTo, newEmailInput.trim());
-            setNewEmailInput('');
-            setShowRecipientModal(false);
-        }
-    };
+        handleGoBack,
+    } = useInvoiceEmail();
 
     if (loading) {
         return (
@@ -54,7 +37,7 @@ const InvoiceEmailCompose = () => {
             <SafeAreaView className="flex-1 bg-white">
                 <View className="flex-1 justify-center items-center p-4">
                     <Text className="text-red-500 text-lg">Invoice not found</Text>
-                    <Pressable onPress={() => router.back()} className="mt-4 bg-gray-200 p-3 rounded-lg">
+                    <Pressable onPress={handleGoBack} className="mt-4 bg-gray-200 p-3 rounded-lg">
                         <Text>Go Back</Text>
                     </Pressable>
                 </View>
@@ -67,9 +50,10 @@ const InvoiceEmailCompose = () => {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 {/* Header */}
                 <View className="flex-row items-center justify-between px-4 pt-8 py-3 border-b border-gray-200">
-                    <Pressable onPress={() => router.back()}>
+                    <Pressable onPress={handleGoBack}>
                         <Ionicons name="arrow-back" size={24} color="#000" />
                     </Pressable>
+
                     <Text className="text-xl font-bold">Email</Text>
                     <Pressable onPress={handleSend} disabled={sending}>
                         {sending ? (
@@ -199,16 +183,17 @@ const InvoiceEmailCompose = () => {
                     visible={showRecipientModal}
                     transparent
                     animationType="slide"
-                    onRequestClose={() => setShowRecipientModal(false)}
+                    onRequestClose={closeRecipientModal}
                 >
                     <View className="flex-1 justify-end bg-black/50">
                         <View className="bg-white rounded-t-3xl p-6" style={{ maxHeight: '80%' }}>
                             <View className="flex-row items-center justify-between mb-4">
                                 <Text className="text-xl font-bold">Add Email</Text>
-                                <Pressable onPress={() => setShowRecipientModal(false)}>
+                                <Pressable onPress={closeRecipientModal}>
                                     <Ionicons name="close" size={24} color="#000" />
                                 </Pressable>
                             </View>
+
 
                             {/* Custom Email Input */}
                             <View className="mb-4">

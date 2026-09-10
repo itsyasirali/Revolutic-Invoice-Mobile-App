@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useRouter } from 'expo-router';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 
 export interface InvoiceDisplayItem {
@@ -79,9 +80,34 @@ const useRecentInvoices = (overrides?: {
   }, [allInvoices, overrides?.invoices]);
 
 
+  const router = useRouter();
+
+  const handleInvoicePress = (inv: InvoiceDisplayItem) => {
+    const rawData = inv.raw || inv;
+    const templateData =
+      rawData?.templateId && typeof rawData.templateId === "object"
+        ? rawData.templateId
+        : null;
+
+    router.push({
+      pathname: "/screens/Invoice/detail",
+      params: {
+        invoiceData: JSON.stringify(rawData),
+        id: inv.id,
+        template: templateData ? JSON.stringify(templateData) : undefined,
+      },
+    });
+  };
+
+  const handleViewAll = () => {
+    router.push("/screens/Invoice/invoices" as any);
+  };
+
   return {
     invoices,
     loading,
+    handleInvoicePress,
+    handleViewAll,
   };
 };
 

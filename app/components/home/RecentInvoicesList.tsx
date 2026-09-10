@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import useRecentInvoices, { InvoiceDisplayItem } from "@/hooks/dashboard/useRecentInvoices";
 
 export type { InvoiceDisplayItem };
@@ -12,24 +11,7 @@ interface RecentInvoicesListProps {
 }
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
-  const { invoices, loading } = useRecentInvoices(props);
-
-  const handleInvoicePress = (inv: InvoiceDisplayItem) => {
-    const rawData = inv.raw || inv;
-    const templateData =
-      rawData?.templateId && typeof rawData.templateId === "object"
-        ? rawData.templateId
-        : null;
-
-    router.push({
-      pathname: "/screens/Invoice/detail",
-      params: {
-        invoiceData: JSON.stringify(rawData),
-        id: inv.id,
-        template: templateData ? JSON.stringify(templateData) : undefined,
-      },
-    });
-  };
+  const { invoices, loading, handleInvoicePress, handleViewAll } = useRecentInvoices(props);
 
   return (
     <View className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
@@ -39,7 +21,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
           Recent Invoices
         </Text>
         <Pressable
-          onPress={() => router.push("/screens/Invoice/invoices" as any)}
+          onPress={handleViewAll}
           className="flex-row items-center"
         >
           <Text style={{ color: "#1AA3FF" }} className="font-semibold text-[13px] mr-1">

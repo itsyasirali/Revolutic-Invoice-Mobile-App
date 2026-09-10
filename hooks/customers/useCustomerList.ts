@@ -93,7 +93,20 @@ const useCustomerList = () => {
         });
     }, [filteredCustomers, searchQuery]);
 
-    const refetch = useCallback(() => fetchCustomers(true), [fetchCustomers]);
+    const handleOpenAdd = useCallback(() => {
+        setShowAddForm(true);
+    }, []);
+
+    const handleSaveSuccess = useCallback(() => {
+        setShowAddForm(false);
+        fetchCustomers(true);
+    }, [fetchCustomers]);
+
+    const filterTabs = [
+        { key: 'all', label: 'All' },
+        { key: 'active', label: 'Active' },
+        { key: 'inactive', label: 'Inactive' },
+    ] as const;
 
     return {
         // State
@@ -104,6 +117,7 @@ const useCustomerList = () => {
         showAddForm,
         searchQuery,
         displayCustomers,
+        filterTabs,
 
         // Setters
         setFilter,
@@ -111,12 +125,16 @@ const useCustomerList = () => {
         setSearchQuery,
 
         // Actions
-        refetch,
+        refetch: () => fetchCustomers(true),
+        fetchCustomers,
         handleCustomerPress,
         handleCancelAdd,
+        handleOpenAdd,
+        handleSaveSuccess,
     };
 };
 
 export default useCustomerList;
+
 
 

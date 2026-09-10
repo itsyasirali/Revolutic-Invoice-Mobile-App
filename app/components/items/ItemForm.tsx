@@ -13,12 +13,16 @@ interface ItemFormProps {
   item?: Item | null;
   onSave?: (itemData: Partial<Item>) => Promise<{ success: boolean; error?: string }>;
   onCancel: () => void;
+  onSuccess?: (item?: any) => void;
+  onSaveSuccess?: () => void;
   loading?: boolean;
 }
 
 const ItemForm: React.FC<ItemFormProps> = ({
   item,
   onCancel,
+  onSuccess,
+  onSaveSuccess,
 }) => {
   const {
     isEditing,
@@ -27,6 +31,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
     unit,
     sellingPrice,
     loading,
+    units,
 
     setName,
     setDescription,
@@ -34,11 +39,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
     setSellingPrice,
 
     handleSubmit,
-  } = useItemForm(item, onCancel);
-
-
-
-  const units = ["Hour", "Daily", "Monthly", "Project Base", "Contract"];
+  } = useItemForm(item, onSaveSuccess || onSuccess || onCancel);
 
   return (
     <View className="flex-1 bg-slate-50">

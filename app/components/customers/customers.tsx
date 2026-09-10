@@ -14,18 +14,21 @@ const CustomerList = () => {
     filter,
     setFilter,
     showAddForm,
-    setShowAddForm,
     searchQuery,
     setSearchQuery,
     displayCustomers,
+    filterTabs,
     refetch,
     handleCustomerPress,
     handleCancelAdd,
+    handleOpenAdd,
+    handleSaveSuccess,
   } = useCustomerList();
 
   return (
     <View className="flex-1 bg-slate-50">
-      <ListPageHeader title="Customers" onAddPress={() => setShowAddForm(true)} />
+      <ListPageHeader title="Customers" onAddPress={handleOpenAdd} />
+
 
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-50">
@@ -47,12 +50,9 @@ const CustomerList = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
         >
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'active', label: 'Active' },
-            { key: 'inactive', label: 'Inactive' },
-          ].map((tab) => {
+          {filterTabs.map((tab) => {
             const isActive = filter === tab.key;
+
             return (
               <Pressable
                 key={tab.key}
@@ -165,11 +165,10 @@ const CustomerList = () => {
       >
         <CustomerForm
           customer={null}
-          onCancel={() => {
-            handleCancelAdd();
-            refetch();
-          }}
+          onCancel={handleCancelAdd}
+          onSaveSuccess={handleSaveSuccess}
         />
+
       </StandardModal>
     </View>
   );

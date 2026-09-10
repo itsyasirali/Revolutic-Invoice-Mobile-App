@@ -1,10 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useProfile } from '@/hooks/auth/useProfile';
-import { useLogout } from '@/hooks/auth/useLogout';
+import { useSettingsScreen } from '@/hooks/settings/useSettingsScreen';
 
 interface SettingsRowProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -46,13 +43,18 @@ const SectionCard: React.FC<{ title: string; children: React.ReactNode }> = ({ t
 );
 
 const Settings: React.FC = () => {
-  const router = useRouter();
-  const { user, loading } = useProfile();
-  const { logout, loading: loggingOut } = useLogout();
-  const insets = useSafeAreaInsets();
-
-  const displayName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'User';
-  const userInitial = displayName.charAt(0).toUpperCase();
+  const {
+    user,
+    loading,
+    loggingOut,
+    displayName,
+    userInitial,
+    insets,
+    handleBack,
+    handleGoProfile,
+    handleGoPassword,
+    handleLogout,
+  } = useSettingsScreen();
 
   return (
     <View className="flex-1 bg-slate-50">
@@ -62,13 +64,7 @@ const Settings: React.FC = () => {
         style={{ paddingTop: insets.top + 12 }}
       >
         <Pressable
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/screens/home');
-            }
-          }}
+          onPress={handleBack}
           className="w-9 h-9 rounded-full items-center justify-center active:bg-slate-100 -ml-2"
         >
           <Ionicons name="arrow-back" size={22} color="#1e293b" />
@@ -84,7 +80,7 @@ const Settings: React.FC = () => {
         <ScrollView className="flex-1 px-4 pt-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
           {/* Profile card */}
           <Pressable
-            onPress={() => router.push('/screens/settings/profile')}
+            onPress={handleGoProfile}
             className="flex-row items-center bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6 active:bg-slate-50"
           >
             <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-3">
@@ -104,13 +100,13 @@ const Settings: React.FC = () => {
               icon="person-outline"
               title="Profile Information"
               subtitle="Update your name, email and contact"
-              onPress={() => router.push('/screens/settings/profile')}
+              onPress={handleGoProfile}
             />
             <SettingsRow
               icon="lock-closed-outline"
               title="Change Password"
               subtitle="Update your account password"
-              onPress={() => router.push('/screens/settings/password')}
+              onPress={handleGoPassword}
             />
           </SectionCard>
 
@@ -119,7 +115,7 @@ const Settings: React.FC = () => {
               icon="log-out-outline"
               title="Logout"
               subtitle="Sign out from your account"
-              onPress={logout}
+              onPress={handleLogout}
               loading={loggingOut}
               danger
             />

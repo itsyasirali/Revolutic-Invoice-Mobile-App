@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import { Alert } from 'react-native';
@@ -107,6 +107,11 @@ const usePaymentPreview = () => {
 
     const goBack = () => router.back();
 
+    const paymentHTML = useMemo(() => {
+        if (!payment) return "";
+        return generatePaymentHTML(payment, template);
+    }, [payment, template]);
+
     const isDraft = !payment?.id || payment.id === 'preview';
 
     return {
@@ -114,10 +119,11 @@ const usePaymentPreview = () => {
         template,
         loading,
         isDraft,
-        generateHTML: () => generatePaymentHTML(payment, template),
+        paymentHTML,
+        generateHTML: () => paymentHTML,
         handleGeneratePDF,
         handleEdit,
-        handleSave,
+        handleSave: () => handleSave(),
         handleSendEmailContext,
         goBack
     };

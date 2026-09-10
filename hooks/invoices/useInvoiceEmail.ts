@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Alert, Keyboard } from 'react-native';
 import axios from '@/services/api';
 import { useProfile } from '@/hooks/auth/useProfile';
@@ -14,8 +14,11 @@ export interface EmailData {
     attachPDF: boolean;
 }
 
-export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
+export const useInvoiceEmail = (passedInvoiceId?: string, passedInitialData?: any) => {
     const router = useRouter();
+    const params = useLocalSearchParams();
+    const invoiceId = passedInvoiceId || (Array.isArray(params.invoiceId) ? params.invoiceId[0] : params.invoiceId);
+    const initialData = passedInitialData !== undefined ? passedInitialData : params.invoiceData;
     const { user } = useProfile();
 
     const [invoice, setInvoice] = useState<any>(null);
@@ -34,19 +37,21 @@ export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
 
     const [availableEmails, setAvailableEmails] = useState<string[]>([]);
 
+    // Recipient Modal State
+    const [showRecipientModal, setShowRecipientModal] = useState(false);
+    const [newEmailInput, setNewEmailInput] = useState('');
+    const [addingTo, setAddingTo] = useState<'to' | 'cc' | 'bcc'>('to');
 
     // Initialize data
     useEffect(() => {
         const initialize = async () => {
             let data = initialData;
 
-            // If initial data is string (from params), parse it
             if (typeof data === 'string') {
                 try {
                     data = JSON.parse(data);
                 } catch (e) {
                     console.error("Failed to parse initial invoice data", e);
-                    // Don't set data to null yet, might still want to try fetch if ID exists
                 }
             }
 
@@ -64,12 +69,12 @@ export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
 
             try {
                 const response = await axios.get(`/api/invoices/${invoiceId}`);
-                data = response.data;
-                setInvoice(data);
-                prepareEmailData(data);
+                const inv = response.data?.invoice || response.data;
+                setInvoice(inv);
+                prepareEmailData(inv);
             } catch (error) {
-                console.error('Error fetching invoice:', error);
-                Alert.alert('Error', 'Failed to load invoice data');
+                console.error("Failed to fetch invoice details for email", error);
+                Alert.alert("Error", "Failed to load invoice details");
             } finally {
                 setLoading(false);
             }
@@ -88,6 +93,7 @@ export const useInvoiceEmail = (invoiceId: string, initialData?: any) => {
         if (invoiceData.customerEmail) {
             allCustomerEmails.push(invoiceData.customerEmail);
         }
+
 
         // 2. Check customer object email
         if (invoiceData.customerId?.email && !allCustomerEmails.includes(invoiceData.customerId.email)) {
@@ -253,17 +259,54 @@ ${companyName}`;
         setEmailData(prev => ({ ...prev, attachPDF: !prev.attachPDF }));
     };
 
+    const openEmailSelector = (type: 'to' | 'cc' | 'bcc') => {
+        setAddingTo(type);
+        setShowRecipientModal(true);
+    };
+
+    const closeRecipientModal = () => {
+        setShowRecipientModal(false);
+    };
+
+    const handleAddCustomEmail = () => {
+        if (newEmailInput.trim() && newEmailInput.includes('@')) {
+            addEmail(addingTo, newEmailInput.trim());
+            setNewEmailInput('');
+            setShowRecipientModal(false);
+        }
+    };
+
+    const handleAddEmailFromList = (email: string) => {
+        addEmail(addingTo, email);
+    };
+
+    const handleGoBack = () => {
+        router.back();
+    };
+
     return {
         invoice,
         loading,
         sending,
         emailData,
         availableEmails,
+        showRecipientModal,
+        setShowRecipientModal,
+        newEmailInput,
+        setNewEmailInput,
+        addingTo,
+        setAddingTo,
+        openEmailSelector,
+        closeRecipientModal,
+        handleAddCustomEmail,
+        handleAddEmailFromList,
         handleSend,
         addEmail,
         removeEmail,
         updateMessage,
         toggleAttachPDF,
+        handleGoBack,
         router
     };
 };
+

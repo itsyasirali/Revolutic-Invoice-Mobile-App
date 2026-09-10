@@ -22,18 +22,21 @@ const ItemList: React.FC = () => {
     filter,
     setFilter,
     showAddForm,
-    setShowAddForm,
     searchQuery,
     setSearchQuery,
     displayItems,
+    filterTabs,
     refetch,
     handleItemPress,
     handleCancelAdd,
+    handleOpenAdd,
+    handleSaveSuccess,
   } = useItemList();
 
   return (
     <View className="flex-1 bg-slate-50">
-      <ListPageHeader title="Items" onAddPress={() => setShowAddForm(true)} />
+      <ListPageHeader title="Items" onAddPress={handleOpenAdd} />
+
 
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-50">
@@ -55,12 +58,9 @@ const ItemList: React.FC = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
         >
-          {[
-            { key: "all", label: "All" },
-            { key: "active", label: "Active" },
-            { key: "inactive", label: "Inactive" },
-          ].map((tab) => {
+          {filterTabs.map((tab) => {
             const isActive = filter === tab.key;
+
             return (
               <Pressable
                 key={tab.key}
@@ -170,10 +170,8 @@ const ItemList: React.FC = () => {
         onClose={handleCancelAdd}
       >
         <ItemForm
-          onCancel={() => {
-            handleCancelAdd();
-            refetch();
-          }}
+          onCancel={handleCancelAdd}
+          onSaveSuccess={handleSaveSuccess}
         />
       </StandardModal>
     </View>
@@ -181,3 +179,4 @@ const ItemList: React.FC = () => {
 };
 
 export default ItemList;
+

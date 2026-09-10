@@ -165,6 +165,17 @@ const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void)
         }
     };
 
+    const currencyOptions = useMemo(() => {
+        return currenciesData.map((c) => ({
+            label: `${c.code} — ${c.name}`,
+            value: c.code,
+            badge: c.code,
+        }));
+    }, []);
+
+    const handleSelectBusiness = () => setCustomerType('Business');
+    const handleSelectIndividual = () => setCustomerType('Individual');
+
     return {
         // State
         isEditing,
@@ -184,6 +195,7 @@ const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void)
         currencyQuery,
         filteredCurrencies,
         currencyInputRef,
+        currencyOptions,
 
         // Setters
         setCustomerType,
@@ -200,6 +212,8 @@ const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void)
         setShowCurrencyDropdown,
 
         // Actions
+        handleSelectBusiness,
+        handleSelectIndividual,
         handleCurrencySelect,
         addContact,
         removeContact,
@@ -208,3 +222,4 @@ const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void)
 };
 
 export default useCustomerForm;
+

@@ -167,12 +167,51 @@ ${companyName}`;
         setEmailData(prev => ({ ...prev, message: text }));
     };
 
+    const [showRecipientModal, setShowRecipientModal] = useState(false);
+    const [addingTo, setAddingTo] = useState<'to' | 'cc' | 'bcc'>('to');
+    const [newEmailInput, setNewEmailInput] = useState('');
+
+    const openEmailSelector = (type: 'to' | 'cc' | 'bcc') => {
+        setAddingTo(type);
+        setShowRecipientModal(true);
+    };
+
+    const closeRecipientModal = () => {
+        setShowRecipientModal(false);
+    };
+
+    const handleAddCustomEmail = () => {
+        if (newEmailInput.trim() && newEmailInput.includes('@')) {
+            addEmail(addingTo, newEmailInput.trim());
+            setNewEmailInput('');
+            setShowRecipientModal(false);
+        }
+    };
+
+    const handleAddEmailFromList = (email: string) => {
+        addEmail(addingTo, email);
+        setShowRecipientModal(false);
+    };
+
+    const handleGoBack = () => {
+        router.back();
+    };
+
     return {
         payment,
         loading,
         sending,
         emailData,
         availableEmails,
+        showRecipientModal,
+        setShowRecipientModal,
+        newEmailInput,
+        setNewEmailInput,
+        openEmailSelector,
+        closeRecipientModal,
+        handleAddCustomEmail,
+        handleAddEmailFromList,
+        handleGoBack,
         handleSend,
         addEmail,
         removeEmail,

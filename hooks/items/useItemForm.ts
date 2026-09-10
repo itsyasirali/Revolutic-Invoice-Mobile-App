@@ -3,7 +3,9 @@ import { Alert } from 'react-native';
 import { Item } from '@/types/items';
 import axios from '@/services/api';
 
-export const useItemForm = (item?: Item | null, onSaveSuccess?: () => void) => {
+export const ITEM_UNITS = ["Hour", "Daily", "Monthly", "Project Base", "Contract"];
+
+export const useItemForm = (item?: Item | null, onSaveSuccess?: (item?: any) => void) => {
     const isEditing = !!(item && item.id);
 
     // Form State
@@ -72,7 +74,7 @@ export const useItemForm = (item?: Item | null, onSaveSuccess?: () => void) => {
 
         if (result.success) {
             Alert.alert('Success', isEditing ? 'Item updated successfully' : 'Item created successfully');
-            if (onSaveSuccess) onSaveSuccess();
+            if (onSaveSuccess) onSaveSuccess(result.item);
         } else {
             Alert.alert('Error', result.error || 'Failed to save item');
         }
@@ -88,6 +90,7 @@ export const useItemForm = (item?: Item | null, onSaveSuccess?: () => void) => {
         unit,
         sellingPrice,
         loading,
+        units: ITEM_UNITS,
 
         // Setters
         setName,
