@@ -1,9 +1,10 @@
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import usePaymentForm from '@/hooks/payments/usePaymentForm';
 import InputField from '../ui/InputField';
 import StandardButton from '../ui/StandardButton';
+import SearchableDropdown from '../ui/SearchableDropdown';
 
 interface PaymentFormProps {
   payment?: any;
@@ -32,6 +33,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
     submitPayment,
     previewPayment,
   } = usePaymentForm(payment);
+
+  const customerOptions = useMemo(() => {
+    return filteredCustomers.map((c: any) => ({
+      label: c.displayName || c.companyName || 'Unknown Customer',
+      value: c.id,
+      sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
+    }));
+  }, [filteredCustomers]);
+
+  const templateOptions = useMemo(() => {
+    return templates.map((t: any) => ({
+      label: t.name || 'Unnamed Template',
+      value: t.id,
+    }));
+  }, [templates]);
 
   const onSubmit = () => submitPayment(onSave, onCancel);
   const onPreview = () => previewPayment(onSave, onCancel);
@@ -64,35 +80,25 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
 
         {/* 1. Customer Selection */}
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm">
-          <Text className="font-bold text-base mb-3 text-slate-800">
-            Customer *
-          </Text>
-          <View className="bg-slate-50 rounded-lg border border-slate-200 mb-3">
-            <Picker
-              selectedValue={paymentData.customerId}
-              onValueChange={(itemValue) => {
-                if (itemValue === "") {
-                  clearCustomer();
-                  return;
-                }
-                const selected = filteredCustomers.find((c: any) => c.id === itemValue);
-                if (selected) selectCustomer(selected);
-              }}
-            >
-              <Picker.Item label="Select Customer" value="" color="#94a3b8" />
-              {filteredCustomers.map((customer: any) => (
-                <Picker.Item
-                  key={customer.id || Math.random().toString()}
-                  label={customer.displayName || customer.companyName || 'Unknown Customer'}
-                  value={customer.id || ''}
-                  color={paymentData.customerId === customer.id ? "#1AA3FF" : "#334155"}
-                />
-              ))}
-            </Picker>
-          </View>
+          <SearchableDropdown
+            label="Customer *"
+            placeholder="Select Customer..."
+            searchPlaceholder="Search customers by name, company, email..."
+            value={paymentData.customerId}
+            options={customerOptions}
+            onSelect={(opt) => {
+              const selected = filteredCustomers.find((c: any) => c.id === opt.value);
+              if (selected) selectCustomer(selected);
+            }}
+            clearable
+            onClear={clearCustomer}
+            leftIcon={<Ionicons name="person-outline" size={18} color="#1AA3FF" />}
+            containerStyle="mb-0"
+          />
         </View>
 
         <View pointerEvents={paymentData.customerId ? 'auto' : 'none'}>
+
           {/* 2. Payment Details */}
           <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-xl mb-4 shadow-sm">
             <Text className="font-bold text-base mb-3 text-slate-800">Payment Details</Text>
@@ -234,19 +240,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
 
           {/* 5. Template */}
           <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-xl mb-4 shadow-sm">
-            <Text className="font-bold text-base mb-3 text-slate-800">Template</Text>
-            <View className="bg-slate-50 rounded-lg border border-slate-200">
-              <Picker
-                selectedValue={paymentData.templateId}
-                onValueChange={(itemValue) => handleInputChange('templateId', itemValue)}
-              >
-                <Picker.Item label="Select Template" value="" color="#94a3b8" />
-                {templates.map((template: any) => (
-                  <Picker.Item key={template.id || Math.random().toString()} label={template.name || 'Unnamed Template'} value={template.id || ''} />
-                ))}
-              </Picker>
-            </View>
+            <SearchableDropdown
+              label="Template"
+              placeholder="Select Template..."
+              searchPlaceholder="Search templates..."
+              value={paymentData.templateId}
+              options={templateOptions}
+              onSelect={(opt) => handleInputChange('templateId', String(opt.value))}
+              leftIcon={<Ionicons name="document-text-outline" size={18} color="#1AA3FF" />}
+              containerStyle="mb-0"
+            />
           </View>
+
 
           {/* 6. Preview Button (Bottom) */}
           <StandardButton

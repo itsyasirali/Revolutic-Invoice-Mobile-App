@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useInvoiceForm } from '@/hooks/invoices/useInvoiceForm';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import InputField from '../ui/InputField';
+import SearchableDropdown from '../ui/SearchableDropdown';
 import useCustomerList from '@/hooks/customers/useCustomerList';
 import { useItemList } from '@/hooks/items/useItemList';
 import useTemplatesList from '@/hooks/templates/useTemplatesList';
@@ -38,6 +38,30 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
   const { items: itemOptions } = useItemList();
   const { templates } = useTemplatesList();
 
+  const customerOptions = useMemo(() => {
+    return customers.map(c => ({
+      label: c.displayName || c.companyName || 'Unknown Customer',
+      value: c.id,
+      sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
+    }));
+  }, [customers]);
+
+  const itemDropdownOptions = useMemo(() => {
+    return itemOptions.map(i => ({
+      label: i.name || 'Unnamed Item',
+      value: i.id,
+      sublabel: i.sellingPrice ? `Price: PKR ${i.sellingPrice} | Unit: ${i.unit || '-'}` : undefined,
+    }));
+  }, [itemOptions]);
+
+  const templateOptions = useMemo(() => {
+    return templates.map(t => ({
+      label: t.name || 'Unnamed Template',
+      value: t.id,
+      sublabel: t.paperSize ? `Paper: ${t.paperSize} | ${t.orientation || 'portrait'}` : undefined,
+    }));
+  }, [templates]);
+
   const [showInvoiceDatePicker, setShowInvoiceDatePicker] = useState(false);
   const [showDueDatePicker, setShowDueDatePicker] = useState(false);
 
@@ -52,88 +76,88 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
     }
   };
 
-
-
-
   const handlePreview = () => {
     if (!customer) {
       Alert.alert("Validation Error", "Please select a customer before previewing the invoice.");
       return;
     }
-    try {
-      const payload = preparePayload();
-      const previewData = {
-        ...payload,
-        id: initialData?.id || 'preview',
-        customerId: customer, // Pass full object for preview to access contacts
-        customerName: customer?.displayName,
-        customerEmail: customer?.email,
-        customerPhone: customer?.phone,
-        customerAddress: customer?.address,
-        customerCurrency: customer?.currency,
-        previousRemaining: previousDue,
-      };
 
-      const selectedTemplate = templates.find(t => String(t.id) === String(templateId));
+    const payload = preparePayload();
+    if (!payload) return;
 
-      router.push({
-        pathname: '/screens/Invoice/preview',
-        params: {
-          invoiceData: JSON.stringify(previewData),
-          template: selectedTemplate?.raw ? JSON.stringify(selectedTemplate.raw) : (selectedTemplate ? JSON.stringify(selectedTemplate) : undefined)
-        },
-      });
-    } catch {
-      // Navigation failed
-    }
+    const previewInvoiceData = {
+      ...payload,
+      id: initialData?.id || "preview-temp-id",
+      invoiceNumber: invoiceNumber,
+      invoiceDate: invoiceDate,
+      dueDate: dueDate,
+      customer: customer,
+      templateId: templateId || undefined,
+    };
+
+    router.push({
+      pathname: "/screens/Invoice/preview",
+      params: {
+        invoiceData: JSON.stringify(previewInvoiceData),
+        templateId: templateId || undefined,
+      },
+    });
   };
 
   return (
     <View className="flex-1 bg-slate-50">
-      <View className="bg-white border-b border-slate-200 px-4 py-5 flex-row justify-between items-center z-10">
+      <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10">
         <Pressable onPress={onCancel}>
-          <Text className="text-primary font-semibold">Cancel</Text>
+          <Text className="text-primary font-semibold text-base">Cancel</Text>
         </Pressable>
         <Text className="font-bold text-lg text-slate-800">
-          {initialData ? 'Edit Invoice' : 'New Invoice'}
+          {initialData ? "Edit Invoice" : "Create Invoice"}
         </Text>
-        <Pressable style={{ opacity: customer ? 1 : 0.3 }} onPress={() => handleSubmit('Draft')} disabled={loading || !customer}>
-          {loading ? <ActivityIndicator size="small" color="#1AA3FF" /> : <Text className="text-primary font-bold">Save</Text>}
+        <Pressable onPress={() => handleSubmit()} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#1AA3FF" />
+          ) : (
+            <Text className="text-primary font-bold text-base">Save</Text>
+          )}
         </Pressable>
+
       </View>
 
       <ScrollView
-        className="flex-1 p-4"
+        className="flex-1 px-4 py-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 36 }}
       >
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
-          <Text className="font-bold text-base mb-3 text-slate-800">
-            Invoice Details
-          </Text>
-
           <InputField
             label="Invoice Number"
             value={invoiceNumber}
             onChangeText={setInvoiceNumber}
-            placeholder="Invoice Number"
+            placeholder="INV-0001"
             containerStyle="mb-3"
           />
 
-          <View className="flex-row gap-3">
+          <View className="flex-row gap-3 mb-1">
             <Pressable onPress={() => setShowInvoiceDatePicker(true)} className="flex-1">
-              <Text className="text-sm font-semibold mb-2 text-slate-800">Date</Text>
-              <View className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <Text className="text-slate-800">{invoiceDate}</Text>
-              </View>
+              <InputField
+                label="Invoice Date"
+                value={invoiceDate}
+                editable={false}
+                placeholder="YYYY-MM-DD"
+                containerStyle="mb-0"
+                rightIcon={<Ionicons name="calendar-outline" size={20} color="#94a3b8" />}
+              />
             </Pressable>
 
             <Pressable onPress={() => setShowDueDatePicker(true)} className="flex-1">
-              <Text className="text-sm font-semibold mb-2 text-slate-800">Due Date</Text>
-              <View className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <Text className="text-slate-800">{dueDate}</Text>
-              </View>
+              <InputField
+                label="Due Date"
+                value={dueDate}
+                editable={false}
+                placeholder="YYYY-MM-DD"
+                containerStyle="mb-0"
+                rightIcon={<Ionicons name="calendar-outline" size={20} color="#94a3b8" />}
+              />
             </Pressable>
           </View>
 
@@ -146,17 +170,22 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         </View>
 
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
-          <Text className="font-bold text-base mb-3 text-slate-800">Customer</Text>
-          <View className="bg-slate-50 rounded-xl border border-slate-200 mb-3 overflow-hidden">
-            <Picker selectedValue={customer?.id} onValueChange={(val) => {
-              const c = customers.find(cus => cus.id === val);
+          <SearchableDropdown
+            label="Customer *"
+            placeholder="Select Customer..."
+            searchPlaceholder="Search customers by name, company..."
+            value={customer?.id || ''}
+            options={customerOptions}
+            onSelect={(opt) => {
+              const c = customers.find(cus => String(cus.id) === String(opt.value));
               if (c) setCustomer(c);
               else setCustomer(null);
-            }}>
-              <Picker.Item label="Select Customer" value="" color="#94a3b8" />
-              {customers.map(c => <Picker.Item key={c.id || Math.random().toString()} label={c.displayName || 'Unknown Customer'} value={c.id || ''} style={{ fontSize: 14 }} />)}
-            </Picker>
-          </View>
+            }}
+            clearable
+            onClear={() => setCustomer(null)}
+            leftIcon={<Ionicons name="person-outline" size={18} color="#1AA3FF" />}
+            containerStyle="mb-0"
+          />
         </View>
 
         <View className="mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
@@ -168,12 +197,15 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
               </View>
 
               <Text className="text-xs font-semibold text-slate-500 mb-1">Item</Text>
-              <View className="bg-slate-50 rounded-xl border border-slate-200 mb-2 overflow-hidden">
-                <Picker selectedValue={item.itemId} onValueChange={(value) => handleItemSelect(item.id, value, itemOptions)}>
-                  <Picker.Item label="Select Item" value="" color="#94a3b8" />
-                  {itemOptions.map(i => <Picker.Item key={i.id || Math.random().toString()} label={i.name || 'Unnamed Item'} value={i.id || ''} style={{ fontSize: 14 }} />)}
-                </Picker>
-              </View>
+              <SearchableDropdown
+                placeholder="Select Item..."
+                searchPlaceholder="Search items..."
+                value={item.itemId || ''}
+                options={itemDropdownOptions}
+                onSelect={(opt) => handleItemSelect(item.id, String(opt.value), itemOptions)}
+                containerStyle="mb-2"
+                leftIcon={<Ionicons name="cube-outline" size={18} color="#1AA3FF" />}
+              />
 
               <View className="flex-row gap-3 mb-2">
                 <View className="flex-1">
@@ -235,13 +267,16 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         </View>
 
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
-          <Text className="font-bold text-base mb-3 text-slate-800">Template</Text>
-          <View className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-            <Picker selectedValue={templateId} onValueChange={setTemplateId}>
-              <Picker.Item label="Select Template" value="" color="#94a3b8" />
-              {templates.map(t => <Picker.Item key={t.id || Math.random().toString()} label={t.name || 'Unnamed Template'} value={t.id || ''} style={{ fontSize: 14 }} />)}
-            </Picker>
-          </View>
+          <SearchableDropdown
+            label="Template"
+            placeholder="Select Template..."
+            searchPlaceholder="Search templates..."
+            value={templateId || ''}
+            options={templateOptions}
+            onSelect={(opt) => setTemplateId(String(opt.value))}
+            leftIcon={<Ionicons name="document-text-outline" size={18} color="#1AA3FF" />}
+            containerStyle="mb-0"
+          />
         </View>
 
         <View className="mb-20 px-2">

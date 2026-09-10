@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,12 @@ import {
   ScrollView,
 } from "react-native";
 import { Customer } from "@/types/customer";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import useCustomerForm from "@/hooks/customers/useCustomerForm";
 import InputField from "../ui/InputField";
 import StandardButton from "../ui/StandardButton";
+import SearchableDropdown from "../ui/SearchableDropdown";
+import currenciesData from "@/data/CurrencyData";
 
 interface CustomerFormProps {
   customer?: Customer | null;
@@ -27,6 +29,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     customerType,
     companyName,
     displayName,
+    currency,
     address,
     remarks,
     contacts,
@@ -35,10 +38,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     contactEmail,
     contactPhone,
     loading,
-    showCurrencyDropdown,
-    currencyQuery,
-    filteredCurrencies,
-    currencyInputRef,
 
     setCustomerType,
     setCompanyName,
@@ -49,14 +48,21 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
     setContactLastName,
     setContactEmail,
     setContactPhone,
-    setCurrencyQuery,
-    setShowCurrencyDropdown,
 
     handleCurrencySelect,
     addContact,
     removeContact,
     handleSubmit,
   } = useCustomerForm(customer, onCancel);
+
+  const currencyOptions = useMemo(() => {
+    return currenciesData.map((c) => ({
+      label: `${c.code} — ${c.name}`,
+      value: c.code,
+      badge: c.code,
+    }));
+  }, []);
+
 
   return (
     <View className="flex-1 bg-slate-50">
@@ -177,70 +183,17 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
             placeholder="Enter address"
           />
 
-          <View className="mb-4">
-            <Text className="text-sm font-semibold mb-2 text-slate-800">
-              Currency
-            </Text>
+          <SearchableDropdown
+            label="Currency"
+            placeholder="Select currency..."
+            searchPlaceholder="Search currency by code or name..."
+            value={currency}
+            options={currencyOptions}
+            onSelect={(opt) => handleCurrencySelect(String(opt.value))}
+            leftIcon={<Ionicons name="cash-outline" size={18} color="#1AA3FF" />}
+            containerStyle="mb-4"
+          />
 
-            <TextInput
-              ref={currencyInputRef}
-              className="p-3 rounded-xl border bg-slate-50 border-slate-200 text-slate-800"
-              value={currencyQuery}
-              onFocus={() => setShowCurrencyDropdown(true)}
-              onChangeText={(t) => {
-                setCurrencyQuery(t);
-                if (!showCurrencyDropdown) setShowCurrencyDropdown(true);
-              }}
-              placeholder="Search currency (code or name)"
-              placeholderTextColor="#94a3b8"
-              blurOnSubmit={false}
-            />
-
-            {showCurrencyDropdown && (
-              <View
-                className="absolute left-0 right-0 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg z-50 max-h-60"
-                style={{ top: "100%" }}
-              >
-                <ScrollView
-                  nestedScrollEnabled
-                  keyboardShouldPersistTaps="always"
-                  showsVerticalScrollIndicator
-                  style={{ maxHeight: 240 }}
-                >
-                  {filteredCurrencies.length === 0 ? (
-                    <View className="p-3">
-                      <Text className="text-slate-500">No results</Text>
-                    </View>
-                  ) : (
-                    filteredCurrencies.map((c) => (
-                      <Pressable
-                        key={c.code}
-                        className="p-3 border-b border-slate-100"
-                        onPress={() => {
-                          handleCurrencySelect(c.code);
-                          setTimeout(
-                            () => currencyInputRef.current?.focus(),
-                            0,
-                          );
-                        }}
-                      >
-                        <Text className="text-slate-800">
-                          {c.code} — {c.name}
-                        </Text>
-                      </Pressable>
-                    ))
-                  )}
-                </ScrollView>
-
-                <Pressable
-                  onPress={() => setShowCurrencyDropdown(false)}
-                  className="p-3 rounded-b-xl bg-slate-50 border-t border-slate-200"
-                >
-                  <Text className="text-center text-slate-500">Close</Text>
-                </Pressable>
-              </View>
-            )}
-          </View>
 
           {/* Remarks */}
           <View className="mb-4">
