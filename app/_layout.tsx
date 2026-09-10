@@ -67,8 +67,9 @@ export default function RootLayout() {
 
       const inAuthGroup = segments[0] === 'auth';
       const inScreensGroup = segments[0] === 'screens';
+      const atOnboarding = segments[0] === undefined || (segments[0] as string) === 'index';
 
-      if (!user && !inAuthGroup) {
+      if (!user && !inAuthGroup && !atOnboarding) {
         // Not authenticated -> redirect to /auth
         router.replace('/auth');
       } else if (user && (!inScreensGroup || inAuthGroup)) {

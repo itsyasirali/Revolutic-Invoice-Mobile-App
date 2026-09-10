@@ -20,11 +20,19 @@ const PaymentEditScreen = () => {
                 setPayment(parsed);
             } catch (e) {
                 Alert.alert("Error", "Invalid payment data");
-                router.back();
+                if (router.canGoBack()) {
+                    router.back();
+                } else {
+                    router.replace("/screens/payments");
+                }
             }
         } else {
             Alert.alert("Error", "No payment data provided");
-            router.back();
+            if (router.canGoBack()) {
+                router.back();
+            } else {
+                router.replace("/screens/payments");
+            }
         }
     }, [paymentData]);
 
@@ -61,7 +69,13 @@ const PaymentEditScreen = () => {
             <PaymentForm
                 payment={payment}
                 onSave={handleSave}
-                onCancel={() => router.back()}
+                onCancel={() => {
+                    if (router.canGoBack()) {
+                        router.back();
+                    } else {
+                        router.replace("/screens/payments");
+                    }
+                }}
             />
         </SafeAreaView>
     );

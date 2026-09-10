@@ -53,9 +53,21 @@ const AuthScreen = () => {
     };
   }, []);
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
+        if (router.canGoBack()) {
+          router.back();
+          return true;
+        }
         Alert.alert("Exit App", "Are you sure you want to exit?", [
           { text: "Cancel", style: "cancel" },
           { text: "OK", onPress: () => BackHandler.exitApp() },
@@ -67,7 +79,7 @@ const AuthScreen = () => {
         onBackPress,
       );
       return () => backHandler.remove();
-    }, []),
+    }, [router]),
   );
 
   return (
@@ -87,7 +99,7 @@ const AuthScreen = () => {
           <View className="flex-1 px-6 pt-4">
             {/* Back button */}
             <Pressable
-              onPress={() => router.back()}
+              onPress={handleBack}
               className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center mb-6"
             >
               <Ionicons name="chevron-back" size={20} color="#374151" />
@@ -135,7 +147,7 @@ const AuthScreen = () => {
             {isSignup && (
               <InputField
                 label="Full Name"
-                placeholder="John Doe"
+                placeholder="Enter your name"
                 value={name}
                 onChangeText={setName}
                 autoCapitalize="words"
@@ -149,7 +161,7 @@ const AuthScreen = () => {
             {/* Email */}
             <InputField
               label="Email"
-              placeholder="you@example.com"
+              placeholder="Enter your email address"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"

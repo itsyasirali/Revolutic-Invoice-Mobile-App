@@ -33,7 +33,11 @@ const ProfileSettings: React.FC = () => {
     if (result.success) {
       await refetch();
       Alert.alert('Success', 'Profile updated successfully');
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/screens/settings');
+      }
     } else {
       Alert.alert('Error', result.message || 'Failed to update profile');
     }
@@ -46,7 +50,13 @@ const ProfileSettings: React.FC = () => {
         style={{ paddingTop: insets.top + 12 }}
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/screens/settings');
+            }
+          }}
           className="w-9 h-9 rounded-full items-center justify-center active:bg-slate-100 -ml-2"
         >
           <Ionicons name="arrow-back" size={22} color="#1e293b" />

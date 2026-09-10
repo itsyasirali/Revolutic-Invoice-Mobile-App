@@ -62,7 +62,13 @@ const Settings: React.FC = () => {
         style={{ paddingTop: insets.top + 12 }}
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/screens/home');
+            }
+          }}
           className="w-9 h-9 rounded-full items-center justify-center active:bg-slate-100 -ml-2"
         >
           <Ionicons name="arrow-back" size={22} color="#1e293b" />

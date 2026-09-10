@@ -50,7 +50,13 @@ export const generateInvoiceHTML = (invoice: any, templateConfig: any) => {
   const numericWidth = Math.round(widthMm * 3.78);
 
   // Branding
-  const logoUrl = config.branding?.logoPreview || (config.logoUrl ? `${IP}${config.logoUrl}` : null);
+  const logoUrl =
+    config.branding?.logoPreview ||
+    (config.logoUrl
+      ? config.logoUrl.startsWith("http")
+        ? config.logoUrl
+        : `${IP}${config.logoUrl}`
+      : null);
   const logoPosition = config.logoPosition || 'left';
   const logoWidth = config.logoWidth || 150;
   const showLogo = config.showLogo !== false;

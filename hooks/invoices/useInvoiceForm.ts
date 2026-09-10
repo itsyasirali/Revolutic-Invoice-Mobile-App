@@ -104,7 +104,7 @@ export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) 
     }, [customer, isEditing]);
 
     // Helpers
-    const calculateSubTotal = () => items.reduce((total, item) => total + item.amount, 0);
+    const calculateSubTotal = () => items.reduce((total, item) => total + (Number(item.amount) || 0), 0);
     const calculateTotalAmount = () => {
         const subTotal = calculateSubTotal();
         const discount = (Number(discountPercent) || 0) / 100 * subTotal;

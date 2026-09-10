@@ -261,7 +261,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           </View>
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-gray-500 text-sm font-semibold">Subtotal</Text>
-            <Text className="text-slate-800 text-sm font-bold">{calculateSubTotal().toFixed(2)}</Text>
+            <Text className="text-slate-800 text-sm font-bold">{Number(calculateSubTotal() || 0).toFixed(2)}</Text>
           </View>
           {customer && (
             <>
