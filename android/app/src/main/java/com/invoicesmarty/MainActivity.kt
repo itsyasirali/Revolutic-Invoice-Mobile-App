@@ -1,4 +1,4 @@
-package com.revoluticinvoice
+package com.invoicesmarty
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

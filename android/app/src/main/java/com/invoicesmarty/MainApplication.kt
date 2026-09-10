@@ -1,4 +1,4 @@
-package com.revoluticinvoice
+package com.invoicesmarty
 
 import android.app.Application
 import android.content.res.Configuration
