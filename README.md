@@ -1,6 +1,6 @@
-# Revolutic Invoice Mobile App
+# InvoiceSmarty Mobile App
 
-Welcome to the **Revolutic Invoice Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
+Welcome to the **InvoiceSmarty Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
 
 ## Features
 

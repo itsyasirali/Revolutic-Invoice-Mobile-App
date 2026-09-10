@@ -216,7 +216,7 @@ export const generatePaymentHTML = (payment: any, templateConfig: any) => {
                     <div>
                         ${showLogo && logoUrl ?
             `<img src="${logoUrl}" class="logo-img" style="margin-top: ${config.logoMarginTop || 0}px; margin-bottom: ${config.logoMarginBottom || 10}px;" />` :
-            `<div style="font-size: 24px; font-weight: bold; color: ${textColor};">${config.branding?.brandName || 'Revolutic'}</div>`
+            `<div style="font-size: 24px; font-weight: bold; color: ${textColor};">${config.branding?.brandName || 'InvoiceSmarty'}</div>`
         }
                     </div>
                     <div class="title-block" style="text-align: ${logoPosition === 'center' ? 'center' : 'right'}; margin-top: ${logoPosition === 'center' ? '15px' : '0'};">

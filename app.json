@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Revolutic Invoice",
-    "slug": "revolutic-invoice",
+    "name": "InvoiceSmarty",
+    "slug": "invoicesmarty",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,12 +11,12 @@
       "backgroundColor": "#FFFFFF"
     },
     "scheme": [
-      "revoluticinvoice"
+      "invoicesmarty"
     ],
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.revoluticinvoice",
+      "bundleIdentifier": "com.invoicesmarty",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photos to save invoice PDFs.",
         "NSPhotoLibraryAddUsageDescription": "This app needs access to your photos to save invoice PDFs.",
@@ -31,7 +31,7 @@
         "foregroundImage": "./assets/images/icon.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.revoluticinvoice",
+      "package": "com.invoicesmarty",
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",

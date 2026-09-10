@@ -84,7 +84,7 @@ export const saveFileWithSAF = async (uri: string, fileName: string): Promise<bo
             const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync(initialUri);
 
             if (!permissions.granted) {
-                Alert.alert("Permission Required", "This allows the app to automatically create the 'Revolutic Invoice' folder in your Downloads.");
+                Alert.alert("Permission Required", "This allows the app to automatically create the 'InvoiceSmarty' folder in your Downloads.");
                 return false;
             }
 
@@ -92,8 +92,8 @@ export const saveFileWithSAF = async (uri: string, fileName: string): Promise<bo
             baseUri = permissions.directoryUri;
         }
 
-        // 2. Automatically ensure the "Revolutic Invoice" folder exists inside Downloads
-        const finalFolderUri = await ensureDirectoryExists(baseUri, "Revolutic Invoice");
+        // 2. Automatically ensure the "InvoiceSmarty" folder exists inside Downloads
+        const finalFolderUri = await ensureDirectoryExists(baseUri, "InvoiceSmarty");
 
         // 3. Save the file
         const base64Content = await FileSystem.readAsStringAsync(uri, {
@@ -111,7 +111,7 @@ export const saveFileWithSAF = async (uri: string, fileName: string): Promise<bo
                 encoding: FileSystem.EncodingType.Base64,
             });
 
-            showToast(`Saved to Downloads/Revolutic Invoice/${fileName}`);
+            showToast(`Saved to Downloads/InvoiceSmarty/${fileName}`);
             return true;
         } catch (e: any) {
             console.warn("Save failed, clearing permission cache and retrying:", e);
@@ -135,7 +135,7 @@ export const savePDFToDevice = async (uri: string, fileName: string): Promise<bo
         const baseDir = FileSystem.documentDirectory;
         if (!baseDir) return false;
 
-        const finalFolderUri = await ensureDirectoryExists(baseDir, "Revolutic Invoice");
+        const finalFolderUri = await ensureDirectoryExists(baseDir, "InvoiceSmarty");
         const destinationUri = `${finalFolderUri}${fileName}`;
 
         await FileSystem.copyAsync({
@@ -143,7 +143,7 @@ export const savePDFToDevice = async (uri: string, fileName: string): Promise<bo
             to: destinationUri
         });
 
-        showToast(`Saved to Revolutic Invoice folder`);
+        showToast(`Saved to InvoiceSmarty folder`);
         return true;
     } catch (e: any) {
         console.error("PDF Save Error:", e);

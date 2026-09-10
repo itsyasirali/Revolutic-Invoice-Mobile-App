@@ -16,7 +16,7 @@ export default function CustomSplashScreen() {
 
         {/* Brand Titles */}
         <Text className="text-3xl font-extrabold text-gray-900 tracking-wide mb-2 text-center">
-          Revolutic Invoice
+          InvoiceSmarty
         </Text>
         <Text className="text-sm font-medium text-gray-500 text-center">
           Smarter Invoicing for Your Business

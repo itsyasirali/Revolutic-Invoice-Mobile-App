@@ -227,7 +227,7 @@ export const generateInvoiceHTML = (invoice: any, templateConfig: any) => {
             <div>
                ${showLogo && logoUrl ?
       `<img src="${logoUrl}" class="logo-img" style="margin-top: ${config.logoMarginTop || 0}px; margin-bottom: ${config.logoMarginBottom || 10}px;" />` :
-      `<div class="brand-name" style="font-size: 26px; font-weight: bold; color: ${textColor};">${config.branding?.brandName || 'Revolutic'}</div><div style="font-size: 12px; color: ${primaryColor};">${config.branding?.tagline || ''}</div>`
+      `<div class="brand-name" style="font-size: 26px; font-weight: bold; color: ${textColor};">${config.branding?.brandName || 'InvoiceSmarty'}</div><div style="font-size: 12px; color: ${primaryColor};">${config.branding?.tagline || ''}</div>`
     }
             </div>
             
@@ -304,7 +304,7 @@ export const generateInvoiceHTML = (invoice: any, templateConfig: any) => {
 
           ${showFooter ? `
             <div class="footer-section">
-               ${config.footerText || `Powered by <span style="color: ${primaryColor}; font-weight: bold;">Revolutic</span>`}
+               ${config.footerText || `Powered by <span style="color: ${primaryColor}; font-weight: bold;">InvoiceSmarty</span>`}
             </div>
           ` : ''}
         

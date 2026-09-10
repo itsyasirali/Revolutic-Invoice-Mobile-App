@@ -51,7 +51,7 @@ export const usePaymentEmail = (paymentId: string, paymentDataParam?: any) => {
                 setPayment(paymentData);
 
                 const userEmail = user?.email || '';
-                const companyName = user?.companyName || 'Revolutic';
+                const companyName = user?.companyName || 'InvoiceSmarty';
 
                 const customer = paymentData.customer || paymentData.customerId;
                 const allCustomerEmails: string[] = [];

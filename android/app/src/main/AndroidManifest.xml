@@ -29,8 +29,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="Revolutic Invoice"/>
-        <data android:scheme="exp+revoluticinvoice"/>
+        <data android:scheme="InvoiceSmarty"/>
+        <data android:scheme="exp+invoicesmarty"/>
       </intent-filter>
     </activity>
   </application>
