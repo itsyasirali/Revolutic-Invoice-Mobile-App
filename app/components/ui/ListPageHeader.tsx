@@ -17,7 +17,7 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   return (
     <View
       className="flex-row items-center justify-between px-4 pb-1 bg-slate-50"
-      style={{ paddingTop: insets.top + 12 }}
+      style={{ paddingTop: insets.top + 3 }}
     >
       <Text className="text-2xl font-bold text-slate-800">{title}</Text>
       <Pressable
