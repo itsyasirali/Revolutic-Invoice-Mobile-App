@@ -14,9 +14,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home', path: '/screens/home' },
   { key: 'customers', label: 'Customers', icon: 'people-outline', path: '/screens/customer/customer' },
-  { key: 'items', label: 'Items', icon: 'bag-handle-outline', path: '/screens/Items/items' },
-  { key: 'invoices', label: 'Invoices', icon: 'receipt-outline', path: '/screens/Invoice/invoices' },
-  { key: 'payments', label: 'Payments', icon: 'cash-outline', path: '/screens/payments' },
+  { key: 'items', label: 'Items', icon: 'cube-outline', path: '/screens/Items/items' },
+  { key: 'invoices', label: 'Invoices', icon: 'document-text-outline', path: '/screens/Invoice/invoices' },
+  { key: 'payments', label: 'Payments', icon: 'card-outline', path: '/screens/payments' },
 ];
 
 const BottomNav: React.FC = () => {
@@ -26,11 +26,11 @@ const BottomNav: React.FC = () => {
 
   return (
     <View
-      className="bg-white border-t border-gray-100 px-4 pt-3 flex-row justify-around items-center shadow-lg"
-      style={{ paddingBottom: insets.bottom + 12 }}
+      className="bg-white border-t border-slate-100 px-3 pt-2.5 flex-row justify-around items-center shadow-lg"
+      style={{ paddingBottom: insets.bottom + 8 }}
     >
       {NAV_ITEMS.map((item) => {
-        const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
+        const isActive = pathname === item.path || (item.path !== '/screens/home' && pathname.startsWith(item.path));
         return (
           <Pressable
             key={item.key}
@@ -39,20 +39,26 @@ const BottomNav: React.FC = () => {
                 router.replace(item.path as any);
               }
             }}
-            className="items-center justify-center gap-1"
+            className="items-center justify-center min-w-[56px]"
           >
             <Ionicons
               name={item.icon}
               size={22}
-              color={isActive ? '#1AA3FF' : '#9CA3AF'}
+              color={isActive ? '#1AA3FF' : '#94a3b8'}
             />
             <Text
-              className={`text-[11px] ${
-                isActive ? 'font-bold text-primary' : 'font-medium text-gray-400'
+              style={isActive ? { color: '#1AA3FF' } : undefined}
+              className={`text-[11px] mt-0.5 ${
+                isActive ? 'font-bold' : 'font-medium text-slate-500'
               }`}
             >
               {item.label}
             </Text>
+            {isActive ? (
+              <View style={{ backgroundColor: '#1AA3FF' }} className="w-5 h-1 rounded-full mt-1" />
+            ) : (
+              <View className="w-5 h-1 mt-1 opacity-0" />
+            )}
           </Pressable>
         );
       })}

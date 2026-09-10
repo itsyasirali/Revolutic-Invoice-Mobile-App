@@ -1,70 +1,288 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import Svg, {
+  Path,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+  Circle,
+} from "react-native-svg";
+import useRevenueHero, {
+  PeriodSummary,
+  PeriodType,
+} from "@/hooks/dashboard/useRevenueHero";
+
+export type { PeriodSummary, PeriodType };
 
 interface RevenueHeroCardProps {
-  userInitial: string;
-  formattedRevenue: string;
+  userName?: string;
+  userAvatar?: string;
+  companyName?: string;
+  periodData?: Record<PeriodType, PeriodSummary>;
+  unreadCount?: number;
 }
 
-const RevenueHeroCard: React.FC<RevenueHeroCardProps> = ({
-  userInitial,
-  formattedRevenue,
-}) => {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+const RevenueHeroCard: React.FC<RevenueHeroCardProps> = (props) => {
+  const {
+    insets,
+    userName,
+    unreadCount,
+    selectedPeriod,
+    setSelectedPeriod,
+    current,
+    chartGeometry,
+    formattedAmount,
+    isPositive,
+  } = useRevenueHero(props);
 
   return (
-    <View
-      className="bg-primary pb-6 px-5 rounded-b-[32px]"
-      style={{ paddingTop: insets.top + 12 }}
-    >
-      {/* Top Header Row */}
-      <View className="flex-row items-center justify-between mb-6">
-        <Text className="text-2xl font-bold text-white tracking-tight">
-          Dashboard
-        </Text>
+    <View className="relative">
+      {/* Curved Blue Header Background */}
+      <LinearGradient
+        colors={["#29B0FF", "#1AA3FF", "#008DE8"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.8, y: 1 }}
+        style={{
+          paddingTop: insets.top + 10,
+          paddingBottom: 36,
+          borderBottomLeftRadius: 36,
+          borderBottomRightRadius: 36,
+        }}
+        className="px-5 shadow-sm"
+      >
+        {/* Top Header Row */}
+        <View className="flex-row items-start justify-between">
+          <View className="flex-1 pr-2">
+            <Text className="text-white/80 text-[14px] font-medium">
+              Good morning,
+            </Text>
+            <Text className="text-white text-[28px] font-bold tracking-tight">
+              {userName}
+            </Text>
+            <Text className="text-white/80 text-[13px] font-normal mt-0.5">
+              Here{"'"}s your business overview
+            </Text>
+          </View>
 
-        <View className="flex-row items-center gap-3">
-          {/* Notification Bell */}
-          <Pressable className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative">
-            <Ionicons name="notifications-outline" size={20} color="white" />
-            <View className="w-2.5 h-2.5 rounded-full bg-white absolute top-2 right-2 border border-primary" />
-          </Pressable>
+          {/* Right Action Buttons */}
+          <View className="flex-row items-center gap-2.5 pt-1">
+            {/* Notification Bell */}
+            <Pressable
+              onPress={() => router.push("/screens/settings")}
+              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative border border-white/25"
+            >
+              <Ionicons name="notifications-outline" size={20} color="white" />
+              {unreadCount > 0 && (
+                <View className="w-[18px] h-[18px] rounded-full bg-red-500 absolute -top-1 -right-1 items-center justify-center border-2 border-[#1AA3FF]">
+                  <Text className="text-white text-[9px] font-bold">
+                    {unreadCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
 
-          {/* Settings */}
-          <Pressable
-            onPress={() => router.push('/screens/settings')}
-            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
-          >
-            <Ionicons name="settings-outline" size={20} color="white" />
-          </Pressable>
+            {/* Settings Gear */}
+            <Pressable
+              onPress={() => router.push("/screens/settings")}
+              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center border border-white/25"
+            >
+              <Ionicons name="settings-outline" size={20} color="white" />
+            </Pressable>
 
-          {/* Profile Avatar (tap to open Profile Information) */}
-          <Pressable
-            onPress={() => router.push('/screens/settings/profile')}
-            className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 bg-white/20 items-center justify-center"
-          >
-            <Text className="text-white font-bold text-sm">{userInitial}</Text>
-          </Pressable>
+            {/* User Profile Avatar / Initial */}
+            <Pressable
+              onPress={() => router.push("/screens/settings/profile")}
+              className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/60 bg-white/30 items-center justify-center"
+            >
+              <Text className="text-white font-bold text-[15px]">
+                {userName.charAt(0).toUpperCase()}
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
-      {/* Hero Revenue Card */}
-      <View className="bg-white/15 border border-white/25 rounded-2xl p-5 relative overflow-hidden">
-        <Text className="text-white/80 text-xs font-medium">
-          Total Revenue
-        </Text>
+      {/* Total Revenue Card */}
+      <View className="px-4 -mt-5">
+        <LinearGradient
+          colors={["#1AA3FF", "#008BE8"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ borderRadius: 12, overflow: "hidden" }}
+          className="p-5 shadow-lg border border-white/20"
+        >
+          {/* Card Top Row: Label + Period Pill */}
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <Text className="text-white text-[15px] font-semibold mr-1.5">
+                Total Revenue
+              </Text>
+              <Ionicons
+                name="information-circle-outline"
+                size={16}
+                color="rgba(255,255,255,0.75)"
+              />
+            </View>
 
-        {/* Value Amount */}
-        <Text className="text-3xl font-extrabold text-white mt-3 mb-1.5">
-          {formattedRevenue}
-        </Text>
+            {/* Week / Month / Year Pills */}
+            <View style={styles.tabContainer}>
+              {(["week", "month", "year"] as const).map((period) => {
+                const isActive = selectedPeriod === period;
+                const label = period.charAt(0).toUpperCase() + period.slice(1);
+                return (
+                  <Pressable
+                    key={period}
+                    onPress={() => setSelectedPeriod(period)}
+                    style={[
+                      styles.tabButton,
+                      isActive && styles.activeTabButton,
+                    ]}
+                  >
+                    <Text
+                      style={
+                        isActive ? styles.activeTabText : styles.inactiveTabText
+                      }
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Amount Number */}
+          <Text className="text-white text-[32px] font-black tracking-tight mt-2.5">
+            {formattedAmount}
+          </Text>
+
+          {/* Percentage vs last period */}
+          <View className="flex-row items-center mt-1">
+            <View className="flex-row items-center">
+              <Ionicons
+                name={isPositive ? "arrow-up" : "arrow-forward"}
+                size={14}
+                color={isPositive ? "#4ade80" : "#ffffff"}
+              />
+              <Text
+                className={`text-[13px] font-bold ml-0.5 ${
+                  isPositive ? "text-[#4ade80]" : "text-white/90"
+                }`}
+              >
+                {current.growth}
+              </Text>
+            </View>
+            <Text className="text-white/75 text-[13px] ml-1.5 font-normal">
+              {current.comparison}
+            </Text>
+          </View>
+
+          {/* Glowing Wavy Line Chart (Dynamic from DB via hook) */}
+          <View className="mt-3">
+            <Svg height="85" width="100%" viewBox="0 0 330 85">
+              <Defs>
+                <SvgLinearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.32" />
+                  <Stop offset="60%" stopColor="#ffffff" stopOpacity="0.10" />
+                  <Stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
+                </SvgLinearGradient>
+              </Defs>
+
+              {/* Gradient Area under Curve */}
+              <Path d={chartGeometry.areaPath} fill="url(#chartFill)" />
+
+              {/* Smooth White Curved Line */}
+              <Path
+                d={chartGeometry.curvePath}
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+
+              {/* Data points on curve */}
+              {chartGeometry.coords.map((pt, idx) => (
+                <Circle
+                  key={idx}
+                  cx={pt.cx}
+                  cy={pt.cy}
+                  r="2.5"
+                  fill="#ffffff"
+                  fillOpacity="0.7"
+                />
+              ))}
+
+              {/* Peak Point Glowing Indicator (only if we have positive data) */}
+              {chartGeometry.hasData && (
+                <>
+                  <Circle
+                    cx={chartGeometry.peak.cx}
+                    cy={chartGeometry.peak.cy}
+                    r="7"
+                    fill="rgba(255,255,255,0.3)"
+                  />
+                  <Circle
+                    cx={chartGeometry.peak.cx}
+                    cy={chartGeometry.peak.cy}
+                    r="4"
+                    fill="#ffffff"
+                  />
+                </>
+              )}
+            </Svg>
+
+            {/* Labels (X-Axis) */}
+            <View className="flex-row justify-between px-1 mt-1">
+              {current.labels.map((label) => (
+                <Text
+                  key={label}
+                  className="text-white/70 text-[11px] font-medium text-center"
+                >
+                  {label}
+                </Text>
+              ))}
+            </View>
+          </View>
+        </LinearGradient>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  tabContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.18)",
+    borderRadius: 9999,
+    padding: 2,
+  },
+  tabButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 9999,
+  },
+  activeTabButton: {
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  activeTabText: {
+    color: "#1AA3FF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  inactiveTabText: {
+    color: "rgba(255, 255, 255, 0.85)",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+});
 
 export default RevenueHeroCard;

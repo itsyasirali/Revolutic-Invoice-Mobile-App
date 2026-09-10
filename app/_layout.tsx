@@ -1,4 +1,4 @@
-import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
+import { Stack, router, useSegments, SplashScreen } from 'expo-router';
 import { LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
@@ -14,7 +14,10 @@ import {
 
 LogBox.ignoreLogs([
   "Couldn't find a navigation context",
-  'setLayoutAnimationEnabledExperimental',
+  "Couldn't find a navigation context. Have you wrapped your app with 'NavigationContainer'?",
+  "CssInterop upgrade warning",
+  "Converting View to Pressable",
+  "setLayoutAnimationEnabledExperimental",
 ]);
 
 // Keep native splash screen visible while loading resources
@@ -22,7 +25,6 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
 
@@ -60,7 +62,7 @@ export default function RootLayout() {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [user, loading, segments, router]);
+  }, [user, loading, segments]);
 
   // Show custom splash screen while checking authentication and loading fonts
   if (loading || !isReady) {

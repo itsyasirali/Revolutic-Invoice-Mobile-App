@@ -1,78 +1,93 @@
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import useRecentInvoices, { InvoiceDisplayItem } from "@/hooks/dashboard/useRecentInvoices";
 
-export interface InvoiceDisplayItem {
-  id: string;
-  customer: string;
-  amount: string;
-  status: string;
-  icon: string;
-  iconBg: string;
-  iconColor: string;
-  badgeBg: string;
-  badgeText: string;
-}
+export type { InvoiceDisplayItem };
 
 interface RecentInvoicesListProps {
-  invoices: InvoiceDisplayItem[];
+  invoices?: InvoiceDisplayItem[];
   loading?: boolean;
 }
 
-const RecentInvoicesList: React.FC<RecentInvoicesListProps> = ({
-  invoices,
-  loading = false,
-}) => {
-  const router = useRouter();
+const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
+  const { invoices, loading } = useRecentInvoices(props);
 
   return (
-    <View className="mt-7">
+    <View className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
       {/* Header */}
-      <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-lg font-bold text-gray-900">Recent Invoices</Text>
-        <Pressable onPress={() => router.push("/screens/Invoice" as any)}>
-          <Text className="text-sm font-semibold text-primary">View All</Text>
+      <View className="flex-row items-center justify-between mb-3.5">
+        <Text className="text-slate-900 font-bold text-[16px]">
+          Recent Invoices
+        </Text>
+        <Pressable
+          onPress={() => router.push("/screens/Invoice/invoices" as any)}
+          className="flex-row items-center"
+        >
+          <Text style={{ color: "#1AA3FF" }} className="font-semibold text-[13px] mr-1">
+            View all
+          </Text>
+          <Ionicons name="arrow-forward" size={13} color="#1AA3FF" />
         </Pressable>
       </View>
 
-      {/* Invoice List Items */}
+      {/* Content */}
       {loading ? (
         <View className="py-8 items-center justify-center">
           <ActivityIndicator size="small" color="#1AA3FF" />
         </View>
-      ) : (
-        <View className="gap-3">
-          {invoices.map((inv, index) => (
+      ) : invoices.length > 0 ? (
+        <View className="gap-2.5">
+          {invoices.map((inv) => (
             <Pressable
-              key={index}
-              onPress={() => router.push("/screens/Invoice" as any)}
-              className="flex-row items-center justify-between bg-white p-3.5 rounded-2xl border border-gray-100 shadow-sm"
+              key={inv.id}
+              onPress={() => router.push("/screens/Invoice/invoices" as any)}
+              className="flex-row items-center justify-between p-3 rounded-2xl bg-slate-50/80 border border-slate-100/80 active:opacity-75"
             >
-              <View className="flex-row items-center gap-3">
-                {/* Invoice ID + Customer */}
-                <View>
-                  <Text className="text-sm font-bold text-gray-900">
-                    {inv.id}
+              {/* Left: Document Icon + Invoice info */}
+              <View className="flex-row items-center flex-1 mr-2">
+                <View className="w-10 h-10 rounded-full bg-[#1AA3FF]/15 items-center justify-center mr-3">
+                  <Ionicons name="receipt-outline" size={18} color="#1AA3FF" />
+                </View>
+                <View className="flex-1">
+                  <Text
+                    className="text-slate-900 font-bold text-[13px]"
+                    numberOfLines={1}
+                  >
+                    {inv.invoiceNumber}
                   </Text>
-                  <Text className="text-xs text-gray-400 font-medium mt-0.5">
-                    {inv.customer}
+                  <Text
+                    className="text-slate-400 text-[11px] mt-0.5"
+                    numberOfLines={1}
+                  >
+                    {inv.customer} • {inv.date}
                   </Text>
                 </View>
               </View>
 
-              {/* Amount + Status Badge */}
-              <View className="flex-col items-center gap-3">
-                <Text className="text-sm font-bold text-gray-900">
+              {/* Right: Amount + Status Badge */}
+              <View className="items-end">
+                <Text className="text-slate-900 font-extrabold text-[13.5px]">
                   {inv.amount}
                 </Text>
-                <View className={`px-3 py-1 rounded-full ${inv.badgeBg}`}>
-                  <Text className={`text-xs font-bold ${inv.badgeText}`}>
+                <View
+                  className={`px-2.5 py-0.5 rounded-full mt-1 ${inv.badgeBg}`}
+                >
+                  <Text className={`text-[10.5px] font-bold ${inv.badgeText}`}>
                     {inv.status}
                   </Text>
                 </View>
               </View>
             </Pressable>
           ))}
+        </View>
+      ) : (
+        <View className="py-8 items-center justify-center">
+          <Ionicons name="document-text-outline" size={32} color="#cbd5e1" />
+          <Text className="text-slate-400 text-[12px] mt-2 font-medium text-center">
+            No recent invoices found
+          </Text>
         </View>
       )}
     </View>
