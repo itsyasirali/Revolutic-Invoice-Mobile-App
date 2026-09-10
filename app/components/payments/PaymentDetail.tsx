@@ -1,7 +1,7 @@
 
 import React from "react";
 import { View, Text, Pressable, ScrollView, Modal, ActivityIndicator } from "react-native";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import usePaymentDetails from "@/hooks/payments/usePaymentDetails";
 import PaymentForm from "./PaymentForm";
 import StandardModal from "../ui/StandardModal";

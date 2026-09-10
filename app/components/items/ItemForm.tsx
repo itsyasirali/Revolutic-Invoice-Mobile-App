@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   Pressable,
   ScrollView,
-  Keyboard,
 } from "react-native";
 import { Item } from "@/types/items";
 import { useItemForm } from "@/hooks/items/useItemForm";

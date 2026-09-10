@@ -4,12 +4,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 import '../global.css';
 import CustomSplashScreen from './components/CustomSplashScreen';
-
-LogBox.ignoreLogs([
-  "Couldn't find a navigation context",
-  'setLayoutAnimationEnabledExperimental',
-]);
-
 import { useAuth } from '../hooks/auth/useAuth';
 import {
   useFonts,
@@ -17,6 +11,11 @@ import {
   Roboto_500Medium,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+
+LogBox.ignoreLogs([
+  "Couldn't find a navigation context",
+  'setLayoutAnimationEnabledExperimental',
+]);
 
 // Keep native splash screen visible while loading resources
 SplashScreen.preventAutoHideAsync().catch(() => {});

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Animated, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { View, Text, Animated, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface DownloadPopInProps {
@@ -9,9 +9,19 @@ interface DownloadPopInProps {
 }
 
 const DownloadPopIn: React.FC<DownloadPopInProps> = ({ visible, fileName, onHide }) => {
-    const [translateY] = useState(new Animated.Value(100));
-
+    const translateY = useRef(new Animated.Value(100)).current;
     const [shouldRender, setShouldRender] = useState(false);
+
+    const hide = useCallback(() => {
+        Animated.timing(translateY, {
+            toValue: 100,
+            duration: 300,
+            useNativeDriver: true
+        }).start(() => {
+            setShouldRender(false);
+            onHide();
+        });
+    }, [onHide, translateY]);
 
     useEffect(() => {
         if (visible) {
@@ -31,18 +41,7 @@ const DownloadPopIn: React.FC<DownloadPopInProps> = ({ visible, fileName, onHide
         } else if (shouldRender) {
             hide();
         }
-    }, [visible]);
-
-    const hide = () => {
-        Animated.timing(translateY, {
-            toValue: 100,
-            duration: 300,
-            useNativeDriver: true
-        }).start(() => {
-            setShouldRender(false);
-            onHide();
-        });
-    };
+    }, [visible, shouldRender, hide, translateY]);
 
     if (!shouldRender) return null;
 

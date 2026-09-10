@@ -1,5 +1,4 @@
-import { View, Text, ScrollView, Pressable, Keyboard, ActivityIndicator } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import usePaymentForm from '@/hooks/payments/usePaymentForm';

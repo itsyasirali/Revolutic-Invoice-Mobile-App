@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, Pressable, Modal, TextInput, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomerForm from './CustomerForm';
-import RefreshableScrollView from '../ui/RefreshableScrollView';
 import useCustomerList from '@/hooks/customers/useCustomerList';
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';

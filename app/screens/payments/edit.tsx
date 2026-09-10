@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import { ActivityIndicator, Alert, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import PaymentForm from '../../components/payments/PaymentForm';
 
@@ -18,7 +18,7 @@ const PaymentEditScreen = () => {
             try {
                 const parsed = JSON.parse(paymentData as string);
                 setPayment(parsed);
-            } catch (e) {
+            } catch {
                 Alert.alert("Error", "Invalid payment data");
                 if (router.canGoBack()) {
                     router.back();
@@ -34,7 +34,7 @@ const PaymentEditScreen = () => {
                 router.replace("/screens/payments");
             }
         }
-    }, [paymentData]);
+    }, [paymentData, router]);
 
     const handleSave = async (updatedPayment: any) => {
         // PaymentForm calls this function when the save is successful internally.

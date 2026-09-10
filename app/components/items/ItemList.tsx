@@ -10,7 +10,6 @@ import {
 import { useItemList } from "@/hooks/items/useItemList";
 import { MaterialIcons } from "@expo/vector-icons";
 import ItemForm from "./ItemForm";
-import RefreshableScrollView from "../ui/RefreshableScrollView";
 import InputField from "../ui/InputField";
 import StandardModal from "../ui/StandardModal";
 import ListPageHeader from "../ui/ListPageHeader";

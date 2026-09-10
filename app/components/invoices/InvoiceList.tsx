@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { useRouter } from 'expo-router';

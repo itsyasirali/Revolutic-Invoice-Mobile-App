@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, ScrollView, Alert, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { usePaymentList } from '@/hooks/payments/usePaymentList';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PaymentForm from './PaymentForm';
-import RefreshableScrollView from '../ui/RefreshableScrollView';
 import StandardModal from '../ui/StandardModal';
 import InputField from '../ui/InputField';
 import ListPageHeader from '../ui/ListPageHeader';
@@ -14,7 +13,6 @@ const PaymentList = () => {
     payments,
     loading,
     refreshing,
-    error,
     filter,
     setFilter,
     refreshPayments,

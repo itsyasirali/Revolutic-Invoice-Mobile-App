@@ -1,9 +1,7 @@
 import React from "react";
 import RenderHtml from 'react-native-render-html';
 import { View, Text, Pressable, ScrollView, Modal, ActivityIndicator } from "react-native";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import * as MediaLibrary from 'expo-media-library';
-import { Platform, Alert } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import InvoiceForm from "./InvoiceForm";
 import useInvoiceDetails from "@/hooks/invoices/useInvoiceDetails";
 import StandardModal from "../ui/StandardModal";
@@ -11,14 +9,11 @@ import DownloadPopIn from '../ui/DownloadPopIn';
 
 const InvoiceDetail: React.FC = () => {
     const {
-        loading,
         invoiceData,
         showEditForm,
         showMenu,
-        expandMoreInfo,
         setShowEditForm,
         setShowMenu,
-        setExpandMoreInfo,
         handleSaveSuccess,
         handleDelete,
         handleDownloadPDF,
@@ -28,12 +23,6 @@ const InvoiceDetail: React.FC = () => {
         router,
         width
     } = useInvoiceDetails();
-
-    const [hasStoragePermission, setHasStoragePermission] = React.useState<boolean | null>(null);
-
-    React.useEffect(() => {
-        // Initial setup if needed
-    }, []);
 
     const onDownloadPress = async () => {
         handleDownloadPDF();

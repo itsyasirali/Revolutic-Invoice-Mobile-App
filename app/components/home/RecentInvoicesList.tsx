@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 export interface InvoiceDisplayItem {

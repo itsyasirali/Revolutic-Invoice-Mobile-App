@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   TextInput,
   Pressable,
   ScrollView,
-  Keyboard,
 } from "react-native";
 import { Customer } from "@/types/customer";
 import { MaterialIcons } from "@expo/vector-icons";

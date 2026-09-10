@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -22,7 +22,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
     templateId, setTemplateId,
     discountPercent, setDiscountPercent,
     notes, setNotes,
-    items, setItems,
+    items,
     previousDue,
     loading,
     handleSubmit,
@@ -83,8 +83,8 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           template: selectedTemplate?.raw ? JSON.stringify(selectedTemplate.raw) : (selectedTemplate ? JSON.stringify(selectedTemplate) : undefined)
         },
       });
-    } catch (err) {
-      // console.error("Navigation failed:", err);
+    } catch {
+      // Navigation failed
     }
   };
 
