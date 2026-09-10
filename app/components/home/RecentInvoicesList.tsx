@@ -14,6 +14,23 @@ interface RecentInvoicesListProps {
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const { invoices, loading } = useRecentInvoices(props);
 
+  const handleInvoicePress = (inv: InvoiceDisplayItem) => {
+    const rawData = inv.raw || inv;
+    const templateData =
+      rawData?.templateId && typeof rawData.templateId === "object"
+        ? rawData.templateId
+        : null;
+
+    router.push({
+      pathname: "/screens/Invoice/detail",
+      params: {
+        invoiceData: JSON.stringify(rawData),
+        id: inv.id,
+        template: templateData ? JSON.stringify(templateData) : undefined,
+      },
+    });
+  };
+
   return (
     <View className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
       {/* Header */}
@@ -42,9 +59,10 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
           {invoices.map((inv) => (
             <Pressable
               key={inv.id}
-              onPress={() => router.push("/screens/Invoice/invoices" as any)}
+              onPress={() => handleInvoicePress(inv)}
               className="flex-row items-center justify-between p-3 rounded-2xl bg-slate-50/80 border border-slate-100/80 active:opacity-75"
             >
+
               {/* Left: Document Icon + Invoice info */}
               <View className="flex-row items-center flex-1 mr-2">
                 <View className="w-10 h-10 rounded-full bg-[#1AA3FF]/15 items-center justify-center mr-3">

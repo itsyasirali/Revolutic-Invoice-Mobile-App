@@ -10,6 +10,7 @@ export interface InvoiceDisplayItem {
   date: string;
   badgeBg: string;
   badgeText: string;
+  raw?: any;
 }
 
 const getStatusStyle = (status: string) => {
@@ -72,9 +73,11 @@ const useRecentInvoices = (overrides?: {
         date: formattedDate,
         badgeBg: style.badgeBg,
         badgeText: style.badgeText,
+        raw: inv.raw || inv,
       };
     });
   }, [allInvoices, overrides?.invoices]);
+
 
   return {
     invoices,

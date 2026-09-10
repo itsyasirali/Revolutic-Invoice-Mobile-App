@@ -193,7 +193,7 @@ const CustomerDetails: React.FC = () => {
         >
           <View
             className="absolute right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]"
-            style={{ top: insets.top + 52 }}
+            style={{ top: insets.top + 8 }}
           >
             <Pressable
               onPress={() => {
