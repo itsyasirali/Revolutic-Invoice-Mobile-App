@@ -14,8 +14,8 @@ const ProfileSettings: React.FC = () => {
   const { saving, updateProfile } = useProfileSettings();
   const insets = useSafeAreaInsets();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || '');
+  const [email, setEmail] = useState(user?.email || '');
 
   useEffect(() => {
     if (user) {
@@ -64,7 +64,7 @@ const ProfileSettings: React.FC = () => {
         <Text className="text-xl font-bold text-slate-800 ml-2">Profile Information</Text>
       </View>
 
-      {loading ? (
+      {loading && !user ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1AA3FF" />
         </View>

@@ -3,29 +3,60 @@ import { useRouter } from 'expo-router';
 import { Customer } from '@/types/customer';
 import axios from '@/services/api';
 
+// Module-level in-memory cache to guarantee zero-loader screen switches
+let customerCache: Customer[] = [];
+let hasFetchedCustomersOnce = false;
+
+// Cache mutation helpers for instant in-place updates without refetch flicker
+export const updateCustomerInCache = (customer: Customer) => {
+    const idx = customerCache.findIndex(c => c.id === customer.id);
+    if (idx >= 0) {
+        customerCache = [...customerCache.slice(0, idx), customer, ...customerCache.slice(idx + 1)];
+    } else {
+        customerCache = [customer, ...customerCache];
+    }
+};
+
+export const removeCustomerFromCache = (id: string) => {
+    customerCache = customerCache.filter(c => c.id !== id);
+};
+
 export const useCustomerList = () => {
     const router = useRouter();
-    const [customers, setCustomers] = useState<Customer[]>([]);
-    const [loading, setLoading] = useState(false);
+    // Instant initialization from memory cache
+    const [customers, setCustomers] = useState<Customer[]>(customerCache);
+    // Loader is ONLY shown on cold first launch when cache is completely empty
+    const [loading, setLoading] = useState<boolean>(!hasFetchedCustomersOnce && customerCache.length === 0);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     const [filter, setFilter] = useState('all');
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const fetchCustomers = useCallback(async () => {
-        setLoading(true);
+    const fetchCustomers = useCallback(async (isRefresh = false) => {
+        if (isRefresh) {
+            setRefreshing(true);
+        } else if (!hasFetchedCustomersOnce && customerCache.length === 0) {
+            setLoading(true);
+        }
+
         try {
             const response = await axios.get('/api/customers');
-            setCustomers(response.data.customers || []);
+            const data = response.data.customers || [];
+            customerCache = data;
+            hasFetchedCustomersOnce = true;
+            setCustomers(data);
         } catch (error) {
             console.error('Failed to fetch customers:', error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchCustomers();
+        // Silently fetch and sync data in the background (SWR)
+        fetchCustomers(false);
     }, [fetchCustomers]);
 
     const filteredCustomers = filter.toLowerCase() === 'all'
@@ -60,6 +91,7 @@ export const useCustomerList = () => {
         // State
         customers,
         loading,
+        refreshing,
         filter,
         showAddForm,
         searchQuery,
@@ -71,7 +103,7 @@ export const useCustomerList = () => {
         setSearchQuery,
 
         // Actions
-        refetch: fetchCustomers,
+        refetch: () => fetchCustomers(true),
         handleCustomerPress,
         handleCancelAdd,
     };

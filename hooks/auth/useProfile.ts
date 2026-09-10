@@ -18,39 +18,61 @@ interface UseProfileReturn {
     refetch: () => Promise<void>;
 }
 
+// In-memory module cache for instant zero-loader profile and settings opening
+let cachedUser: User | null = null;
+let hasFetchedProfileOnce = false;
+
+export const updateCachedUser = (user: User | null) => {
+    cachedUser = user;
+    if (user) {
+        hasFetchedProfileOnce = true;
+    } else {
+        hasFetchedProfileOnce = false;
+    }
+};
+
+export const getCachedUser = () => cachedUser;
+
 export const useProfile = (): UseProfileReturn => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(cachedUser);
+    const [loading, setLoading] = useState<boolean>(!hasFetchedProfileOnce && cachedUser === null);
     const [error, setError] = useState<string | null>(null);
 
     const fetchProfile = async (opts?: { silent?: boolean }) => {
         try {
-            if (!opts?.silent) setLoading(true);
+            if (!opts?.silent && cachedUser === null && !hasFetchedProfileOnce) {
+                setLoading(true);
+            }
             setError(null);
 
             const response = await axios.get('/api/auth/me');
 
             if (response.data?.user) {
+                cachedUser = response.data.user;
+                hasFetchedProfileOnce = true;
                 setUser(response.data.user);
             } else {
+                cachedUser = null;
                 setUser(null);
             }
         } catch (err: any) {
-            setUser(null);
-            if (err.response?.status !== 401) {
+            if (err.response?.status === 401) {
+                cachedUser = null;
+                hasFetchedProfileOnce = false;
+                setUser(null);
+            } else {
                 setError(err.response?.data?.message || 'Failed to fetch user profile');
             }
         } finally {
-            if (!opts?.silent) setLoading(false);
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchProfile();
+        // Silently revalidate in background if we already have cache
+        fetchProfile({ silent: hasFetchedProfileOnce && cachedUser !== null });
 
-        // Silent: login/logout transitions shouldn't flip the app-wide loading
-        // state, which would unmount/remount the root navigator and briefly
-        // flash back to the first declared screen (index) mid-transition.
+        // Silent listener for auth changes
         const subscription = DeviceEventEmitter.addListener('auth.changed', () =>
             fetchProfile({ silent: true })
         );

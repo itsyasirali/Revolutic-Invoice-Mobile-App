@@ -76,7 +76,7 @@ const Settings: React.FC = () => {
         <Text className="text-xl font-bold text-slate-800 ml-2">Settings</Text>
       </View>
 
-      {loading ? (
+      {loading && !user ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1AA3FF" />
         </View>

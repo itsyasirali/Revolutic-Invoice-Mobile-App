@@ -34,7 +34,11 @@ const BottomNav: React.FC = () => {
         return (
           <Pressable
             key={item.key}
-            onPress={() => router.push(item.path as any)}
+            onPress={() => {
+              if (pathname !== item.path) {
+                router.replace(item.path as any);
+              }
+            }}
             className="items-center justify-center gap-1"
           >
             <Ionicons

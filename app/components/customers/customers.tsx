@@ -11,6 +11,7 @@ import ListPageHeader from '../ui/ListPageHeader';
 const CustomerList = () => {
   const {
     loading,
+    refreshing,
     filter,
     setFilter,
     showAddForm,
@@ -73,7 +74,7 @@ const CustomerList = () => {
             contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
             refreshControl={
               <RefreshControl
-                refreshing={loading}
+                refreshing={refreshing}
                 onRefresh={refetch}
                 tintColor="#1AA3FF"
                 colors={["#1AA3FF"]}
