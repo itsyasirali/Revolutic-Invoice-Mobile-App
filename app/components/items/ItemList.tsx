@@ -3,12 +3,13 @@ import {
   View,
   Text,
   Pressable,
+  ScrollView,
   ActivityIndicator,
   FlatList,
   RefreshControl,
 } from "react-native";
 import { useItemList } from "@/hooks/items/useItemList";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import ItemForm from "./ItemForm";
 import InputField from "../ui/InputField";
 import StandardModal from "../ui/StandardModal";
@@ -31,39 +32,53 @@ const ItemList: React.FC = () => {
   } = useItemList();
 
   return (
-    <>
+    <View className="flex-1 bg-slate-50">
       <ListPageHeader title="Items" onAddPress={() => setShowAddForm(true)} />
 
+      {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-50">
         <InputField
+          label=""
           placeholder="Search items..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           containerStyle="mb-0"
+          inputStyle="bg-slate-50"
+          leftIcon={<Ionicons name="search" size={20} color="#94a3b8" />}
         />
       </View>
 
       {/* Filter Tabs */}
-      <View className="flex-row px-4 py-2 bg-slate-50">
-        {(["all", "active", "inactive"] as const).map((tab) => {
-          const isActive = filter === tab;
-          return (
-            <Pressable
-              key={tab}
-              onPress={() => setFilter(tab as any)}
-              className={`px-4 py-3 mx-1 rounded-xl flex-row items-center border ${isActive
-                ? "bg-primary border-primary"
-                : "bg-white border-slate-200"
-                }`}
-            >
-              <Text
-                className={`font-bold mr-2 ${isActive ? "text-white" : "text-slate-600"}`}
+      <View className="bg-slate-50 border-b border-gray-100 w-full">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+        >
+          {[
+            { key: "all", label: "All" },
+            { key: "active", label: "Active" },
+            { key: "inactive", label: "Inactive" },
+          ].map((tab) => {
+            const isActive = filter === tab.key;
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setFilter(tab.key as any)}
+                className={`px-5 py-2.5 mr-2 rounded-xl border ${isActive
+                  ? "bg-primary border-primary"
+                  : "bg-white border-slate-200"
+                  }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  className={`font-semibold ${isActive ? "text-white" : "text-slate-600"}`}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
       </View>
 
       <View className="flex-1 bg-slate-50">
@@ -161,7 +176,7 @@ const ItemList: React.FC = () => {
           }}
         />
       </StandardModal>
-    </>
+    </View>
   );
 };
 

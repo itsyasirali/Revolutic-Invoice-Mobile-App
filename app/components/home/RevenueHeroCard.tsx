@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, {
   Path,
@@ -27,9 +26,6 @@ interface RevenueHeroCardProps {
 
 const RevenueHeroCard: React.FC<RevenueHeroCardProps> = (props) => {
   const {
-    insets,
-    userName,
-    unreadCount,
     selectedPeriod,
     setSelectedPeriod,
     current,
@@ -39,81 +35,14 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = (props) => {
   } = useRevenueHero(props);
 
   return (
-    <View className="relative">
-      {/* Curved Blue Header Background */}
+    <View className="px-4 mt-2">
       <LinearGradient
-        colors={["#29B0FF", "#1AA3FF", "#008DE8"]}
+        colors={["#1AA3FF", "#008BE8"]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 0.8, y: 1 }}
-        style={{
-          paddingTop: insets.top + 10,
-          paddingBottom: 36,
-          borderBottomLeftRadius: 36,
-          borderBottomRightRadius: 36,
-        }}
-        className="px-5 shadow-sm"
+        end={{ x: 1, y: 1 }}
+        style={{ borderRadius: 16, overflow: "hidden" }}
+        className="p-5 shadow-md border border-primary/20"
       >
-        {/* Top Header Row */}
-        <View className="flex-row items-start justify-between">
-          <View className="flex-1 pr-2">
-            <Text className="text-white/80 text-[14px] font-medium">
-              Good morning,
-            </Text>
-            <Text className="text-white text-[28px] font-bold tracking-tight">
-              {userName}
-            </Text>
-            <Text className="text-white/80 text-[13px] font-normal mt-0.5">
-              Here{"'"}s your business overview
-            </Text>
-          </View>
-
-          {/* Right Action Buttons */}
-          <View className="flex-row items-center gap-2.5 pt-1">
-            {/* Notification Bell */}
-            <Pressable
-              onPress={() => router.push("/screens/settings")}
-              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative border border-white/25"
-            >
-              <Ionicons name="notifications-outline" size={20} color="white" />
-              {unreadCount > 0 && (
-                <View className="w-[18px] h-[18px] rounded-full bg-red-500 absolute -top-1 -right-1 items-center justify-center border-2 border-[#1AA3FF]">
-                  <Text className="text-white text-[9px] font-bold">
-                    {unreadCount}
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-
-            {/* Settings Gear */}
-            <Pressable
-              onPress={() => router.push("/screens/settings")}
-              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center border border-white/25"
-            >
-              <Ionicons name="settings-outline" size={20} color="white" />
-            </Pressable>
-
-            {/* User Profile Avatar / Initial */}
-            <Pressable
-              onPress={() => router.push("/screens/settings/profile")}
-              className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/60 bg-white/30 items-center justify-center"
-            >
-              <Text className="text-white font-bold text-[15px]">
-                {userName.charAt(0).toUpperCase()}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </LinearGradient>
-
-      {/* Total Revenue Card */}
-      <View className="px-4 -mt-5">
-        <LinearGradient
-          colors={["#1AA3FF", "#008BE8"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 12, overflow: "hidden" }}
-          className="p-5 shadow-lg border border-white/20"
-        >
           {/* Card Top Row: Label + Period Pill */}
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
@@ -248,7 +177,6 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = (props) => {
           </View>
         </LinearGradient>
       </View>
-    </View>
   );
 };
 

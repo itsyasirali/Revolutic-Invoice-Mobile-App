@@ -8,13 +8,15 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import InvoiceForm from "./InvoiceForm";
 import useInvoiceDetails from "@/hooks/invoices/useInvoiceDetails";
 import StandardModal from "../ui/StandardModal";
 import DownloadPopIn from "../ui/DownloadPopIn";
+import DetailPageHeader from "../ui/DetailPageHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const InvoiceDetail: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     invoiceData,
     showEditForm,
@@ -260,25 +262,12 @@ const InvoiceDetail: React.FC = () => {
   return (
     <View className="flex-1 bg-white">
       {/* Top Header */}
-      <View className="flex-row items-center p-4 pt-12 bg-slate-100">
-        <Pressable onPress={() => router.back()} className="mr-4">
-          <MaterialIcons name="arrow-back" size={24} color="#1e293b" />
-        </Pressable>
-        <Text
-          className="text-2xl font-normal text-slate-800 flex-1"
-          numberOfLines={1}
-        >
-          Invoice
-        </Text>
-        <View className="flex-row">
-          <Pressable className="p-2" onPress={() => setShowEditForm(true)}>
-            <MaterialIcons name="edit" size={24} color="#64748b" />
-          </Pressable>
-          <Pressable className="p-2" onPress={() => setShowMenu(true)}>
-            <MaterialIcons name="more-vert" size={24} color="#64748b" />
-          </Pressable>
-        </View>
-      </View>
+      <DetailPageHeader
+        title="Invoice"
+        onBack={() => router.back()}
+        onEdit={() => setShowEditForm(true)}
+        onMenu={() => setShowMenu(true)}
+      />
 
       {renderHeaderStats()}
       {renderDetails()}
@@ -303,7 +292,10 @@ const InvoiceDetail: React.FC = () => {
         onRequestClose={() => setShowMenu(false)}
       >
         <Pressable style={{ flex: 1 }} onPress={() => setShowMenu(false)}>
-          <View className="absolute right-3 top-14 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]">
+          <View
+            className="absolute right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]"
+            style={{ top: insets.top + 52 }}
+          >
             <Pressable
               onPress={() => {
                 setShowMenu(false);

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, ScrollView, RefreshControl } from "react-native";
 import useDashboard from "@/hooks/dashboard/useDashboard";
+import DashboardHeader from "../components/home/DashboardHeader";
 import RevenueHeroCard from "../components/home/RevenueHeroCard";
 import InvoiceStatusCard from "../components/home/InvoiceStatusCard";
 import QuickActions from "../components/home/QuickActions";
@@ -10,7 +11,10 @@ const Home: React.FC = () => {
   const { isRefreshing, handleRefresh } = useDashboard();
 
   return (
-    <View className="flex-1 bg-[#f4f7fb]">
+    <View className="flex-1 bg-slate-50">
+      {/* Fixed Dashboard Header */}
+      <DashboardHeader />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 28 }}
@@ -23,7 +27,7 @@ const Home: React.FC = () => {
           />
         }
       >
-        {/* 1. Header + Dynamic Revenue Hero Card */}
+        {/* Dynamic Revenue Hero Card */}
         <RevenueHeroCard />
 
         {/* 2. Main Content Body */}

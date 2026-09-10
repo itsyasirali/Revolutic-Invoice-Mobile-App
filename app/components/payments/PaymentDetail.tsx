@@ -7,12 +7,14 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import usePaymentDetails from "@/hooks/payments/usePaymentDetails";
 import PaymentForm from "./PaymentForm";
 import StandardModal from "../ui/StandardModal";
+import DetailPageHeader from "../ui/DetailPageHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PaymentDetail: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     paymentData,
     loading,
@@ -263,25 +265,12 @@ const PaymentDetail: React.FC = () => {
   return (
     <View className="flex-1 bg-white">
       {/* Top Header */}
-      <View className="flex-row items-center p-4 pt-8 bg-slate-100">
-        <Pressable onPress={goBack} className="mr-4">
-          <MaterialIcons name="arrow-back" size={24} color="#1e293b" />
-        </Pressable>
-        <Text
-          className="text-2xl font-normal text-slate-800 flex-1"
-          numberOfLines={1}
-        >
-          Payment
-        </Text>
-        <View className="flex-row">
-          <Pressable className="p-2" onPress={handleEdit}>
-            <MaterialIcons name="edit" size={24} color="#64748b" />
-          </Pressable>
-          <Pressable className="p-2" onPress={() => setShowMenu(true)}>
-            <MaterialIcons name="more-vert" size={24} color="#64748b" />
-          </Pressable>
-        </View>
-      </View>
+      <DetailPageHeader
+        title="Payment"
+        onBack={goBack}
+        onEdit={handleEdit}
+        onMenu={() => setShowMenu(true)}
+      />
 
       {renderHeaderStats()}
       {renderDetails()}
@@ -310,7 +299,10 @@ const PaymentDetail: React.FC = () => {
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.1)" }}
           onPress={() => setShowMenu(false)}
         >
-          <View className="absolute top-14 right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]">
+          <View
+            className="absolute right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]"
+            style={{ top: insets.top + 52 }}
+          >
             <Pressable
               onPress={handleSendEmail}
               className="flex-row items-center justify-between px-4 py-3.5"

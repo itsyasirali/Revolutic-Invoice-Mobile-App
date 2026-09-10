@@ -16,8 +16,11 @@ import CustomerInfoTab from "./CustomerInfoTab";
 import CustomerInvoicesTab from "./CustomerInvoicesTab";
 import CustomerPaymentsTab from "./CustomerPaymentsTab";
 import StandardModal from "../ui/StandardModal";
+import DetailPageHeader from "../ui/DetailPageHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CustomerDetails: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     customerData,
     activeTab,
@@ -120,22 +123,12 @@ const CustomerDetails: React.FC = () => {
   return (
     <View className="flex-1 bg-white ">
       {/* Top Header */}
-      <View className="flex-row items-center p-4 pt-12 bg-slate-100">
-        <Pressable onPress={() => router.back()} className="mr-4">
-          <MaterialIcons name="arrow-back" size={24} color="#1e293b" />
-        </Pressable>
-        <Text className="text-2xl font-normal text-slate-800 flex-1">
-          {customerData.displayName}
-        </Text>
-        <View className="flex-row">
-          <Pressable className="p-2" onPress={() => setShowEditForm(true)}>
-            <MaterialIcons name="edit" size={24} color="#64748b" />
-          </Pressable>
-          <Pressable className="p-2" onPress={() => setShowMenu(true)}>
-            <MaterialIcons name="more-vert" size={24} color="#64748b" />
-          </Pressable>
-        </View>
-      </View>
+      <DetailPageHeader
+        title={customerData.displayName}
+        onBack={() => router.back()}
+        onEdit={() => setShowEditForm(true)}
+        onMenu={() => setShowMenu(true)}
+      />
 
       {renderHeaderStats()}
 
@@ -198,7 +191,10 @@ const CustomerDetails: React.FC = () => {
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.1)" }}
           onPress={() => setShowMenu(false)}
         >
-          <View className="absolute top-14 right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]">
+          <View
+            className="absolute right-3 bg-white rounded-md shadow-xl border border-slate-100 py-2 min-w-[280px]"
+            style={{ top: insets.top + 52 }}
+          >
             <Pressable
               onPress={() => {
                 setShowMenu(false);

@@ -28,93 +28,81 @@ const QuickActions: React.FC<QuickActionsProps> = (props) => {
     handleInvoiceSuccess,
   } = useQuickActions(props);
 
+  const actions: {
+    key: string;
+    label: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    iconColor: string;
+    bgColor: string;
+    onPress: () => void;
+  }[] = [
+    {
+      key: "customer",
+      label: "New\nCustomer",
+      icon: "person",
+      iconColor: "#10b981",
+      bgColor: "#ecfdf5",
+      onPress: handleOpenCustomer,
+    },
+    {
+      key: "item",
+      label: "New\nItem",
+      icon: "cube",
+      iconColor: "#d97706",
+      bgColor: "#fef3c7",
+      onPress: handleOpenItem,
+    },
+    {
+      key: "invoice",
+      label: "New\nInvoice",
+      icon: "document-text",
+      iconColor: "#1AA3FF",
+      bgColor: "#eef2ff",
+      onPress: handleOpenInvoice,
+    },
+    {
+      key: "payment",
+      label: "New\nPayment",
+      icon: "card",
+      iconColor: "#f43f5e",
+      bgColor: "#fff1f2",
+      onPress: handleOpenPayment,
+    },
+  ];
+
   return (
     <>
-      <View className="bg-white rounded-[22px] p-3.5 border border-slate-100 shadow-sm">
+      <View className="bg-white rounded-[24px] py-5 px-3 border border-slate-100 shadow-sm">
         <View className="flex-row items-center justify-between">
-          {/* 1. New Customer */}
-          <Pressable
-            onPress={handleOpenCustomer}
-            className="items-center active:opacity-80 flex-1 px-1"
-          >
-            <View className="relative items-center justify-center">
-              <View className="w-12 h-12 rounded-full bg-[#ecfdf5] items-center justify-center">
-                <Ionicons name="person" size={22} color="#10b981" />
-              </View>
-              <View className="w-4 h-4 rounded-full bg-slate-900 absolute bottom-0 right-0 items-center justify-center border border-white">
-                <Ionicons name="add" size={9} color="white" />
-              </View>
-            </View>
-            <Text
-              numberOfLines={2}
-              className="text-slate-800 font-bold text-[11px] leading-[14px] text-center mt-1.5"
+          {actions.map((action) => (
+            <Pressable
+              key={action.key}
+              onPress={action.onPress}
+              className="items-center justify-center active:opacity-80 flex-1 px-0.5 py-1"
             >
-              New{"\n"}Customer
-            </Text>
-          </Pressable>
-
-          {/* 2. New Item */}
-          <Pressable
-            onPress={handleOpenItem}
-            className="items-center active:opacity-80 flex-1 px-1"
-          >
-            <View className="relative items-center justify-center">
-              <View className="w-12 h-12 rounded-full bg-[#fef3c7] items-center justify-center">
-                <Ionicons name="cube" size={22} color="#d97706" />
+              <View className="relative items-center justify-center">
+                <View
+                  style={{ backgroundColor: action.bgColor }}
+                  className="w-14 h-14 rounded-full items-center justify-center"
+                >
+                  <Ionicons
+                    name={action.icon}
+                    size={25}
+                    color={action.iconColor}
+                  />
+                </View>
+                <View className="w-[18px] h-[18px] rounded-full bg-slate-900 absolute bottom-0 right-0 items-center justify-center border-2 border-white shadow-xs">
+                  <Ionicons name="add" size={10} color="white" />
+                </View>
               </View>
-              <View className="w-4 h-4 rounded-full bg-slate-900 absolute bottom-0 right-0 items-center justify-center border border-white">
-                <Ionicons name="add" size={9} color="white" />
-              </View>
-            </View>
-            <Text
-              numberOfLines={2}
-              className="text-slate-800 font-bold text-[11px] leading-[14px] text-center mt-1.5"
-            >
-              New{"\n"}Item
-            </Text>
-          </Pressable>
-
-          {/* 3. New Invoice */}
-          <Pressable
-            onPress={handleOpenInvoice}
-            className="items-center active:opacity-80 flex-1 px-1"
-          >
-            <View className="relative items-center justify-center">
-              <View className="w-12 h-12 rounded-full bg-[#eef2ff] items-center justify-center">
-                <Ionicons name="document-text" size={22} color="#1AA3FF" />
-              </View>
-              <View className="w-4 h-4 rounded-full bg-slate-900 absolute bottom-0 right-0 items-center justify-center border border-white">
-                <Ionicons name="add" size={9} color="white" />
-              </View>
-            </View>
-            <Text
-              numberOfLines={2}
-              className="text-slate-800 font-bold text-[11px] leading-[14px] text-center mt-1.5"
-            >
-              New{"\n"}Invoice
-            </Text>
-          </Pressable>
-
-          {/* 4. New Payment */}
-          <Pressable
-            onPress={handleOpenPayment}
-            className="items-center active:opacity-80 flex-1 px-1"
-          >
-            <View className="relative items-center justify-center">
-              <View className="w-12 h-12 rounded-full bg-[#fff1f2] items-center justify-center">
-                <Ionicons name="card" size={22} color="#f43f5e" />
-              </View>
-              <View className="w-4 h-4 rounded-full bg-slate-900 absolute bottom-0 right-0 items-center justify-center border border-white">
-                <Ionicons name="add" size={9} color="white" />
-              </View>
-            </View>
-            <Text
-              numberOfLines={2}
-              className="text-slate-800 font-bold text-[11px] leading-[14px] text-center mt-1.5"
-            >
-              New{"\n"}Payment
-            </Text>
-          </Pressable>
+              <Text
+                numberOfLines={2}
+                className="text-slate-800 font-semibold text-[12px] leading-[16px] text-center mt-2.5"
+              >
+                {action.label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </View>
 
@@ -123,10 +111,7 @@ const QuickActions: React.FC<QuickActionsProps> = (props) => {
         visible={activeModal === "customer"}
         onClose={handleCloseModal}
       >
-        <CustomerForm
-          customer={null}
-          onCancel={handleCloseModal}
-        />
+        <CustomerForm customer={null} onCancel={handleCloseModal} />
       </StandardModal>
 
       {/* Item Form Modal */}
@@ -134,10 +119,7 @@ const QuickActions: React.FC<QuickActionsProps> = (props) => {
         visible={activeModal === "item"}
         onClose={handleCloseModal}
       >
-        <ItemForm
-          item={null}
-          onCancel={handleCloseModal}
-        />
+        <ItemForm item={null} onCancel={handleCloseModal} />
       </StandardModal>
 
       {/* Invoice Form Modal */}

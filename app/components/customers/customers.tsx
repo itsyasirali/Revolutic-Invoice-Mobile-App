@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, Pressable, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import CustomerForm from './CustomerForm';
 import useCustomerList from '@/hooks/customers/useCustomerList';
 import InputField from '../ui/InputField';
@@ -24,41 +24,53 @@ const CustomerList = () => {
   } = useCustomerList();
 
   return (
-    <>
+    <View className="flex-1 bg-slate-50">
       <ListPageHeader title="Customers" onAddPress={() => setShowAddForm(true)} />
 
-      <View
-        className="px-4 py-3 bg-slate-50"
-      >
+      {/* Search Bar */}
+      <View className="px-4 py-3 bg-slate-50">
         <InputField
+          label=""
           placeholder="Search customers..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           containerStyle="mb-0"
+          inputStyle="bg-slate-50"
+          leftIcon={<Ionicons name="search" size={20} color="#94a3b8" />}
         />
       </View>
 
       {/* Filter Tabs */}
-      <View className="flex-row px-4 py-2 bg-slate-50">
-        {(['all', 'active', 'inactive'] as const).map((tab) => {
-          const isActive = filter === tab;
-          return (
-            <Pressable
-              key={tab}
-              onPress={() => setFilter(tab as any)}
-              className={`px-4 py-3 mx-1 rounded-xl flex-row items-center border ${isActive
-                ? "bg-primary border-primary"
-                : "bg-white border-slate-200"
-                } `}
-            >
-              <Text
-                className={`font - bold mr - 2 ${isActive ? 'text-white' : 'text-slate-600'} `}
+      <View className="bg-slate-50 border-b border-gray-100 w-full">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+        >
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'active', label: 'Active' },
+            { key: 'inactive', label: 'Inactive' },
+          ].map((tab) => {
+            const isActive = filter === tab.key;
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setFilter(tab.key as any)}
+                className={`px-5 py-2.5 mr-2 rounded-xl border ${isActive
+                  ? "bg-primary border-primary"
+                  : "bg-white border-slate-200"
+                  }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  className={`font-semibold ${isActive ? 'text-white' : 'text-slate-600'}`}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
       </View>
 
       <View className="flex-1 bg-slate-50">
@@ -159,7 +171,7 @@ const CustomerList = () => {
           }}
         />
       </StandardModal>
-    </>
+    </View>
   );
 };
 
