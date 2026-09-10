@@ -104,9 +104,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
 
       <ScrollView
         className="flex-1 p-4"
-        nestedScrollEnabled={true}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 36 }}
       >
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
           <Text className="font-bold text-base mb-3 text-slate-800">

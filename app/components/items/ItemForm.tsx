@@ -42,14 +42,10 @@ const ItemForm: React.FC<ItemFormProps> = ({
   const units = ["Hour", "Daily", "Monthly", "Project Base", "Contract"];
 
   return (
-    <ScrollView
-      className="flex-1 bg-slate-50"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 20 }}
-    >
-      {/* Header */}
+    <View className="flex-1 bg-slate-50">
+      {/* Pinned Header */}
       <View
-        className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white"
+        className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10"
       >
         <Pressable onPress={onCancel}>
           <Text className="text-primary font-semibold text-base">Cancel</Text>
@@ -66,15 +62,20 @@ const ItemForm: React.FC<ItemFormProps> = ({
         </Pressable>
       </View>
 
-      {/* Form Fields */}
-      <View className="px-4 py-6">
-        {/* Item Name */}
-        <InputField
-          label="Item Name *"
-          value={name}
-          onChangeText={setName}
-          placeholder="Enter item name"
-        />
+      <ScrollView
+        className="flex-1 bg-slate-50"
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 32 }}
+      >
+        <View className="px-4 py-6">
+          {/* Item Name */}
+          <InputField
+            label="Item Name *"
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter item name"
+          />
 
         {/* Description */}
         <InputField
@@ -124,6 +125,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
         />
       </View>
     </ScrollView>
+  </View>
   );
 };
 

@@ -56,7 +56,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
         </Pressable>
       </View>
 
-      <ScrollView className="flex-1 p-4" contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="flex-1 p-4"
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 36 }}
+        showsVerticalScrollIndicator={false}
+      >
 
         {/* 1. Customer Selection */}
         <View className="bg-white p-4 rounded-xl mb-4 shadow-sm">

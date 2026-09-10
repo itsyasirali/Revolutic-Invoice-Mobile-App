@@ -107,16 +107,6 @@ const Settings: React.FC = () => {
               onPress={() => router.push('/screens/settings/profile')}
             />
             <SettingsRow
-              icon="briefcase-outline"
-              title="Business Information"
-              subtitle="Update your business details"
-            />
-            <SettingsRow
-              icon="ribbon-outline"
-              title="Subscription"
-              subtitle="Manage your plan and billing"
-            />
-            <SettingsRow
               icon="lock-closed-outline"
               title="Change Password"
               subtitle="Update your account password"
@@ -124,22 +114,7 @@ const Settings: React.FC = () => {
             />
           </SectionCard>
 
-          <SectionCard title="Preferences">
-            <SettingsRow icon="settings-outline" title="General Settings" subtitle="Manage general preferences" />
-            <SettingsRow icon="document-text-outline" title="Invoice Settings" subtitle="Customize invoice preferences" />
-            <SettingsRow icon="card-outline" title="Payment Settings" subtitle="Manage payment methods" />
-            <SettingsRow icon="pricetag-outline" title="Tax Settings" subtitle="Configure tax rates and rules" />
-            <SettingsRow icon="notifications-outline" title="Notifications" subtitle="Manage email and push notifications" />
-          </SectionCard>
-
-          <SectionCard title="Other">
-            <SettingsRow icon="cloud-upload-outline" title="Backup & Export" subtitle="Backup your data and export" />
-            <SettingsRow icon="shield-checkmark-outline" title="Data & Privacy" subtitle="Manage your data and privacy" />
-            <SettingsRow icon="color-palette-outline" title="Appearance" subtitle="Choose theme and appearance" />
-            <SettingsRow icon="globe-outline" title="Language" subtitle="Select your preferred language" />
-          </SectionCard>
-
-          <SectionCard title="">
+          <SectionCard title="Session">
             <SettingsRow
               icon="log-out-outline"
               title="Logout"

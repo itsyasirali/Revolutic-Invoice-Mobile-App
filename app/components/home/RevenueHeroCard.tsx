@@ -42,9 +42,9 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = ({
             <Ionicons name="settings-outline" size={20} color="white" />
           </Pressable>
 
-          {/* Profile Avatar (tap to open settings) */}
+          {/* Profile Avatar (tap to open Profile Information) */}
           <Pressable
-            onPress={() => router.push('/screens/settings')}
+            onPress={() => router.push('/screens/settings/profile')}
             className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 bg-white/20 items-center justify-center"
           >
             <Text className="text-white font-bold text-sm">{userInitial}</Text>

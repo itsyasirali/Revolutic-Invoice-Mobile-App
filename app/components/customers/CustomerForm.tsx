@@ -60,16 +60,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
   } = useCustomerForm(customer, onCancel);
 
   return (
-    <ScrollView
-      className="flex-1 bg-slate-50"
-      contentContainerStyle={{ paddingBottom: 20 }}
-      keyboardShouldPersistTaps="always"
-      keyboardDismissMode="none"
-      nestedScrollEnabled
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white">
+    <View className="flex-1 bg-slate-50">
+      {/* Pinned Header */}
+      <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10">
         <Pressable onPress={onCancel}>
           <Text className="text-primary font-semibold text-base">Cancel</Text>
         </Pressable>
@@ -85,7 +78,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
         </Pressable>
       </View>
 
-      <View className="px-4 py-6">
+      <ScrollView
+        className="flex-1 bg-slate-50"
+        contentContainerStyle={{ paddingBottom: 32 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="px-4 py-6">
         {/* Customer Type */}
         <View className="mb-6">
           <Text className="text-sm font-semibold mb-3 text-slate-800">
@@ -336,7 +335,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel }) => {
           ))}
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Modal, View, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Pressable, Keyboard, Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface StandardModalProps {
     visible: boolean;
@@ -15,8 +15,33 @@ const StandardModal: React.FC<StandardModalProps> = ({
     onClose,
     children,
     animationType = 'slide',
-    height = '96%',
+    height = '94%',
 }) => {
+    const insets = useSafeAreaInsets();
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+    useEffect(() => {
+        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+        const showSub = Keyboard.addListener(showEvent, (e) => {
+            setKeyboardHeight(e.endCoordinates.height);
+        });
+        const hideSub = Keyboard.addListener(hideEvent, () => {
+            setKeyboardHeight(0);
+        });
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
+
+    // When keyboard is open, lift content above the keyboard so fields are never overlapped
+    const activeBottomPadding = keyboardHeight > 0
+        ? keyboardHeight
+        : Math.max(insets.bottom, 12);
+
     return (
         <Modal
             visible={visible}
@@ -25,32 +50,58 @@ const StandardModal: React.FC<StandardModalProps> = ({
             statusBarTranslucent
             transparent={true}
         >
-            <TouchableOpacity
-                className="flex-1 bg-black/10 justify-end"
-                activeOpacity={1}
-                onPress={onClose}
-            >
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={(e) => e.stopPropagation()}
+            <View style={styles.overlay}>
+                {/* Independent Backdrop: tapping outside closes modal */}
+                <Pressable
+                    style={StyleSheet.absoluteFill}
+                    onPress={onClose}
+                    accessibilityRole="button"
+                    accessibilityLabel="Close modal"
                 >
-                    <View
-                        className="w-full bg-white shadow-lg rounded-t-3xl overflow-hidden"
-                        style={height !== 'auto' ? { height: height as any } : {}}
-                    >
-                        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'padding'} style={height !== 'auto' ? { flex: 1 } : {}}>
-                            <SafeAreaView
-                                className={height === 'auto' ? '' : 'flex-1'}
-                                edges={['bottom', 'left', 'right']}
-                            >
-                                {children}
-                            </SafeAreaView>
-                        </KeyboardAvoidingView>
+                    <View style={styles.backdrop} />
+                </Pressable>
+
+                {/* Modal Sheet Container */}
+                <View
+                    style={[
+                        styles.sheet,
+                        height !== 'auto' ? { height: height as any } : {},
+                        { paddingBottom: activeBottomPadding },
+                    ]}
+                >
+                    <View style={styles.content}>
+                        {children}
                     </View>
-                </TouchableOpacity>
-            </TouchableOpacity>
+                </View>
+            </View>
         </Modal>
     );
 };
+
+const styles = StyleSheet.create({
+    overlay: {
+        flex: 1,
+        justifyContent: 'flex-end',
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    },
+    sheet: {
+        width: '100%',
+        backgroundColor: '#ffffff',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 16,
+    },
+    content: {
+        flex: 1,
+    },
+});
 
 export default StandardModal;
