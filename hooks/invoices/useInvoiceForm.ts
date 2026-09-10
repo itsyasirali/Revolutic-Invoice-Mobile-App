@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import axios from '@/services/api';
-import { useCustomerList } from '@/hooks/customers/useCustomerList';
+import useCustomerList from '@/hooks/customers/useCustomerList';
 
 export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) => void) => {
     const { customers } = useCustomerList();

@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import axios from '@/services/api'; // Use configured axios instance
-import { useCustomerList } from '../customers/useCustomerList';
+import useCustomerList from '../customers/useCustomerList';
 import { PaymentFormData } from '@/types/Payment'; // Ensure this type exists or use any for now if broken
 import useTemplatesList from '../templates/useTemplatesList';
 
-export const usePaymentForm = (initialPayment?: any) => {
+const usePaymentForm = (initialPayment?: any) => {
     const params = useLocalSearchParams();
     const id = params.id as string || initialPayment?.id;
     const isEditMode = Boolean(id);

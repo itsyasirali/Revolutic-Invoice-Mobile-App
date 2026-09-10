@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useProfileSettings } from '@/hooks/settings/useProfileSettings';
+import useProfileSettings from '@/hooks/settings/useProfileSettings';
 import InputField from '../ui/InputField';
 import StandardButton from '../ui/StandardButton';
 

@@ -9,8 +9,7 @@ import { useInvoiceDelete } from './useInvoiceDelete';
 import * as Print from "expo-print";
 import { generateInvoiceHTML } from "@/utils/generateInvoiceHTML";
 
-
-export const useInvoiceDetails = () => {
+const useInvoiceDetails = () => {
     const [downloadSuccess, setDownloadSuccess] = useState(false);
     const [downloadFileName, setDownloadFileName] = useState('');
 

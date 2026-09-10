@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable, Modal } from 'react-native';
+import { View, Text, Pressable, Modal, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomerForm from './CustomerForm';
 import InvoiceForm from '../invoices/InvoiceForm';
-import { useCustomerDetails } from '@/hooks/customers/useCustomerDetails';
+import useCustomerDetails from '@/hooks/customers/useCustomerDetails';
+import useCustomerDelete from '@/hooks/customers/useCustomerDelete';
 import CustomerInfoTab from './CustomerInfoTab';
 import CustomerInvoicesTab from './CustomerInvoicesTab';
 import CustomerPaymentsTab from './CustomerPaymentsTab';
@@ -30,12 +31,33 @@ const CustomerDetails: React.FC = () => {
     handleEmail,
     handleStatusToggle,
     handleCreateInvoice,
-    handleDelete,
     handleEditFormCancel,
     router,
     invoices,
     payments,
   } = useCustomerDetails();
+
+  const { deleteCustomer, deleteLoading } = useCustomerDelete();
+
+  const handleDelete = () => {
+    if (!customerData) return;
+    setShowMenu(false);
+    Alert.alert('Delete Customer', 'Are you sure you want to delete this customer?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          const res = await deleteCustomer(customerData.id);
+          if (res.success) {
+            router.back();
+          } else {
+            Alert.alert('Error', res.error || 'Failed to delete customer');
+          }
+        },
+      },
+    ]);
+  };
 
   if (!customerData) {
     return (
@@ -170,8 +192,15 @@ const CustomerDetails: React.FC = () => {
               <Text className="text-base text-slate-800">{customerData.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}</Text>
             </Pressable>
 
-            <Pressable onPress={handleDelete} className="px-4 py-3.5">
-              <Text className="text-base text-slate-800">Delete</Text>
+            <Pressable
+              onPress={handleDelete}
+              disabled={deleteLoading}
+              className="px-4 py-3.5 flex-row items-center justify-between"
+            >
+              <Text className={`text-base ${deleteLoading ? 'text-red-300' : 'text-red-600'}`}>
+                {deleteLoading ? 'Deleting...' : 'Delete'}
+              </Text>
+              {deleteLoading && <ActivityIndicator size="small" color="#dc2626" />}
             </Pressable>
           </View>
         </Pressable>

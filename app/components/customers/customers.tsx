@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, TextInput, ActivityIndicator, FlatList, R
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomerForm from './CustomerForm';
 import RefreshableScrollView from '../ui/RefreshableScrollView';
-import { useCustomerList } from '@/hooks/customers/useCustomerList';
+import useCustomerList from '@/hooks/customers/useCustomerList';
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
 import ListPageHeader from '../ui/ListPageHeader';

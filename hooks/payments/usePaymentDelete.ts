@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import axios from '@/services/api';
 
-export const usePaymentDelete = () => {
+const usePaymentDelete = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const deletePayment = async (id: string) => {
+    const deletePayment = useCallback(async (id: string) => {
         if (!id) return { success: false, error: 'No payment ID' };
 
         try {
@@ -22,7 +22,7 @@ export const usePaymentDelete = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     return { deletePayment, loading, error };
 };

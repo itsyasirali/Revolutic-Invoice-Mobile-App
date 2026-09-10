@@ -5,7 +5,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import * as MediaLibrary from 'expo-media-library';
 import { Platform, Alert } from "react-native";
 import InvoiceForm from "./InvoiceForm";
-import { useInvoiceDetails } from "@/hooks/invoices/useInvoiceDetails";
+import useInvoiceDetails from "@/hooks/invoices/useInvoiceDetails";
 import StandardModal from "../ui/StandardModal";
 import DownloadPopIn from '../ui/DownloadPopIn';
 

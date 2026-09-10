@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { Customer } from '@/types/customer';
 import axios from '@/services/api';
@@ -21,7 +21,7 @@ export const removeCustomerFromCache = (id: string) => {
     customerCache = customerCache.filter(c => c.id !== id);
 };
 
-export const useCustomerList = () => {
+const useCustomerList = () => {
     const router = useRouter();
     // Instant initialization from memory cache
     const [customers, setCustomers] = useState<Customer[]>(customerCache);
@@ -59,33 +59,41 @@ export const useCustomerList = () => {
         fetchCustomers(false);
     }, [fetchCustomers]);
 
-    const filteredCustomers = filter.toLowerCase() === 'all'
-        ? customers
-        : customers.filter(c => c.status?.toLowerCase() === filter.toLowerCase());
+    const filteredCustomers = useMemo(() => {
+        return filter.toLowerCase() === 'all'
+            ? customers
+            : customers.filter(c => c.status?.toLowerCase() === filter.toLowerCase());
+    }, [filter, customers]);
 
-    const handleCustomerPress = (customer: Customer) => {
+    const handleCustomerPress = useCallback((customer: Customer) => {
         router.push({
             pathname: '/screens/customer/customer-details',
             params: { customer: JSON.stringify(customer) },
         });
-    };
+    }, [router]);
 
-    const handleCancelAdd = () => {
+    const handleCancelAdd = useCallback(() => {
         setShowAddForm(false);
-    };
+    }, []);
 
-    const displayCustomers = filteredCustomers.filter((c) => {
-        const search = searchQuery.toLowerCase();
-        const displayName = c.displayName ?? '';
-        const companyName = c.companyName ?? '';
-        const email = c.email ?? '';
+    const displayCustomers = useMemo(() => {
+        const search = searchQuery.toLowerCase().trim();
+        if (!search) return filteredCustomers;
 
-        return (
-            displayName.toLowerCase().includes(search) ||
-            companyName.toLowerCase().includes(search) ||
-            email.toLowerCase().includes(search)
-        );
-    });
+        return filteredCustomers.filter(c => {
+            const displayName = c.displayName ?? '';
+            const companyName = c.companyName ?? '';
+            const email = c.email ?? '';
+
+            return (
+                displayName.toLowerCase().includes(search) ||
+                companyName.toLowerCase().includes(search) ||
+                email.toLowerCase().includes(search)
+            );
+        });
+    }, [filteredCustomers, searchQuery]);
+
+    const refetch = useCallback(() => fetchCustomers(true), [fetchCustomers]);
 
     return {
         // State
@@ -103,9 +111,12 @@ export const useCustomerList = () => {
         setSearchQuery,
 
         // Actions
-        refetch: () => fetchCustomers(true),
+        refetch,
         handleCustomerPress,
         handleCancelAdd,
     };
 };
+
+export default useCustomerList;
+
 

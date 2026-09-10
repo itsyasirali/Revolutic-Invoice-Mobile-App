@@ -11,7 +11,7 @@ interface ChangePasswordInput {
   newPassword: string;
 }
 
-export const useProfileSettings = () => {
+const useProfileSettings = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

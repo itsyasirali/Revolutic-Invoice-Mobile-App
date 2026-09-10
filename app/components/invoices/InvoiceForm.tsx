@@ -6,7 +6,7 @@ import { useInvoiceForm } from '@/hooks/invoices/useInvoiceForm';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import InputField from '../ui/InputField';
-import { useCustomerList } from '@/hooks/customers/useCustomerList';
+import useCustomerList from '@/hooks/customers/useCustomerList';
 import { useItemList } from '@/hooks/items/useItemList';
 import useTemplatesList from '@/hooks/templates/useTemplatesList';
 import { InvoiceFormProps } from '@/types/invoice';

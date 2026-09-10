@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Linking, Alert } from 'react-native';
 import { Customer } from '@/types/customer';
-import { useCustomerDelete } from './useCustomerDelete';
 import axios from '@/services/api';
 
-export const useCustomerDetails = () => {
+const useCustomerDetails = () => {
     const { customer } = useLocalSearchParams();
     const router = useRouter();
-    const { deleteCustomer } = useCustomerDelete();
 
     const [customerData, setCustomerData] = useState<Customer | null>(null);
     const [activeTab, setActiveTab] = useState<'details' | 'invoices' | 'payments'>('details');
@@ -32,17 +30,17 @@ export const useCustomerDetails = () => {
     const currency = customerData?.currency || 'PKR';
     const firstContact = customerData?.contacts?.[0];
 
-    const handleCall = (number?: string) => {
+    const handleCall = useCallback((number?: string) => {
         if (number) Linking.openURL(`tel:${number}`);
         else Alert.alert('No Number', 'This customer does not have a phone number.');
-    };
+    }, []);
 
-    const handleEmail = (email?: string) => {
+    const handleEmail = useCallback((email?: string) => {
         if (email) Linking.openURL(`mailto:${email}`);
         else Alert.alert('No Email', 'This customer does not have an email address.');
-    };
+    }, []);
 
-    const handleStatusToggle = async () => {
+    const handleStatusToggle = useCallback(async () => {
         if (!customerData) return;
         const newStatus = customerData.status === 'Active' ? 'Inactive' : 'Active';
 
@@ -64,46 +62,35 @@ export const useCustomerDetails = () => {
             Alert.alert('Error', 'Failed to update status');
         }
         setShowMenu(false);
-    };
+    }, [customerData]);
 
-
-    const handleEditFormCancel = () => {
+    const handleEditFormCancel = useCallback(() => {
         setShowEditForm(false);
-    };
+    }, []);
 
-    const handleCreateInvoice = (newInvoice: any) => {
+    const handleCreateInvoice = useCallback((newInvoice: any) => {
         if (newInvoice && customerData) {
             const updatedInvoices = [newInvoice, ...(customerData.invoices || [])];
             setCustomerData({ ...customerData, invoices: updatedInvoices });
             Alert.alert('Success', 'Invoice created successfully');
         }
         setShowNewInvoiceForm(false);
-    };
+    }, [customerData]);
 
-    const handleDelete = async () => {
-        if (!customerData) return;
-        Alert.alert('Delete', 'Are you sure?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Delete', style: 'destructive', onPress: async () => {
-                    const res = await deleteCustomer(customerData.id);
-                    if (res.success) router.back();
-                    else Alert.alert('Error', res.error || 'Delete failed');
-                }
-            }
-        ]);
-        setShowMenu(false);
-    };
+    // Derived sorted data for views (memoized to avoid re-sorting & mutations on every render)
+    const invoices = useMemo(() => {
+        return [...(customerData?.invoices || [])].sort((a: any, b: any) => {
+            const dateA = new Date(a.dueDate || a.invoiceDate || a.createdAt || a.date).getTime();
+            const dateB = new Date(b.dueDate || b.invoiceDate || b.createdAt || b.date).getTime();
+            return dateB - dateA;
+        });
+    }, [customerData?.invoices]);
 
-    // Derived sorted data for views
-    const invoices = (customerData?.invoices || []).sort((a: any, b: any) => {
-        const dateA = new Date(a.dueDate || a.invoiceDate || a.createdAt || a.date).getTime();
-        const dateB = new Date(b.dueDate || b.invoiceDate || b.createdAt || b.date).getTime();
-        return dateB - dateA;
-    });
-
-    const payments = (customerData?.payments || []).sort((a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime());
-
+    const payments = useMemo(() => {
+        return [...(customerData?.payments || [])].sort(
+            (a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+        );
+    }, [customerData?.payments]);
 
     return {
         // State
@@ -132,8 +119,10 @@ export const useCustomerDetails = () => {
         handleEmail,
         handleStatusToggle,
         handleCreateInvoice,
-        handleDelete,
         handleEditFormCancel,
         router,
     };
 };
+
+export default useCustomerDetails;
+

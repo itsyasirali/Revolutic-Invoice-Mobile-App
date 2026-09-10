@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Customer } from "@/types/customer";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useCustomerForm } from "@/hooks/customers/useCustomerForm";
+import useCustomerForm from "@/hooks/customers/useCustomerForm";
 import InputField from "../ui/InputField";
 import StandardButton from "../ui/StandardButton";
 

@@ -26,7 +26,7 @@ const buildCustomerFormData = (data: Partial<Customer>): FormData => {
     return formData;
 };
 
-export const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void) => {
+const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void) => {
     const isEditing = !!customer;
 
     // Form State
@@ -206,3 +206,5 @@ export const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () =
         handleSubmit,
     };
 };
+
+export default useCustomerForm;

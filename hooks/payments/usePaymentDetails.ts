@@ -1,14 +1,13 @@
-
 import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import * as Print from 'expo-print';
-import { usePaymentDelete } from './usePaymentDelete';
+import usePaymentDelete from './usePaymentDelete';
 import { generatePaymentHTML } from '@/utils/generatePaymentHTML';
 import { savePDFToDevice } from '@/utils/fileSystem';
 import useTemplatesList from '../templates/useTemplatesList';
 
-export const usePaymentDetails = () => {
+const usePaymentDetails = () => {
     const { payment } = useLocalSearchParams();
     const router = useRouter();
     const { deletePayment } = usePaymentDelete();

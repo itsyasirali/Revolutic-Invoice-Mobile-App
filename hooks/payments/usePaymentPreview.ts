@@ -6,7 +6,7 @@ import { savePDFToDevice } from '@/utils/fileSystem';
 import { generatePaymentHTML } from '@/utils/generatePaymentHTML';
 import axios from '@/services/api';
 
-export const usePaymentPreview = () => {
+const usePaymentPreview = () => {
     const params = useLocalSearchParams();
     const router = useRouter();
     const { paymentData, id } = params;
