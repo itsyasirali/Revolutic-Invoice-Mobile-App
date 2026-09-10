@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter, usePathname } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from "react";
+import { View, Text, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter, usePathname } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface NavItem {
   key: string;
@@ -12,11 +12,31 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: 'home', path: '/screens/home' },
-  { key: 'customers', label: 'Customers', icon: 'people-outline', path: '/screens/customer/customer' },
-  { key: 'items', label: 'Items', icon: 'cube-outline', path: '/screens/Items/items' },
-  { key: 'invoices', label: 'Invoices', icon: 'document-text-outline', path: '/screens/Invoice/invoices' },
-  { key: 'payments', label: 'Payments', icon: 'card-outline', path: '/screens/payments' },
+  { key: "dashboard", label: "Dashboard", icon: "home", path: "/screens/home" },
+  {
+    key: "customers",
+    label: "Customers",
+    icon: "people-outline",
+    path: "/screens/customer/customer",
+  },
+  {
+    key: "items",
+    label: "Items",
+    icon: "cube-outline",
+    path: "/screens/Items/items",
+  },
+  {
+    key: "invoices",
+    label: "Invoices",
+    icon: "document-text-outline",
+    path: "/screens/Invoice/invoices",
+  },
+  {
+    key: "payments",
+    label: "Payments",
+    icon: "card-outline",
+    path: "/screens/payments",
+  },
 ];
 
 const BottomNav: React.FC = () => {
@@ -30,7 +50,9 @@ const BottomNav: React.FC = () => {
       style={{ paddingBottom: insets.bottom + 8 }}
     >
       {NAV_ITEMS.map((item) => {
-        const isActive = pathname === item.path || (item.path !== '/screens/home' && pathname.startsWith(item.path));
+        const isActive =
+          pathname === item.path ||
+          (item.path !== "/screens/home" && pathname.startsWith(item.path));
         return (
           <Pressable
             key={item.key}
@@ -44,18 +66,21 @@ const BottomNav: React.FC = () => {
             <Ionicons
               name={item.icon}
               size={22}
-              color={isActive ? '#1AA3FF' : '#94a3b8'}
+              color={isActive ? "#1AA3FF" : "#94a3b8"}
             />
             <Text
-              style={isActive ? { color: '#1AA3FF' } : undefined}
+              style={isActive ? { color: "#1AA3FF" } : undefined}
               className={`text-[11px] mt-0.5 ${
-                isActive ? 'font-bold' : 'font-medium text-slate-500'
+                isActive ? "font-bold" : "font-medium text-slate-500"
               }`}
             >
               {item.label}
             </Text>
             {isActive ? (
-              <View style={{ backgroundColor: '#1AA3FF' }} className="w-5 h-1 rounded-full mt-1" />
+              <View
+                style={{ backgroundColor: "#1AA3FF" }}
+                className="w-5 h-1 rounded-full mt-1"
+              />
             ) : (
               <View className="w-5 h-1 mt-1 opacity-0" />
             )}
