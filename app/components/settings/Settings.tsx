@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSettingsScreen } from '@/hooks/settings/useSettingsScreen';
+import OrganizationSwitcher from '../organization/OrganizationSwitcher';
 
 interface SettingsRowProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -94,6 +95,20 @@ const Settings: React.FC = () => {
             </View>
             <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </Pressable>
+
+          <SectionCard title="Organization">
+            <View className="px-4 py-3 flex-row items-center justify-between">
+              <View className="flex-1 pr-2">
+                <Text className="text-sm font-semibold text-slate-800">
+                  Active Organization
+                </Text>
+                <Text className="text-xs text-slate-400 mt-0.5">
+                  Tap to switch or add another workspace
+                </Text>
+              </View>
+              <OrganizationSwitcher />
+            </View>
+          </SectionCard>
 
           <SectionCard title="Account">
             <SettingsRow

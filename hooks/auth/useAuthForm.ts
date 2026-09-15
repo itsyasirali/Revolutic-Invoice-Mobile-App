@@ -4,6 +4,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import axios from '@/services/api';
 import { setStoredToken } from '@/utils/authToken';
+import { setStoredActiveOrgId } from '@/utils/activeOrg';
+import { updateCachedOrganization } from '@/context/OrganizationContext';
+import { updateCachedUser } from '@/hooks/auth/useProfile';
 
 export const useAuthForm = () => {
   const [isSignup, setIsSignup] = useState(false);
@@ -78,10 +81,21 @@ export const useAuthForm = () => {
       const response = await axios.post('/api/auth/login', { email, password });
 
       if (response.data?.user) {
+        const userData = response.data.user;
+        const orgData = userData.organization || null;
+
         if (response.data?.token) {
           await setStoredToken(response.data.token);
         }
-        DeviceEventEmitter.emit('auth.changed');
+
+        if (orgData?.id) {
+          await setStoredActiveOrgId(orgData.id);
+        }
+
+        updateCachedUser(userData);
+        updateCachedOrganization(orgData, orgData ? [orgData] : []);
+
+        DeviceEventEmitter.emit('auth.changed', { user: userData, org: orgData });
         resetForm();
       }
     } catch (err: any) {

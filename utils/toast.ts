@@ -1,15 +1,16 @@
 import { ToastAndroid, Platform } from "react-native";
 
-export const showToast = (message: string) => {
+export const showToast = (typeOrMsg: string, message?: string) => {
+    const text = message || typeOrMsg;
     if (Platform.OS === "android") {
         ToastAndroid.showWithGravityAndOffset(
-            message,
+            text,
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM,
             0,
             100
         );
     } else {
-        console.log("Toast:", message);
+        console.log("Toast:", text);
     }
 };

@@ -30,13 +30,22 @@ export default function ScreensLayout() {
         return true;
       }
 
-      // 3. For detail or sub-screens, go back in stack if possible
+      // 3. If on organization setup, allow back navigation or let system exit
+      if (pathname.includes('/organization-setup')) {
+        if (router.canGoBack()) {
+          router.back();
+          return true;
+        }
+        return false;
+      }
+
+      // 4. For detail or sub-screens, go back in stack if possible
       if (router.canGoBack()) {
         router.back();
         return true;
       }
 
-      // 4. Fallback: navigate to Home
+      // 5. Fallback: navigate to Home
       router.replace('/screens/home');
       return true;
     };
@@ -44,6 +53,8 @@ export default function ScreensLayout() {
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => subscription.remove();
   }, [pathname, router]);
+
+  const hideBottomNav = pathname.includes('/organization-setup');
 
   return (
     <View style={{ flex: 1 }}>
@@ -55,9 +66,10 @@ export default function ScreensLayout() {
           <Stack.Screen name="Items" />
           <Stack.Screen name="customer" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="organization-setup" />
         </Stack>
       </View>
-      <BottomNav />
+      {!hideBottomNav && <BottomNav />}
     </View>
   );
 }

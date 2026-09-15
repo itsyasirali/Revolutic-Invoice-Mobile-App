@@ -1,1 +1,1 @@
-export const IP = "https://www.invoicesmarty.com";
+export const IP = "https://invoicesmarty.com";

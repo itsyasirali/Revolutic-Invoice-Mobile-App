@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import axios from '@/services/api';
+import { updateCachedOrganization } from '@/context/OrganizationContext';
+import { setStoredActiveOrgId } from '@/utils/activeOrg';
 
 interface User {
-    id: string;
+    id: string | number;
     name?: string;
     firstName?: string;
     lastName?: string;
     email: string;
     companyName?: string;
+    organizationId?: number | null;
+    organization?: any;
 }
 
 interface UseProfileReturn {
@@ -26,6 +30,12 @@ export const updateCachedUser = (user: User | null) => {
     cachedUser = user;
     if (user) {
         hasFetchedProfileOnce = true;
+        if (user.organization) {
+            updateCachedOrganization(user.organization);
+            if (user.organization.id) {
+                setStoredActiveOrgId(user.organization.id);
+            }
+        }
     } else {
         hasFetchedProfileOnce = false;
     }
@@ -48,9 +58,17 @@ export const useProfile = (): UseProfileReturn => {
             const response = await axios.get('/api/auth/me');
 
             if (response.data?.user) {
-                cachedUser = response.data.user;
+                const userData = response.data.user;
+                cachedUser = userData;
                 hasFetchedProfileOnce = true;
-                setUser(response.data.user);
+                setUser(userData);
+
+                if (userData.organization) {
+                    updateCachedOrganization(userData.organization);
+                    if (userData.organization.id) {
+                        await setStoredActiveOrgId(userData.organization.id);
+                    }
+                }
             } else {
                 cachedUser = null;
                 setUser(null);
@@ -73,8 +91,15 @@ export const useProfile = (): UseProfileReturn => {
         fetchProfile({ silent: hasFetchedProfileOnce && cachedUser !== null });
 
         // Silent listener for auth changes
-        const subscription = DeviceEventEmitter.addListener('auth.changed', () =>
-            fetchProfile({ silent: true })
+        const subscription = DeviceEventEmitter.addListener(
+            'auth.changed',
+            (data?: { user?: User | null }) => {
+                if (data?.user) {
+                    updateCachedUser(data.user);
+                    setUser(data.user);
+                }
+                fetchProfile({ silent: true });
+            }
         );
 
         return () => {

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDashboardHeader } from "@/hooks/dashboard/useDashboardHeader";
+import OrganizationSwitcher from "../organization/OrganizationSwitcher";
 
 interface DashboardHeaderProps {
   userName?: string;
@@ -74,6 +75,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </Text>
           </Pressable>
         </View>
+      </View>
+
+      {/* Organization Switcher */}
+      <View className="mt-2.5 flex-row items-center">
+        <OrganizationSwitcher />
       </View>
     </View>
   );
