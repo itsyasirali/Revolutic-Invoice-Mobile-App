@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProfile } from '@/hooks/auth/useProfile';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
+import { useOrgCurrency } from '@/hooks/common/useCurrencyExchange';
 
 export type PeriodType = 'week' | 'month' | 'year';
 
@@ -46,6 +47,7 @@ const useRevenueHero = (overrides?: {
   const insets = useSafeAreaInsets();
   const { user } = useProfile();
   const { allInvoices = [] } = useInvoiceList();
+  const { orgCurrency, convertToOrgCurrency } = useOrgCurrency();
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('week');
 
   // User and Company identity
@@ -100,8 +102,11 @@ const useRevenueHero = (overrides?: {
     const currentYear = now.getFullYear();
 
     allInvoices.forEach((inv) => {
-      const paid = getPaidAmount(inv);
-      if (paid <= 0) return;
+      const rawPaid = getPaidAmount(inv);
+      if (rawPaid <= 0) return;
+
+      const invCurrency = inv.currency || inv.raw?.currency || orgCurrency;
+      const paid = convertToOrgCurrency(rawPaid, invCurrency);
 
       const dateVal = inv.date || inv.raw?.invoiceDate || inv.raw?.createdAt;
       const invDate = dateVal ? new Date(dateVal) : null;
@@ -163,7 +168,7 @@ const useRevenueHero = (overrides?: {
         points: yearPoints,
       },
     };
-  }, [allInvoices, overrides?.periodData]);
+  }, [allInvoices, overrides?.periodData, orgCurrency, convertToOrgCurrency]);
 
   const current = periodData[selectedPeriod] || DEFAULT_PERIOD_DATA[selectedPeriod];
 
@@ -208,7 +213,7 @@ const useRevenueHero = (overrides?: {
     return { coords, peak, curvePath, areaPath, hasData: maxVal > 0 };
   }, [current.points]);
 
-  const formattedAmount = `PKR ${current.amount.toLocaleString('en-US')}`;
+  const formattedAmount = `${orgCurrency} ${Math.round(current.amount).toLocaleString('en-US')}`;
   const isPositive = current.growth.startsWith('+');
 
   return {

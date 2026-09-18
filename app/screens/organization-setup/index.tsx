@@ -415,7 +415,7 @@ export default function OrganizationSetupScreen() {
                   <ActivityIndicator size="small" color="white" />
                 ) : (
                   <Text className="text-white text-sm font-bold">
-                    {isAddingNewOrg ? 'Create Organization' : 'Get Started'}
+                    Create Organization
                   </Text>
                 )}
               </TouchableOpacity>

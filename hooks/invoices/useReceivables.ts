@@ -14,7 +14,7 @@ export type FilterType =
 
 export const useReceivables = () => {
   const { allInvoices, loading: invoiceLoading } = useInvoiceList();
-  const { convertToPKR, loading: ratesLoading } = usePKRCurrency();
+  const { convertToPKR, orgCurrency, loading: ratesLoading } = usePKRCurrency();
   const [filter, setFilter] = useState<FilterType>("this_fiscal_year");
 
   const data = useMemo(() => {
@@ -135,6 +135,7 @@ export const useReceivables = () => {
 
   return {
     ...data,
+    currency: orgCurrency,
     isLoading: invoiceLoading || ratesLoading,
     filter,
     setFilter,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import useOrganizationSwitcher from '@/hooks/organization/useOrganizationSwitcher';
 import { OrganizationData } from '@/types/organization';
+import StandardModal from '../ui/StandardModal';
+import OrganizationForm from './OrganizationForm';
 
 const OrganizationSwitcher: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const {
     organization,
     organizations,
@@ -22,8 +25,12 @@ const OrganizationSwitcher: React.FC = () => {
     isOpen,
     setIsOpen,
     handleSelectOrg,
-    handleAddNewOrg,
   } = useOrganizationSwitcher();
+
+  const handleOpenAdd = () => {
+    setIsOpen(false);
+    setShowCreateModal(true);
+  };
 
   const initial = organization?.name?.charAt(0)?.toUpperCase() || 'O';
   const orgName = organization?.name || 'Select Organization';
@@ -140,7 +147,7 @@ const OrganizationSwitcher: React.FC = () => {
             {/* Add New Org Button */}
             <View className="border-t border-slate-100 mx-4 mt-1 pt-2">
               <TouchableOpacity
-                onPress={handleAddNewOrg}
+                onPress={handleOpenAdd}
                 className="flex-row items-center gap-3 px-2 py-3 rounded-xl active:bg-primary/5"
               >
                 <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center">
@@ -155,6 +162,17 @@ const OrganizationSwitcher: React.FC = () => {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* ── Organization Creation Modal (same like Customer modal) ── */}
+      <StandardModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      >
+        <OrganizationForm
+          onCancel={() => setShowCreateModal(false)}
+          onSuccess={() => setShowCreateModal(false)}
+        />
+      </StandardModal>
     </>
   );
 };

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
+import { useOrgCurrency } from '@/hooks/common/useCurrencyExchange';
 
 export interface InvoiceDisplayItem {
   id: string;
@@ -35,6 +36,7 @@ const useRecentInvoices = (overrides?: {
   loading?: boolean;
 }) => {
   const { allInvoices = [], loading: invoiceLoading } = useInvoiceList();
+  const { orgCurrency } = useOrgCurrency();
 
   const loading = overrides?.loading ?? invoiceLoading;
 
@@ -65,11 +67,13 @@ const useRecentInvoices = (overrides?: {
           })
         : 'Recent';
 
+      const cur = inv.currency || inv.raw?.currency || orgCurrency;
+
       return {
         id: inv.id || inv.invoiceNumber,
         invoiceNumber: inv.invoiceNumber ? `#${inv.invoiceNumber}` : '#INV',
         customer: inv.customerName || 'Unknown Customer',
-        amount: `PKR ${Number(inv.amount || 0).toLocaleString('en-US')}`,
+        amount: `${cur} ${Number(inv.amount || 0).toLocaleString('en-US')}`,
         status,
         date: formattedDate,
         badgeBg: style.badgeBg,
@@ -77,7 +81,7 @@ const useRecentInvoices = (overrides?: {
         raw: inv.raw || inv,
       };
     });
-  }, [allInvoices, overrides?.invoices]);
+  }, [allInvoices, overrides?.invoices, orgCurrency]);
 
 
   const router = useRouter();

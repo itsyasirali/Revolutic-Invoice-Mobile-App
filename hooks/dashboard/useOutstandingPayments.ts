@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { useReceivables } from '@/hooks/invoices/useReceivables';
+import { useOrgCurrency } from '@/hooks/common/useCurrencyExchange';
 
 export interface AgingItem {
   id: string;
@@ -10,24 +11,18 @@ export interface AgingItem {
   dotColor: string;
 }
 
-const DEFAULT_AGING_EMPTY: AgingItem[] = [
-  { id: '1', label: 'Due today', count: 0, amount: 'PKR 0', dotColor: '#ef4444' },
-  { id: '2', label: '1–7 days', count: 0, amount: 'PKR 0', dotColor: '#f97316' },
-  { id: '3', label: '8–30 days', count: 0, amount: 'PKR 0', dotColor: '#0284c7' },
-  { id: '4', label: '30+ days', count: 0, amount: 'PKR 0', dotColor: '#94a3b8' },
-];
-
 const useOutstandingPayments = (overrides?: {
   totalAmount?: string;
   agingData?: AgingItem[];
 }) => {
   const { allInvoices = [] } = useInvoiceList();
   const { totalReceivables = 0 } = useReceivables();
+  const { orgCurrency, convertToOrgCurrency } = useOrgCurrency();
 
   const totalAmount = useMemo(() => {
     if (overrides?.totalAmount !== undefined) return overrides.totalAmount;
-    return `PKR ${(totalReceivables || 0).toLocaleString('en-US')}`;
-  }, [totalReceivables, overrides?.totalAmount]);
+    return `${orgCurrency} ${Math.round(totalReceivables || 0).toLocaleString('en-US')}`;
+  }, [totalReceivables, overrides?.totalAmount, orgCurrency]);
 
   const agingData = useMemo(() => {
     if (overrides?.agingData && overrides.agingData.length > 0) {
@@ -50,8 +45,11 @@ const useOutstandingPayments = (overrides?: {
 
       const fullAmount = Number(inv.amount || 0);
       const paidAmount = Number(inv.raw?.paidAmount || inv.raw?.received || 0);
-      const remaining = Math.max(0, fullAmount - paidAmount);
-      if (remaining <= 0) return;
+      const rawRemaining = Math.max(0, fullAmount - paidAmount);
+      if (rawRemaining <= 0) return;
+
+      const invCurrency = inv.currency || inv.raw?.currency || orgCurrency;
+      const remaining = convertToOrgCurrency(rawRemaining, invCurrency);
 
       const dueDateStr = inv.dueDate || inv.date || inv.raw?.dueDate || inv.raw?.invoiceDate;
       const dueDate = dueDateStr ? new Date(dueDateStr) : new Date();
@@ -76,13 +74,20 @@ const useOutstandingPayments = (overrides?: {
 
     return buckets.map((b) => ({
       ...b,
-      amount: `PKR ${b.amount.toLocaleString('en-US')}`,
+      amount: `${orgCurrency} ${Math.round(b.amount).toLocaleString('en-US')}`,
     }));
-  }, [allInvoices, overrides?.agingData]);
+  }, [allInvoices, overrides?.agingData, orgCurrency, convertToOrgCurrency]);
+
+  const defaultEmpty = useMemo(() => [
+    { id: '1', label: 'Due today', count: 0, amount: `${orgCurrency} 0`, dotColor: '#ef4444' },
+    { id: '2', label: '1–7 days', count: 0, amount: `${orgCurrency} 0`, dotColor: '#f97316' },
+    { id: '3', label: '8–30 days', count: 0, amount: `${orgCurrency} 0`, dotColor: '#0284c7' },
+    { id: '4', label: '30+ days', count: 0, amount: `${orgCurrency} 0`, dotColor: '#94a3b8' },
+  ], [orgCurrency]);
 
   return {
     totalAmount,
-    agingData: agingData.length > 0 ? agingData : DEFAULT_AGING_EMPTY,
+    agingData: agingData.length > 0 ? agingData : defaultEmpty,
   };
 };
 

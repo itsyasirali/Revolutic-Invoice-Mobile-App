@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { usePaymentList } from '@/hooks/payments/usePaymentList';
+import { useOrgCurrency } from '@/hooks/common/useCurrencyExchange';
 
 export interface ActivityItem {
   id: string;
@@ -8,31 +9,31 @@ export interface ActivityItem {
   subtitle: string;
   amount: string;
   time: string;
-  type: 'paid' | 'sent' | 'received' | 'overdue';
+  type: 'received' | 'sent' | 'paid' | 'overdue';
 }
 
-const formatRelativeTime = (dateInput?: string | Date | null): string => {
-  if (!dateInput) return 'Recently';
-  const target = new Date(dateInput).getTime();
-  if (isNaN(target)) return 'Recently';
-  const diffMs = Date.now() - target;
-  if (diffMs < 0) return 'Just now';
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+const formatRelativeTime = (date: Date): string => {
+  const now = new Date();
+  const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
   if (diffMinutes < 1) return 'Just now';
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
   const diffHours = Math.floor(diffMinutes / 60);
   if (diffHours < 24) return `${diffHours}h ago`;
   const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;
-  return new Date(target).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const useRecentActivity = (overrideItems?: ActivityItem[]) => {
+const useRecentActivity = (overrides?: { activities?: ActivityItem[] }) => {
   const { allInvoices = [] } = useInvoiceList();
   const { allPayments = [] } = usePaymentList();
+  const { orgCurrency } = useOrgCurrency();
 
-  const items = useMemo(() => {
-    if (overrideItems) return overrideItems;
+  const activities: ActivityItem[] = useMemo(() => {
+    if (overrides?.activities && overrides.activities.length > 0) {
+      return overrides.activities;
+    }
 
     const combined: {
       id: string;
@@ -45,13 +46,14 @@ const useRecentActivity = (overrideItems?: ActivityItem[]) => {
 
     // Map Invoices
     allInvoices.forEach((inv) => {
-      const s = (inv.status || 'Draft').toLowerCase();
+      const s = (inv.status || '').toLowerCase();
       let type: ActivityItem['type'] = 'sent';
       if (s === 'paid') type = 'paid';
       else if (s === 'overdue') type = 'overdue';
 
       const dateVal = inv.date || inv.raw?.createdAt || inv.raw?.invoiceDate;
       const parsedDate = dateVal ? new Date(dateVal) : new Date();
+      const invCur = inv.currency || inv.raw?.currency || orgCurrency;
 
       combined.push({
         id: `inv-${inv.id || inv.invoiceNumber}`,
@@ -62,7 +64,7 @@ const useRecentActivity = (overrideItems?: ActivityItem[]) => {
             : s === 'overdue'
             ? `Overdue • ${inv.customerName || 'Customer'}`
             : `Sent to ${inv.customerName || 'Customer'}`,
-        amount: `PKR ${Number(inv.amount || 0).toLocaleString('en-US')}`,
+        amount: `${invCur} ${Number(inv.amount || 0).toLocaleString('en-US')}`,
         date: parsedDate,
         type,
       });
@@ -74,12 +76,13 @@ const useRecentActivity = (overrideItems?: ActivityItem[]) => {
       const parsedDate = dateVal ? new Date(dateVal) : new Date();
       const customerName =
         p.customer?.displayName || p.customer?.companyName || p.customer?.firstName || 'Customer';
+      const payCur = p.currency || (p as any).raw?.currency || orgCurrency;
 
       combined.push({
         id: `pay-${p.id}`,
         title: 'Payment Received',
         subtitle: `From ${customerName}`,
-        amount: `PKR ${Number(p.amount || 0).toLocaleString('en-US')}`,
+        amount: `${payCur} ${Number(p.amount || 0).toLocaleString('en-US')}`,
         date: parsedDate,
         type: 'received',
       });
@@ -95,9 +98,9 @@ const useRecentActivity = (overrideItems?: ActivityItem[]) => {
       time: formatRelativeTime(item.date),
       type: item.type,
     }));
-  }, [allInvoices, allPayments, overrideItems]);
+  }, [allInvoices, allPayments, overrides?.activities, orgCurrency]);
 
-  return { items };
+  return { items: activities, activities };
 };
 
 export default useRecentActivity;
