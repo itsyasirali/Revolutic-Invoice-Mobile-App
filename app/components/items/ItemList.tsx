@@ -1,4 +1,5 @@
 import React from "react";
+import { getStatusStyle } from '@/utils/invoiceStatus';
 import {
   View,
   Text,
@@ -34,12 +35,12 @@ const ItemList: React.FC = () => {
   } = useItemList();
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       <ListPageHeader title="Items" onAddPress={handleOpenAdd} />
 
 
       {/* Search Bar */}
-      <View className="px-4 py-3 bg-slate-50">
+      <View className="px-4 py-3 bg-slate-100">
         <InputField
           label=""
           placeholder="Search items..."
@@ -52,7 +53,7 @@ const ItemList: React.FC = () => {
       </View>
 
       {/* Filter Tabs */}
-      <View className="bg-slate-50 border-b border-gray-100 w-full">
+      <View className="bg-slate-100 border-b border-gray-100 w-full">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -65,7 +66,7 @@ const ItemList: React.FC = () => {
               <Pressable
                 key={tab.key}
                 onPress={() => setFilter(tab.key as any)}
-                className={`px-5 py-2.5 mr-2 rounded-xl border ${isActive
+                className={`px-5 py-2.5 mr-2 rounded-md border ${isActive
                   ? "bg-primary border-primary"
                   : "bg-white border-slate-200"
                   }`}
@@ -81,7 +82,7 @@ const ItemList: React.FC = () => {
         </ScrollView>
       </View>
 
-      <View className="flex-1 bg-slate-50">
+      <View className="flex-1 bg-slate-100">
         {loading && displayItems.length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#1AA3FF" />
@@ -90,7 +91,7 @@ const ItemList: React.FC = () => {
           <FlatList
             data={displayItems}
             keyExtractor={(item, index) => item.id || index.toString()}
-            contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+            contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -110,7 +111,7 @@ const ItemList: React.FC = () => {
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => handleItemPress(item)}
-                className="bg-white rounded-xl mb-4 p-5 shadow-sm elevation-2"
+                className="bg-white rounded-md mb-4 p-5 shadow-sm elevation-2"
               >
                 <View className="flex-row items-center justify-between mb-3">
                   <View className="flex-row items-center flex-1">
@@ -128,13 +129,9 @@ const ItemList: React.FC = () => {
                   </View>
 
                   <View
-                    className={`px-3 py-1 rounded-full ${item.status === "Active" ? "bg-green-100" : "bg-orange-100" // Kept custom logic if needed, or revert to user's edit if I see it. 
-                      }`}
+                    className={`px-3 py-1 rounded-full border ${getStatusStyle(item.status || "Active").bg} ${getStatusStyle(item.status || "Active").border}`}
                   >
-                    <Text
-                      className={`text-xs font-bold ${item.status === "Active" ? "text-green-700" : "text-orange-700"
-                        }`}
-                    >
+                    <Text className={`text-xs font-bold ${getStatusStyle(item.status || "Active").text}`}>
                       {item.status || "Active"}
                     </Text>
                   </View>

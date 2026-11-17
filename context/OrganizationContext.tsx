@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { DeviceEventEmitter } from 'react-native';
+import { mutate as swrMutate } from 'swr';
 import axios from '@/services/api';
 import { OrganizationData } from '@/types/organization';
 import { showToast } from '@/utils/toast';
@@ -124,6 +125,8 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
 
           // Notify other hooks/components that org has changed
           DeviceEventEmitter.emit('org.changed', { orgId: switchedOrg.id });
+          // Drop cached lists (invoices, payments...) from the previous organization
+          await swrMutate(() => true, undefined, { revalidate: true });
           showToast('success', `Switched to ${switchedOrg.name}`);
           return true;
         }

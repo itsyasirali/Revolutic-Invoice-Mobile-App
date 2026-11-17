@@ -1,4 +1,5 @@
 import React from 'react';
+import { getStatusStyle } from '@/utils/invoiceStatus';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import CustomerForm from './CustomerForm';
@@ -26,12 +27,12 @@ const CustomerList = () => {
   } = useCustomerList();
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       <ListPageHeader title="Customers" onAddPress={handleOpenAdd} />
 
 
       {/* Search Bar */}
-      <View className="px-4 py-3 bg-slate-50">
+      <View className="px-4 py-3 bg-slate-100">
         <InputField
           label=""
           placeholder="Search customers..."
@@ -44,7 +45,7 @@ const CustomerList = () => {
       </View>
 
       {/* Filter Tabs */}
-      <View className="bg-slate-50 border-b border-gray-100 w-full">
+      <View className="bg-slate-100 border-b border-gray-100 w-full">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -57,7 +58,7 @@ const CustomerList = () => {
               <Pressable
                 key={tab.key}
                 onPress={() => setFilter(tab.key as any)}
-                className={`px-5 py-2.5 mr-2 rounded-xl border ${isActive
+                className={`px-5 py-2.5 mr-2 rounded-md border ${isActive
                   ? "bg-primary border-primary"
                   : "bg-white border-slate-200"
                   }`}
@@ -73,7 +74,7 @@ const CustomerList = () => {
         </ScrollView>
       </View>
 
-      <View className="flex-1 bg-slate-50">
+      <View className="flex-1 bg-slate-100">
         {loading && displayCustomers.length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#1AA3FF" />
@@ -82,7 +83,7 @@ const CustomerList = () => {
           <FlatList
             data={displayCustomers}
             keyExtractor={(item, index) => item.id || index.toString()}
-            contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+            contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -102,7 +103,7 @@ const CustomerList = () => {
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => handleCustomerPress(item)}
-                className="bg-white rounded-xl mb-4 p-5 shadow-sm elevation-2"
+                className="bg-white rounded-md mb-4 p-5 shadow-sm elevation-2"
               >
                 <View className="flex-row items-center justify-between mb-3">
                   <View className="flex-row items-center flex-1">
@@ -121,13 +122,9 @@ const CustomerList = () => {
 
                   {/* Status Badge */}
                   <View
-                    className={`px-3 py-1 rounded-full ${item.status === 'Active' ? 'bg-primary/10' : 'bg-orange-100' // Kept custom logic if needed, or revert to user's edit if I see it. 
-                      } `}
+                    className={`px-3 py-1 rounded-full border ${getStatusStyle(item.status || 'Active').bg} ${getStatusStyle(item.status || 'Active').border}`}
                   >
-                    <Text
-                      className={`text-xs font-bold ${item.status === 'Active' ? 'text-primary' : 'text-orange-700'
-                        } `}
-                    >
+                    <Text className={`text-xs font-bold ${getStatusStyle(item.status || 'Active').text}`}>
                       {item.status || 'Active'}
                     </Text>
                   </View>

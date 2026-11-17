@@ -40,7 +40,7 @@ const PreviewScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-slate-100">
       {/* Header */}
       <View className="bg-white px-4 py-3 pt-12 border-b border-slate-200 flex-row justify-between items-center shadow-sm z-10">
         <Pressable onPress={handleGoBack}>
@@ -52,7 +52,7 @@ const PreviewScreen = () => {
         </Pressable>
       </View>
 
-      <View className="flex-1 bg-slate-50 relative pb-24">
+      <View className="flex-1 bg-slate-100 relative pb-24">
         <View className="flex-1">
           <WebView
             originWhitelist={['*']}
@@ -69,7 +69,7 @@ const PreviewScreen = () => {
       <View className="absolute mb-2 bottom-0 left-0 right-0 p-4 flex-row gap-3">
         <Pressable
           onPress={handleGeneratePDF}
-          className="flex-1 bg-white border border-slate-300 py-3 rounded-xl items-center flex-row justify-center"
+          className="flex-1 bg-white border border-slate-300 py-3 rounded-md items-center flex-row justify-center"
         >
           <Ionicons name="share-outline" size={20} color="#334155" />
           <Text className="font-bold text-slate-700 ml-2">PDF</Text>

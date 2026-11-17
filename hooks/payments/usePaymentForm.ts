@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import axios from '@/services/api'; // Use configured axios instance
 import useCustomerList from '../customers/useCustomerList';
 import { PaymentFormData } from '@/types/Payment'; // Ensure this type exists or use any for now if broken
@@ -16,7 +16,7 @@ const usePaymentForm = (
     const isEditMode = Boolean(id);
 
     const { customers, loading: customersLoading } = useCustomerList();
-    const { templates, loading: templatesLoading } = useTemplatesList();
+    const { templates } = useTemplatesList();
 
     const [paymentData, setPaymentData] = useState<PaymentFormData>(() => {
         if (initialPayment) {
@@ -171,7 +171,12 @@ const usePaymentForm = (
     const amountVal = Number(paymentData.amount || 0);
     const amountInExcess = Math.max(amountVal - totalApplied, 0);
 
-    const filteredCustomers = customers.filter((customer) => {
+    const activeCustomers = customers.filter((c: any) => {
+        const isInactive = String(c.status || '').toLowerCase().includes('inactive');
+        return !isInactive || String(c.id) === String(paymentData.customerId);
+    });
+
+    const filteredCustomers = activeCustomers.filter((customer) => {
         const searchLower = customerSearchTerm.toLowerCase();
         const displayName = (customer.displayName || customer.companyName || '').toLowerCase();
         const email = (customer.contacts?.[0]?.email || '').toLowerCase();
@@ -331,7 +336,7 @@ const usePaymentForm = (
         });
     };
 
-    const customerOptions = customers.map((c: any) => ({
+    const customerOptions = activeCustomers.map((c: any) => ({
         label: c.displayName || c.companyName || 'Unknown Customer',
         value: c.id,
         sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,

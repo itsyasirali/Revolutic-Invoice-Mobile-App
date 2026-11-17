@@ -40,7 +40,7 @@ const ItemDetails: React.FC = () => {
 
   if (!itemData) {
     return (
-      <View className="flex-1 p-4 bg-slate-50 items-center justify-center">
+      <View className="flex-1 p-4 bg-slate-100 items-center justify-center">
         <ActivityIndicator size="large" color="#1AA3FF" />
       </View>
     );
@@ -76,11 +76,11 @@ const ItemDetails: React.FC = () => {
 
       {/* Details tab content */}
       <ScrollView
-        className="flex-1 bg-slate-50"
+        className="flex-1 bg-slate-100"
         contentContainerStyle={{ padding: 16 }}
       >
         {/* Profile Card */}
-        <View className="bg-white p-4 rounded-lg shadow-sm mb-4 border border-slate-100">
+        <View className="bg-white p-4 rounded-md shadow-sm mb-4 border border-slate-100">
           <View className="flex-row items-center mb-1">
             <Ionicons name="cube-outline" size={20} color="#64748b" />
             <Text className="ml-2 text-2xl font-normal text-slate-800">
@@ -100,7 +100,7 @@ const ItemDetails: React.FC = () => {
         </View>
 
         {/* Accordion: More Information */}
-        <View className="bg-white rounded-lg shadow-sm mb-4 border border-slate-100 overflow-hidden">
+        <View className="bg-white rounded-md shadow-sm mb-4 border border-slate-100 overflow-hidden">
           <Pressable
             onPress={toggleExpandMoreInfo}
             className="flex-row justify-between items-center p-4 bg-white"

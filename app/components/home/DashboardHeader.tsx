@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSidebar } from "@/context/SidebarContext";
 import { useDashboardHeader } from "@/hooks/dashboard/useDashboardHeader";
 import OrganizationSwitcher from "../organization/OrganizationSwitcher";
 
@@ -21,23 +22,23 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     handleGoSettings,
     handleGoProfile,
   } = useDashboardHeader(customUserName);
+  const { openSidebar } = useSidebar();
 
   return (
     <View
-      className="px-4 pb-2 bg-slate-50"
+      className="px-4 pb-2 bg-slate-100"
       style={{ paddingTop: insets.top + 3 }}
     >
       <View className="flex-row items-center justify-between">
-        <View className="flex-1 pr-2">
-          <Text className="text-slate-500 text-xs font-medium">
-            {greeting}
-          </Text>
-          <Text className="text-slate-800 text-2xl font-bold tracking-tight">
-            {userName}
-          </Text>
-          <Text className="text-slate-400 text-xs font-normal mt-0.5">
-            Here{"'"}s your business overview
-          </Text>
+        {/* Organization Switcher */}
+        <View className="flex-1 pr-2 flex-row items-center">
+          <Pressable
+            onPress={openSidebar}
+            className="w-10 h-10 items-center justify-center mr-1 -ml-2"
+          >
+            <Ionicons name="menu" size={22} color="#334155" />
+          </Pressable>
+          <OrganizationSwitcher />
         </View>
 
         {/* Right Action Buttons */}
@@ -77,9 +78,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </View>
       </View>
 
-      {/* Organization Switcher */}
-      <View className="mt-2.5 flex-row items-center">
-        <OrganizationSwitcher />
+      {/* Greeting */}
+      <View className="mt-3">
+        <Text className="text-slate-800 text-2xl font-bold tracking-tight">
+          {greeting} {userName}
+        </Text>
+        <Text className="text-slate-400 text-xs font-normal mt-0.5">
+          Happy Invoicing
+        </Text>
       </View>
     </View>
   );

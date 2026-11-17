@@ -263,7 +263,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={label || placeholder}
-        className={`flex-row items-center justify-between px-4 py-3 rounded-xl border bg-slate-50 ${
+        className={`flex-row items-center justify-between px-4 py-3 rounded-md border bg-slate-50 ${
           error
             ? "border-red-500"
             : isOpen
@@ -361,7 +361,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
 
               {/* Search Input Bar */}
               <View className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                <View className="flex-row items-center px-3 py-2 rounded-xl bg-white border border-slate-200">
+                <View className="flex-row items-center px-3 py-2 rounded-md bg-white border border-slate-200">
                   <Ionicons name="search" size={18} color="#94a3b8" />
                   <TextInput
                     value={searchQuery}

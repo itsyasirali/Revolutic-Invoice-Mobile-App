@@ -59,7 +59,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
 
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       {/* Pinned Header */}
       <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10">
         <Pressable onPress={onCancel}>
@@ -78,7 +78,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
       </View>
 
       <ScrollView
-        className="flex-1 bg-slate-50"
+        className="flex-1 bg-slate-100"
         contentContainerStyle={{ paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -110,7 +110,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
           ) : (
             <View className="flex-row">
               <Pressable
-                className={`flex-1 p-3 rounded-xl mr-2 border ${
+                className={`flex-1 p-3 rounded-md mr-2 border ${
                   customerType === "Business"
                     ? "bg-primary/10 border-primary"
                     : "bg-slate-50 border-slate-200"
@@ -128,7 +128,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
                 </Text>
               </Pressable>
               <Pressable
-                className={`flex-1 p-3 rounded-xl ml-2 border ${
+                className={`flex-1 p-3 rounded-md ml-2 border ${
                   customerType === "Individual"
                     ? "bg-primary/10 border-primary"
                     : "bg-slate-50 border-slate-200"
@@ -149,7 +149,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
           )}
         </View>
 
-        <View className="rounded-2xl p-6 mb-6 bg-white border border-slate-200">
+        <View className="rounded-md p-6 mb-6 bg-white border border-slate-200">
           <Text className="text-lg font-bold mb-4 text-slate-800">
             Basic Information
           </Text>
@@ -195,7 +195,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
               Remarks
             </Text>
             <TextInput
-              className="p-3 rounded-xl border bg-slate-50 border-slate-200 text-slate-800 h-20 text-top"
+              className="p-3 rounded-md border bg-slate-50 border-slate-200 text-slate-800 h-20 text-top"
               value={remarks}
               onChangeText={setRemarks}
               placeholder="Enter remarks"
@@ -207,7 +207,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onCancel, onSaveS
         </View>
 
         {/* Contacts */}
-        <View className="rounded-2xl p-3 mb-6 bg-white border border-slate-200">
+        <View className="rounded-md p-3 mb-6 bg-white border border-slate-200">
           <Text className="text-lg font-bold mb-4 text-slate-800">
             Contacts
           </Text>

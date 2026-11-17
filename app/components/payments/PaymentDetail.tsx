@@ -40,7 +40,7 @@ const PaymentDetail: React.FC = () => {
 
   if (!paymentData) {
     return (
-      <View className="flex-1 p-4 bg-slate-50 items-center justify-center">
+      <View className="flex-1 p-4 bg-slate-100 items-center justify-center">
         <ActivityIndicator size="large" color="#1AA3FF" />
       </View>
     );
@@ -79,10 +79,10 @@ const PaymentDetail: React.FC = () => {
       {/* Details content */}
       <ScrollView
         className="flex-1 bg-white"
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
       >
         {/* Customer Profile Card */}
-        <View className="bg-white rounded-2xl mb-4 border border-primary/20 p-5">
+        <View className="bg-white rounded-md mb-4 border border-primary/20 p-5">
           <View className="flex-row items-center">
             <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-3">
               <Text className="text-xl font-black text-primary">
@@ -103,7 +103,7 @@ const PaymentDetail: React.FC = () => {
         </View>
 
         {/* Metadata Card */}
-        <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white rounded-md p-5 mb-4 shadow-sm border border-slate-100">
           <View className="flex-row justify-between items-start mb-6">
             <View>
               <Text className="text-slate-500 text-sm mb-1">
@@ -142,7 +142,7 @@ const PaymentDetail: React.FC = () => {
         {/* Applied Invoices List */}
         {paymentData.appliedInvoices &&
           paymentData.appliedInvoices.length > 0 && (
-            <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100">
+            <View className="bg-white rounded-md p-5 mb-4 shadow-sm border border-slate-100">
               <Text className="font-bold text-lg mb-4 text-slate-800">
                 Applied Invoices ({paymentData.appliedInvoices.length})
               </Text>
@@ -174,7 +174,7 @@ const PaymentDetail: React.FC = () => {
           )}
 
         {/* Totals Card */}
-        <View className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-slate-100">
+        <View className="bg-white rounded-md p-5 mb-6 shadow-sm border border-slate-100">
           <View className="flex-row justify-between pt-1">
             <Text className="text-slate-800 font-bold text-xl">
               Amount Received
@@ -191,7 +191,7 @@ const PaymentDetail: React.FC = () => {
             More Information
           </Text>
           {paymentData.notes ? (
-            <View className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+            <View className="bg-white rounded-md p-5 shadow-sm border border-slate-100">
               <Text className="text-slate-700 text-base leading-6">
                 {paymentData.notes}
               </Text>

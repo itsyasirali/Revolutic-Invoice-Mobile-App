@@ -1,7 +1,5 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { View, Text } from "react-native";
 import useInvoiceStatus, { InvoiceStatusMetrics } from "@/hooks/dashboard/useInvoiceStatus";
 
 type InvoiceStatusCardProps = Partial<InvoiceStatusMetrics>;
@@ -18,21 +16,12 @@ const InvoiceStatusCard: React.FC<InvoiceStatusCardProps> = (props) => {
   } = useInvoiceStatus(props);
 
   return (
-    <View className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+    <View className="bg-white rounded-md p-4 border border-slate-100 shadow-sm">
       {/* Card Header */}
       <View className="flex-row items-center justify-between mb-3.5">
         <Text className="text-slate-900 font-bold text-[16px]">
           Invoice Status
         </Text>
-        <Pressable
-          onPress={() => router.push("/screens/Invoice/invoices" as any)}
-          className="flex-row items-center"
-        >
-          <Text style={{ color: "#1AA3FF" }} className="font-semibold text-[13px] mr-1">
-            View all
-          </Text>
-          <Ionicons name="arrow-forward" size={13} color="#1AA3FF" />
-        </Pressable>
       </View>
 
       {/* Multi-segment Progress Bar */}

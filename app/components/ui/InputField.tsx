@@ -32,7 +32,7 @@ const InputField: React.FC<InputFieldProps> = ({
                     {label}
                 </Text>
             )}
-            <View className={`flex-row items-center px-4 py-1.5 rounded-xl border bg-slate-50 border-slate-200 ${error ? 'border-red-500' : ''}`}>
+            <View className={`flex-row items-center px-4 py-1.5 rounded-md border bg-slate-50 border-slate-200 ${error ? 'border-red-500' : ''}`}>
                 {leftIcon && <View className="mr-3">{leftIcon}</View>}
                 <TextInput
                     className={inputStyle}

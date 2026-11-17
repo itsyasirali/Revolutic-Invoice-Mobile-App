@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { Alert, Keyboard } from 'react-native';
+import { Alert } from 'react-native';
 import axios from '@/services/api';
 import { useProfile } from '@/hooks/auth/useProfile';
 
@@ -51,7 +51,7 @@ export const usePaymentEmail = (paymentId: string, paymentDataParam?: any) => {
                 setPayment(paymentData);
 
                 const userEmail = user?.email || '';
-                const companyName = user?.companyName || 'InvoiceSmarty';
+                const companyName = user?.companyName || 'Invoice Smarty';
 
                 const customer = paymentData.customer || paymentData.customerId;
                 const allCustomerEmails: string[] = [];

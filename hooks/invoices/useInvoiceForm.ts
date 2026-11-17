@@ -6,6 +6,9 @@ import useCustomerList from '@/hooks/customers/useCustomerList';
 import { useItemList } from '@/hooks/items/useItemList';
 import useTemplatesList from '@/hooks/templates/useTemplatesList';
 
+// Treat a missing status as Active; only an explicit "inactive" is hidden.
+const isActive = (status?: string) => !String(status || '').toLowerCase().includes('inactive');
+
 export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) => void) => {
     const router = useRouter();
     const { customers } = useCustomerList();
@@ -34,15 +37,17 @@ export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) 
 
     // Dropdown options
     const customerOptions = useMemo(() => {
-        return customers.map(c => ({
+        // Only Active customers can be picked (the already-selected one stays visible when editing).
+        const isSelected = (c: any) => customer && String(c.id) === String(customer.id);
+        return customers.filter((c: any) => isActive(c.status) || isSelected(c)).map(c => ({
             label: c.displayName || c.companyName || 'Unknown Customer',
             value: c.id,
             sublabel: [c.companyName, c.email].filter(Boolean).join(' • ') || undefined,
         }));
-    }, [customers]);
+    }, [customers, customer]);
 
     const itemDropdownOptions = useMemo(() => {
-        return itemOptions.map(i => ({
+        return itemOptions.filter((i: any) => isActive(i.status)).map(i => ({
             label: i.name || 'Unnamed Item',
             value: i.id,
             sublabel: i.sellingPrice ? `Price: PKR ${i.sellingPrice} | Unit: ${i.unit || '-'}` : undefined,
@@ -122,7 +127,7 @@ export const useInvoiceForm = (initialData: any, onSaveSuccess?: (invoice: any) 
                         } else {
                             setTemplateId('');
                         }
-                    } catch (error) {
+                    } catch {
                         // ignored
                     }
                 };

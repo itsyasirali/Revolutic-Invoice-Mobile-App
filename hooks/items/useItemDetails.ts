@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getStatusStyle } from '@/utils/invoiceStatus';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { Item } from '@/types/items';
@@ -102,8 +103,9 @@ export const useItemDetails = () => {
         router.back();
     };
 
-    const statusColor = itemData?.status === "Active" ? "bg-green-100" : "bg-orange-100";
-    const statusTextColor = itemData?.status === "Active" ? "text-green-700" : "text-orange-700";
+    const itemStatusStyle = getStatusStyle(itemData?.status || "Active");
+    const statusColor = `${itemStatusStyle.bg} border ${itemStatusStyle.border}`;
+    const statusTextColor = itemStatusStyle.text;
 
     return {
         // State

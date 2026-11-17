@@ -55,7 +55,7 @@ const QuickActions: React.FC<QuickActionsProps> = (props) => {
     {
       key: "invoice",
       label: "New\nInvoice",
-      icon: "document-text",
+      icon: "receipt",
       iconColor: "#1AA3FF",
       bgColor: "#eef2ff",
       onPress: handleOpenInvoice,
@@ -72,7 +72,7 @@ const QuickActions: React.FC<QuickActionsProps> = (props) => {
 
   return (
     <>
-      <View className="bg-white rounded-[24px] py-5 px-3 border border-slate-100 shadow-sm">
+      <View className="bg-white rounded-md py-5 px-3 border border-slate-100 shadow-sm">
         <View className="flex-row items-center justify-between">
           {actions.map((action) => (
             <Pressable

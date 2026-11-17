@@ -43,7 +43,7 @@ const InvoiceDetail: React.FC = () => {
 
   if (!invoiceData) {
     return (
-      <View className="flex-1 p-4 bg-slate-50 items-center justify-center">
+      <View className="flex-1 p-4 bg-slate-100 items-center justify-center">
         <ActivityIndicator size="large" color="#1AA3FF" />
       </View>
     );
@@ -83,10 +83,10 @@ const InvoiceDetail: React.FC = () => {
       {/* Details Tab Content */}
       <ScrollView
         className="flex-1 bg-white"
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
       >
         {/* Customer Profile Card */}
-        <View className="bg-white rounded-2xl mb-4 border border-primary/20 p-5">
+        <View className="bg-white rounded-md mb-4 border border-primary/20 p-5">
           <View className="flex-row items-center">
             <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-3">
               <Text className="text-xl font-black text-primary">
@@ -107,7 +107,7 @@ const InvoiceDetail: React.FC = () => {
         </View>
 
         {/* Metadata Card */}
-        <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white rounded-md p-5 mb-4 shadow-sm border border-slate-100">
           <View className="flex-row justify-between items-start mb-6">
             <View>
               <Text className="text-slate-500 text-sm mb-1">
@@ -121,7 +121,7 @@ const InvoiceDetail: React.FC = () => {
               </Text>
             </View>
             <View
-              className={`px-3 py-1 rounded-bl-xl rounded-tr-xl ${statusStyle.bg}`}
+              className={`px-3 py-1 rounded-bl-xl rounded-tr-xl border ${statusStyle.bg} ${statusStyle.border}`}
             >
               <Text
                 className={`text-xs font-bold uppercase ${statusStyle.text} tracking-wider`}
@@ -152,7 +152,7 @@ const InvoiceDetail: React.FC = () => {
         </View>
 
         {/* Items Card */}
-        <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white rounded-md p-5 mb-4 shadow-sm border border-slate-100">
           <Text className="font-bold text-lg mb-4 text-slate-800">
             Items ({invoiceData.items?.length || 0})
           </Text>
@@ -179,7 +179,7 @@ const InvoiceDetail: React.FC = () => {
         </View>
 
         {/* Totals Card */}
-        <View className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-slate-100">
+        <View className="bg-white rounded-md p-5 mb-6 shadow-sm border border-slate-100">
           <View className="flex-row justify-between mb-3">
             <Text className="text-slate-600 font-medium text-base">
               Sub Total
@@ -204,7 +204,7 @@ const InvoiceDetail: React.FC = () => {
             More Information
           </Text>
           {invoiceData.notes ? (
-            <View className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+            <View className="bg-white rounded-md p-5 shadow-sm border border-slate-100">
               <RenderHtml
                 contentWidth={width - 72}
                 source={{ html: invoiceData.notes }}

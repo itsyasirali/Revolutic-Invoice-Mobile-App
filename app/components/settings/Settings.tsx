@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSettingsScreen } from '@/hooks/settings/useSettingsScreen';
-import OrganizationSwitcher from '../organization/OrganizationSwitcher';
 
 interface SettingsRowProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -37,7 +36,7 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ icon, title, subtitle, onPres
 const SectionCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <View className="mb-6">
     <Text className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">{title}</Text>
-    <View className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100">
+    <View className="bg-white rounded-md border border-gray-100 shadow-sm divide-y divide-gray-100">
       {children}
     </View>
   </View>
@@ -58,7 +57,7 @@ const Settings: React.FC = () => {
   } = useSettingsScreen();
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       {/* Header */}
       <View
         className="flex-row items-center px-4 pb-2"
@@ -82,7 +81,7 @@ const Settings: React.FC = () => {
           {/* Profile card */}
           <Pressable
             onPress={handleGoProfile}
-            className="flex-row items-center bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6 active:bg-slate-50"
+            className="flex-row items-center bg-white rounded-md border border-gray-100 shadow-sm p-4 mb-6 active:bg-slate-50"
           >
             <View className="w-12 h-12 rounded-full bg-primary/10 items-center justify-center mr-3">
               <Text className="text-xl font-bold text-primary">{userInitial}</Text>
@@ -95,20 +94,6 @@ const Settings: React.FC = () => {
             </View>
             <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </Pressable>
-
-          <SectionCard title="Organization">
-            <View className="px-4 py-3 flex-row items-center justify-between">
-              <View className="flex-1 pr-2">
-                <Text className="text-sm font-semibold text-slate-800">
-                  Active Organization
-                </Text>
-                <Text className="text-xs text-slate-400 mt-0.5">
-                  Tap to switch or add another workspace
-                </Text>
-              </View>
-              <OrganizationSwitcher />
-            </View>
-          </SectionCard>
 
           <SectionCard title="Account">
             <SettingsRow

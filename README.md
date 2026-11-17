@@ -1,6 +1,6 @@
-# InvoiceSmarty Mobile App
+# Invoice Smarty Mobile App
 
-Welcome to the **InvoiceSmarty Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
+Welcome to the **Invoice Smarty Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
 
 ## Features
 

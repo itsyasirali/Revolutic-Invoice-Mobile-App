@@ -210,13 +210,13 @@ const AuthScreen = () => {
 
             {/* Social Buttons */}
             <View className="flex-row gap-4 mb-8">
-              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-xl border border-gray-200 bg-white shadow-sm">
+              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-md border border-gray-200 bg-white shadow-sm">
                 <Ionicons name="logo-google" size={20} color="#EA4335" />
                 <Text className="font-semibold text-gray-700 text-sm">
                   Google
                 </Text>
               </Pressable>
-              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-xl border border-gray-200 bg-white shadow-sm">
+              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-md border border-gray-200 bg-white shadow-sm">
                 <Ionicons name="logo-apple" size={20} color="#1C1C1E" />
                 <Text className="font-semibold text-gray-700 text-sm">
                   Apple

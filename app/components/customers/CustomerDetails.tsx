@@ -42,21 +42,18 @@ const CustomerDetails: React.FC = () => {
     handleEditFormCancel,
     handleDelete,
     handleOpenEdit,
-    handleCloseEdit,
     handleOpenNewInvoice,
     handleCloseNewInvoice,
     handleOpenMenu,
     handleCloseMenu,
     handleNavigateBack,
-    toggleExpandMoreInfo,
-    toggleExpandContacts,
     router,
   } = useCustomerDetails();
 
 
   if (!customerData) {
     return (
-      <View className="flex-1 p-4 bg-slate-50 items-center justify-center">
+      <View className="flex-1 p-4 bg-slate-100 items-center justify-center">
         <Text className="text-slate-500">Loading...</Text>
       </View>
     );

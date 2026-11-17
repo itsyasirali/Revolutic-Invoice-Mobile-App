@@ -42,7 +42,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
   } = useItemForm(item, onSaveSuccess || onSuccess || onCancel);
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       {/* Pinned Header */}
       <View
         className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10"
@@ -63,7 +63,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
       </View>
 
       <ScrollView
-        className="flex-1 bg-slate-50"
+        className="flex-1 bg-slate-100"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 32 }}

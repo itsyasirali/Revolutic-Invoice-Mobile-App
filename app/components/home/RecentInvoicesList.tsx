@@ -11,24 +11,15 @@ interface RecentInvoicesListProps {
 }
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
-  const { invoices, loading, handleInvoicePress, handleViewAll } = useRecentInvoices(props);
+  const { invoices, loading, handleInvoicePress } = useRecentInvoices(props);
 
   return (
-    <View className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+    <View className="bg-white rounded-md p-4 border border-slate-100 shadow-sm">
       {/* Header */}
       <View className="flex-row items-center justify-between mb-3.5">
         <Text className="text-slate-900 font-bold text-[16px]">
           Recent Invoices
         </Text>
-        <Pressable
-          onPress={handleViewAll}
-          className="flex-row items-center"
-        >
-          <Text style={{ color: "#1AA3FF" }} className="font-semibold text-[13px] mr-1">
-            View all
-          </Text>
-          <Ionicons name="arrow-forward" size={13} color="#1AA3FF" />
-        </Pressable>
       </View>
 
       {/* Content */}
@@ -37,12 +28,12 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
           <ActivityIndicator size="small" color="#1AA3FF" />
         </View>
       ) : invoices.length > 0 ? (
-        <View className="gap-2.5">
+        <View>
           {invoices.map((inv) => (
             <Pressable
               key={inv.id}
               onPress={() => handleInvoicePress(inv)}
-              className="flex-row items-center justify-between p-3 rounded-2xl bg-slate-50/80 border border-slate-100/80 active:opacity-75"
+              className="flex-row items-center justify-between py-3 border-b border-slate-100 active:opacity-75"
             >
 
               {/* Left: Document Icon + Invoice info */}
@@ -72,7 +63,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
                   {inv.amount}
                 </Text>
                 <View
-                  className={`px-2.5 py-0.5 rounded-full mt-1 ${inv.badgeBg}`}
+                  className={`mt-1`}
                 >
                   <Text className={`text-[10.5px] font-bold ${inv.badgeText}`}>
                     {inv.status}

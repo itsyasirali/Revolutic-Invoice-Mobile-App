@@ -9,7 +9,7 @@ import axios from '@/services/api';
 const usePaymentPreview = () => {
     const params = useLocalSearchParams();
     const router = useRouter();
-    const { paymentData, id } = params;
+    const { paymentData } = params;
 
     const [payment, setPayment] = useState<any>(null);
     const [template, setTemplate] = useState<any>(null);

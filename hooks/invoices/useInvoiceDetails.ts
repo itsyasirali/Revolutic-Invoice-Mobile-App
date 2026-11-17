@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getInvoiceStatusStyle } from '@/utils/invoiceStatus';
 import axios from '@/services/api';
-import { Invoice } from '@/types/invoice';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Alert, useWindowDimensions, Platform, PermissionsAndroid } from 'react-native';
+import { Alert, useWindowDimensions } from 'react-native';
 import { savePDFToDevice } from "@/utils/fileSystem";
 import { useInvoiceDelete } from './useInvoiceDelete';
 import * as Print from "expo-print";
@@ -13,7 +12,7 @@ const useInvoiceDetails = () => {
     const [downloadSuccess, setDownloadSuccess] = useState(false);
     const [downloadFileName, setDownloadFileName] = useState('');
 
-    const { invoice, invoiceData: invoiceDataParam, id, invoiceId, template } = useLocalSearchParams();
+    const { invoice, invoiceData: invoiceDataParam, template } = useLocalSearchParams();
     const router = useRouter();
     const { deleteInvoice } = useInvoiceDelete();
 
@@ -23,21 +22,18 @@ const useInvoiceDetails = () => {
             try {
                 const raw = Array.isArray(passedData) ? passedData[0] : passedData;
                 return JSON.parse(raw);
-            } catch (err) {
-                // console.warn("Failed to parse invoice param initially", err);
+            } catch {
+                // ignore malformed param
             }
         }
         return null;
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     // UI State
     const [showEditForm, setShowEditForm] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [expandMoreInfo, setExpandMoreInfo] = useState(true);
-
-    const targetId = id || invoiceId;
 
     useEffect(() => {
         const loadData = async () => {
@@ -51,8 +47,8 @@ const useInvoiceDetails = () => {
                     const parsed = JSON.parse(raw);
                     setInvoiceData(parsed);
                     return;
-                } catch (err) {
-                    // console.warn("Failed to parse invoice param in effect", err);
+                } catch {
+                    // ignore malformed param
                 }
             }
         };
@@ -185,25 +181,9 @@ const useInvoiceDetails = () => {
         });
     };
 
-    const getStatusStyle = (status: string) => {
-        const s = (status || '').toLowerCase();
-        switch (s) {
-            case "paid":
-                return { bg: "bg-primary/10", text: "text-primary" };
-            case "sent":
-                return { bg: "bg-primary/10", text: "text-primary" };
-            case "draft":
-                return { bg: "bg-primary/10", text: "text-primary" };
-            case "overdue":
-                return { bg: "bg-red-100", text: "text-red-700" };
-            case "cancelled":
-                return { bg: "bg-red-100", text: "text-red-700" };
-            default:
-                return { bg: "bg-gray-100", text: "text-gray-700" };
-        }
-    };
+    const getStatusStyle = getInvoiceStatusStyle;
 
-    const statusStyle = invoiceData ? getStatusStyle(invoiceData.status) : { bg: "bg-gray-100", text: "text-gray-700" };
+    const statusStyle = getInvoiceStatusStyle(invoiceData?.status);
 
     const customerDisplayName = invoiceData ? (
         invoiceData.customer?.displayName ||
@@ -226,7 +206,6 @@ const useInvoiceDetails = () => {
         // State
         invoiceData,
         loading,
-        error,
         showEditForm,
         showMenu,
         expandMoreInfo,

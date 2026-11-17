@@ -44,7 +44,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
   } = useInvoiceForm(initialData, onSaveSuccess);
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       <View className="px-4 py-5 bg-white border-b border-slate-200 flex-row justify-between items-center z-10">
         <Pressable onPress={onCancel}>
           <Text className="text-primary font-semibold text-base">Cancel</Text>
@@ -66,7 +66,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white p-4 rounded-md mb-4 shadow-sm border border-slate-100">
           <InputField
             label="Invoice Number"
             value={invoiceNumber}
@@ -107,7 +107,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           )}
         </View>
 
-        <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white p-4 rounded-md mb-4 shadow-sm border border-slate-100">
           <SearchableDropdown
             label="Customer *"
             placeholder="Select Customer..."
@@ -122,7 +122,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           />
         </View>
 
-        <View className="mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <View className="mb-4 bg-white p-4 rounded-md shadow-sm border border-slate-100">
           <Text className="font-bold text-base mb-2 text-slate-800 px-1">Items</Text>
           {items.map((item, index) => (
             <View key={item.id} className="mb-6 border-b border-slate-100 pb-4 last:border-0 last:pb-0 relative">
@@ -180,13 +180,13 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
             </View>
           ))}
 
-          <Pressable onPress={addItemRow} className="bg-primary/10 border border-primary/20 p-3 rounded-xl items-center flex-row justify-center mt-2">
+          <Pressable onPress={addItemRow} className="bg-primary/10 border border-primary/20 p-3 rounded-md items-center flex-row justify-center mt-2">
             <Ionicons name="add-circle-outline" size={20} color="#1AA3FF" />
             <Text className="text-primary font-bold ml-2">Add Item</Text>
           </Pressable>
         </View>
 
-        <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white p-4 rounded-md mb-4 shadow-sm border border-slate-100">
           <InputField
             label="Notes & Terms"
             value={notes}
@@ -200,7 +200,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onCancel, onSave
           />
         </View>
 
-        <View className="bg-white p-4 rounded-xl mb-4 shadow-sm border border-slate-100">
+        <View className="bg-white p-4 rounded-md mb-4 shadow-sm border border-slate-100">
           <SearchableDropdown
             label="Template"
             placeholder="Select Template..."

@@ -12,11 +12,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import type { OrganizationData } from '@/types/organization';
 import { useOrganizationForm } from '@/hooks/organization/useOrganizationForm';
-// eslint-disable-next-line import/no-named-as-default
-import SelectField from '../ui/SelectField';
-// eslint-disable-next-line import/no-named-as-default
-import SearchablePickerModal from '../ui/SearchablePickerModal';
+import SearchableDropdown from '../ui/SearchableDropdown';
 import {
   INDUSTRIES,
   LOCATIONS,
@@ -26,12 +24,14 @@ import {
 
 interface OrganizationFormProps {
   onCancel: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (() => void) | undefined;
+  organization?: OrganizationData | null;
 }
 
 export const OrganizationForm: React.FC<OrganizationFormProps> = ({
   onCancel,
   onSuccess,
+  organization,
 }) => {
   const insets = useSafeAreaInsets();
   const {
@@ -46,7 +46,6 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
     provincesList,
     currency,
     setCurrency,
-    currencyLabel,
     timeZone,
     setTimeZone,
     showAddress,
@@ -59,10 +58,16 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
     setZipCode,
     loading,
     error,
-    activePicker,
-    setActivePicker,
     handleSubmit,
-  } = useOrganizationForm(onCancel, onSuccess);
+    isEditing,
+  } = useOrganizationForm(onCancel, onSuccess, organization);
+
+  const toOptions = (list: string[]) => list.map((v) => ({ label: v, value: v }));
+  const industryOptions = toOptions(INDUSTRIES);
+  const locationOptions = toOptions(LOCATIONS);
+  const provinceOptions = toOptions(provincesList);
+  const currencyOptions = CURRENCIES.map((c) => ({ label: c.label, value: c.value }));
+  const timezoneOptions = toOptions(TIMEZONES);
 
   return (
     <KeyboardAvoidingView
@@ -76,7 +81,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
           <Text className="text-slate-600 font-medium text-base">Cancel</Text>
         </Pressable>
         <Text className="text-lg font-bold text-slate-800">
-          New Organization
+          {isEditing ? 'Edit Organization' : 'New Organization'}
         </Text>
         <Pressable onPress={handleSubmit} disabled={loading}>
           <Text
@@ -84,23 +89,23 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
               loading ? 'text-slate-400' : 'text-primary'
             }`}
           >
-            {loading ? 'Creating...' : 'Create'}
+            {loading ? (isEditing ? 'Saving...' : 'Creating...') : isEditing ? 'Save' : 'Create'}
           </Text>
         </Pressable>
       </View>
 
       {/* ── Form Body ── */}
       <ScrollView
-        className="flex-1 bg-slate-50"
+        className="flex-1 bg-slate-100"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
         <View className="px-5 pt-5 gap-5">
           {/* Greeting banner */}
-          <View className="bg-primary/5 border border-primary/15 rounded-2xl p-4">
+          <View className="bg-primary/5 border border-primary/15 rounded-md p-4">
             <Text className="text-[16px] font-bold text-slate-900 tracking-tight">
-              Create a New Organization
+              {isEditing ? 'Edit Organization' : 'Create a New Organization'}
             </Text>
             <Text className="text-xs text-slate-500 mt-1">
               Set up a separate business profile, currency, and address for this workspace.
@@ -109,7 +114,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
 
           {/* Error Banner */}
           {error ? (
-            <View className="bg-red-50 border border-red-200 rounded-xl p-3.5 flex-row items-center gap-2.5">
+            <View className="bg-red-50 border border-red-200 rounded-md p-3.5 flex-row items-center gap-2.5">
               <Ionicons name="alert-circle" size={18} color="#dc2626" />
               <Text className="text-red-700 text-xs flex-1 font-medium">
                 {error}
@@ -123,7 +128,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
               Organization Name <Text className="text-red-500">*</Text>
             </Text>
             <TextInput
-              className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-sm font-medium"
+              className="bg-white border border-slate-200 rounded-md px-4 py-3 text-slate-800 text-sm font-medium"
               placeholder="e.g. Acme Corp"
               placeholderTextColor="#94a3b8"
               value={organizationName}
@@ -133,28 +138,41 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
           </View>
 
           {/* 2. Industry */}
-          <SelectField
-            label="Industry"
+          <SearchableDropdown
+            label="Industry *"
+            placeholder="Select Industry..."
+            modalTitle="Select Industry"
+            searchPlaceholder="Search industry..."
             value={industry}
-            required
-            onPress={() => setActivePicker('industry')}
+            options={industryOptions}
+            onSelect={(o) => setIndustry(String(o.value))}
+            containerStyle="mb-0"
           />
 
           {/* 3. Location (Country) */}
-          <SelectField
-            label="Organization Location"
+          <SearchableDropdown
+            label="Organization Location *"
+            placeholder="Select Organization Location..."
+            modalTitle="Select Organization Location"
+            searchPlaceholder="Search organization location..."
             value={location}
-            required
-            onPress={() => setActivePicker('location')}
+            options={locationOptions}
+            onSelect={(o) => handleLocationChange(String(o.value))}
+            containerStyle="mb-0"
           />
 
           {/* 4. State / Province (conditional) */}
           {provincesList.length > 0 && (
-            <SelectField
-              label="State / Province"
-              value={province}
-              onPress={() => setActivePicker('province')}
-            />
+            <SearchableDropdown
+            label="State / Province"
+            placeholder="Select State / Province..."
+            modalTitle="Select State / Province"
+            searchPlaceholder="Search state / province..."
+            value={province}
+            options={provinceOptions}
+            onSelect={(o) => setProvince(String(o.value))}
+            containerStyle="mb-0"
+          />
           )}
 
           {/* 5. Address Toggle */}
@@ -174,13 +192,13 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
             </TouchableOpacity>
 
             {showAddress && (
-              <View className="mt-3 gap-3.5 bg-white border border-slate-200 rounded-2xl p-4">
+              <View className="mt-3 gap-3.5 bg-white border border-slate-200 rounded-md p-4">
                 <View>
                   <Text className="text-[12px] font-semibold text-slate-600 mb-1.5">
                     Street Address
                   </Text>
                   <TextInput
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-sm"
+                    className="bg-slate-50 border border-slate-200 rounded-md px-4 py-3 text-slate-800 text-sm"
                     placeholder="123 Main St, Suite 100"
                     placeholderTextColor="#94a3b8"
                     value={streetAddress}
@@ -194,7 +212,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
                       City
                     </Text>
                     <TextInput
-                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-sm"
+                      className="bg-slate-50 border border-slate-200 rounded-md px-4 py-3 text-slate-800 text-sm"
                       placeholder="City"
                       placeholderTextColor="#94a3b8"
                       value={city}
@@ -206,7 +224,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
                       Postal / ZIP
                     </Text>
                     <TextInput
-                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 text-sm"
+                      className="bg-slate-50 border border-slate-200 rounded-md px-4 py-3 text-slate-800 text-sm"
                       placeholder="ZIP Code"
                       placeholderTextColor="#94a3b8"
                       value={zipCode}
@@ -219,20 +237,27 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
           </View>
 
           {/* 6. Currency */}
-          <SelectField
-            label="Currency"
+          <SearchableDropdown
+            label="Currency *"
+            placeholder="Select Currency..."
+            modalTitle="Select Currency"
+            searchPlaceholder="Search currency..."
             value={currency}
-            displayValue={currencyLabel}
-            required
-            onPress={() => setActivePicker('currency')}
+            options={currencyOptions}
+            onSelect={(o) => setCurrency(String(o.value))}
+            containerStyle="mb-0"
           />
 
           {/* 7. Time Zone */}
-          <SelectField
-            label="Time Zone"
+          <SearchableDropdown
+            label="Time Zone *"
+            placeholder="Select Time Zone..."
+            modalTitle="Select Time Zone"
+            searchPlaceholder="Search time zone..."
             value={timeZone}
-            required
-            onPress={() => setActivePicker('timezone')}
+            options={timezoneOptions}
+            onSelect={(o) => setTimeZone(String(o.value))}
+            containerStyle="mb-0"
           />
 
           {/* ── Submit Button: "Create Organization" ── */}
@@ -254,7 +279,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
             <TouchableOpacity
               onPress={onCancel}
               disabled={loading}
-              className="h-12 rounded-xl bg-white border border-slate-200 items-center justify-center active:bg-slate-50 disabled:opacity-50"
+              className="h-12 rounded-md bg-white border border-slate-200 items-center justify-center active:bg-slate-50 disabled:opacity-50"
             >
               <Text className="text-slate-700 text-sm font-semibold">
                 Cancel
@@ -264,51 +289,6 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
         </View>
       </ScrollView>
 
-      {/* ── Searchable Picker Modals from UI ── */}
-      <SearchablePickerModal
-        visible={activePicker === 'industry'}
-        title="Select Industry"
-        options={INDUSTRIES}
-        selected={industry}
-        onSelect={setIndustry}
-        onClose={() => setActivePicker(null)}
-      />
-
-      <SearchablePickerModal
-        visible={activePicker === 'location'}
-        title="Select Location"
-        options={LOCATIONS}
-        selected={location}
-        onSelect={handleLocationChange}
-        onClose={() => setActivePicker(null)}
-      />
-
-      <SearchablePickerModal
-        visible={activePicker === 'province'}
-        title="Select State / Province"
-        options={provincesList}
-        selected={province}
-        onSelect={setProvince}
-        onClose={() => setActivePicker(null)}
-      />
-
-      <SearchablePickerModal
-        visible={activePicker === 'currency'}
-        title="Select Currency"
-        options={CURRENCIES}
-        selected={currency}
-        onSelect={setCurrency}
-        onClose={() => setActivePicker(null)}
-      />
-
-      <SearchablePickerModal
-        visible={activePicker === 'timezone'}
-        title="Select Time Zone"
-        options={TIMEZONES}
-        selected={timeZone}
-        onSelect={setTimeZone}
-        onClose={() => setActivePicker(null)}
-      />
     </KeyboardAvoidingView>
   );
 };

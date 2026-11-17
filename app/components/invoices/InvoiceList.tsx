@@ -29,11 +29,11 @@ const InvoiceList = () => {
     } = useInvoiceList();
 
     return (
-        <View className="flex-1 bg-slate-50">
+        <View className="flex-1 bg-slate-100">
             <ListPageHeader title="Invoices" onAddPress={handleOpenAdd} />
 
             {/* Search Bar */}
-            <View className="px-4 py-3 bg-slate-50">
+            <View className="px-4 py-3 bg-slate-100">
                 <InputField
                     label=""
                     placeholder="Search invoices..."
@@ -46,7 +46,7 @@ const InvoiceList = () => {
             </View>
 
             {/* Filter Tabs */}
-            <View className="bg-slate-50 border-b border-gray-100 w-full">
+            <View className="bg-slate-100 border-b border-gray-100 w-full">
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -58,7 +58,7 @@ const InvoiceList = () => {
                             <Pressable
                                 key={tab.key}
                                 onPress={() => setFilter(tab.key as any)}
-                                className={`px-5 py-2.5 mr-2 rounded-xl border ${isActive
+                                className={`px-5 py-2.5 mr-2 rounded-md border ${isActive
                                     ? "bg-primary border-primary"
                                     : "bg-white border-slate-200"
                                     }`}
@@ -73,7 +73,7 @@ const InvoiceList = () => {
             </View>
 
             {/* List */}
-            <View className="flex-1 bg-slate-50">
+            <View className="flex-1 bg-slate-100">
                 {loading && invoices.length === 0 ? (
                     <View className="flex-1 justify-center items-center">
                         <ActivityIndicator size="large" color="#1AA3FF" />
@@ -83,7 +83,7 @@ const InvoiceList = () => {
                     <FlatList
                         data={invoices}
                         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-                        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+                        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -105,7 +105,7 @@ const InvoiceList = () => {
                             return (
                                 <Pressable
                                     onPress={() => handleInvoicePress(item)}
-                                    className="bg-white rounded-xl mb-4 p-5 shadow-sm border border-slate-100"
+                                    className="bg-white rounded-md mb-4 p-5 shadow-sm border border-slate-100"
                                 >
                                     <View className="flex-row items-center justify-between mb-3">
                                         <View className="flex-row items-center flex-1">
@@ -123,7 +123,7 @@ const InvoiceList = () => {
                                         </View>
 
                                         {/* Status Badge */}
-                                        <View className={`px-3 py-1 rounded-full flex-row items-center ${statusStyle.bg}`}>
+                                        <View className={`px-3 py-1 rounded-full flex-row items-center border ${statusStyle.bg} ${statusStyle.border}`}>
                                             <Text className={`text-xs font-bold ${statusStyle.text}`}>
                                                 {(item.status as any).tooltip || item.status}
                                             </Text>

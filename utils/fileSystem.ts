@@ -1,162 +1,101 @@
 import { Platform, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as MediaLibrary from 'expo-media-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showToast } from './toast';
 
 const { StorageAccessFramework } = FileSystem;
-const SAF_DIR_KEY = 'saf_root_uri_v7'; // Bumped version for refreshed logic
 
-/**
- * Helper to ensure a subdirectory exists.
- */
-const ensureDirectoryExists = async (parentUri: string, dirName: string): Promise<string> => {
-    const isSAF = parentUri.startsWith('content://');
-    const lowerDirName = dirName.toLowerCase();
+// Folder created inside the phone's Download folder.
+const FOLDER_NAME = 'InvoiceSmarty';
+// The Download folder the user granted once; reused for every later save.
+const SAF_DIR_KEY = 'saf_download_dir_uri_v8';
 
-    try {
-        if (isSAF) {
-            const files = await StorageAccessFramework.readDirectoryAsync(parentUri);
-            for (const fileUri of files) {
-                const decodedUri = decodeURIComponent(fileUri);
-                const parts = decodedUri.split(/[/:]/);
-                const lastPart = parts.pop() || parts.pop() || "";
-                if (lastPart.toLowerCase() === lowerDirName) {
-                    return fileUri;
-                }
-            }
-            return await StorageAccessFramework.makeDirectoryAsync(parentUri, dirName);
-        } else {
-            const dirUri = parentUri.endsWith('/') ? `${parentUri}${dirName}/` : `${parentUri}/${dirName}/`;
-            const dirInfo = await FileSystem.getInfoAsync(dirUri);
-            if (!dirInfo.exists) {
-                await FileSystem.makeDirectoryAsync(dirUri, { intermediates: true });
-            }
-            return dirUri;
-        }
-    } catch (e) {
-        console.warn(`Failed to ensure directory ${dirName}:`, e);
-        if (isSAF) {
-            try {
-                return await StorageAccessFramework.makeDirectoryAsync(parentUri, dirName);
-            } catch (err) {
-                return parentUri;
-            }
-        }
-        return parentUri;
+/** Returns the folder's URI inside `parentUri`, creating it when missing. */
+const ensureFolder = async (parentUri: string): Promise<string> => {
+    const wanted = FOLDER_NAME.toLowerCase();
+    const children = await StorageAccessFramework.readDirectoryAsync(parentUri);
+    const existing = children.find((child) => {
+        const last = decodeURIComponent(child).split(/[/:]/).pop() || '';
+        return last.toLowerCase() === wanted;
+    });
+    return existing ?? (await StorageAccessFramework.makeDirectoryAsync(parentUri, FOLDER_NAME));
+};
+
+/** Asks once for access to the Download folder and remembers it. */
+const grantDownloadFolder = async (): Promise<string | null> => {
+    await new Promise<void>((resolve) => {
+        Alert.alert(
+            'Automatic Saving',
+            `Choose the "Download" folder on the next screen and tap "Use this folder". Your PDFs will then save automatically to Download/${FOLDER_NAME}.\n\nYou only need to do this once.`,
+            [{ text: 'Continue', onPress: () => resolve() }]
+        );
+    });
+
+    const initial = StorageAccessFramework.getUriForDirectoryInRoot('Download');
+    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync(initial);
+    if (!permissions.granted) {
+        Alert.alert('Permission Required', `Allow access to the Download folder so PDFs can save automatically to ${FOLDER_NAME}.`);
+        return null;
     }
+    await AsyncStorage.setItem(SAF_DIR_KEY, permissions.directoryUri);
+    return permissions.directoryUri;
+};
+
+const writeToAndroid = async (sourceUri: string, fileName: string, downloadUri: string): Promise<void> => {
+    const folderUri = await ensureFolder(downloadUri);
+    const content = await FileSystem.readAsStringAsync(sourceUri, { encoding: FileSystem.EncodingType.Base64 });
+    const destination = await StorageAccessFramework.createFileAsync(folderUri, fileName, 'application/pdf');
+    await FileSystem.writeAsStringAsync(destination, content, { encoding: FileSystem.EncodingType.Base64 });
 };
 
 /**
- * Android Specific: Attempt to save to public Downloads folder directly.
- * Uses MediaLibrary for automated saving where possible, falls back to SAF.
+ * Android: saves into Download/InvoiceSmarty with no prompt after the first
+ * time. If the stored permission is gone (storage cleared, folder deleted) it
+ * asks again, once, and retries a single time.
  */
-export const saveFileWithSAF = async (uri: string, fileName: string): Promise<boolean> => {
-    try {
-        if (Platform.OS !== 'android') return false;
+const saveOnAndroid = async (sourceUri: string, fileName: string): Promise<boolean> => {
+    let downloadUri = await AsyncStorage.getItem(SAF_DIR_KEY);
+    let askedThisTime = false;
 
-        // 1. Try MediaLibrary first for "Downloads" or "Invoices"
-        // This can sometimes bypass SAF if permissions are granted.
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status === 'granted') {
-            try {
-                // We create an asset in the "Downloads" or a custom album
-                // NOTE: MediaLibrary is primarily for media, but it's a good alternative for some Android versions.
-                // However, for PDF, SAF is still more reliable across all Android 11+ versions.
-            } catch (err) {
-                console.log("MediaLibrary save skipped/failed:", err);
-            }
-        }
-
-        let baseUri = await AsyncStorage.getItem(SAF_DIR_KEY);
-
-        if (!baseUri) {
-            // Initial one-time setup for Downloads folder
-            await new Promise<void>((resolve) => {
-                Alert.alert(
-                    "Automatic Saving",
-                    "To enable automatic saving to your Downloads, please select the 'Download' folder in the next screen and then 'Use this folder'.\n\nYou will only need to do this once.",
-                    [{ text: "Continue", onPress: () => resolve() }]
-                );
-            });
-
-            const initialUri = StorageAccessFramework.getUriForDirectoryInRoot("Download");
-            const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync(initialUri);
-
-            if (!permissions.granted) {
-                Alert.alert("Permission Required", "This allows the app to automatically create the 'InvoiceSmarty' folder in your Downloads.");
-                return false;
-            }
-
-            await AsyncStorage.setItem(SAF_DIR_KEY, permissions.directoryUri);
-            baseUri = permissions.directoryUri;
-        }
-
-        // 2. Automatically ensure the "InvoiceSmarty" folder exists inside Downloads
-        const finalFolderUri = await ensureDirectoryExists(baseUri, "InvoiceSmarty");
-
-        // 3. Save the file
-        const base64Content = await FileSystem.readAsStringAsync(uri, {
-            encoding: FileSystem.EncodingType.Base64,
-        });
-
-        try {
-            const destinationUri = await StorageAccessFramework.createFileAsync(
-                finalFolderUri,
-                fileName,
-                'application/pdf'
-            );
-
-            await FileSystem.writeAsStringAsync(destinationUri, base64Content, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-
-            showToast(`Saved to Downloads/InvoiceSmarty/${fileName}`);
-            return true;
-        } catch (e: any) {
-            console.warn("Save failed, clearing permission cache and retrying:", e);
-            await AsyncStorage.removeItem(SAF_DIR_KEY);
-            return await saveFileWithSAF(uri, fileName);
-        }
-    } catch (e: any) {
-        console.error("Android Save Error:", e);
-        Alert.alert("Error", "Failed to save PDF: " + (e.message || "Unknown error"));
-        return false;
+    if (!downloadUri) {
+        downloadUri = await grantDownloadFolder();
+        if (!downloadUri) return false;
+        askedThisTime = true;
     }
+
+    try {
+        await writeToAndroid(sourceUri, fileName, downloadUri);
+    } catch {
+        // Stored access is stale. Re-ask only if we have not just done so.
+        await AsyncStorage.removeItem(SAF_DIR_KEY);
+        if (askedThisTime) throw new Error('Could not write to the selected folder.');
+        const fresh = await grantDownloadFolder();
+        if (!fresh) return false;
+        await writeToAndroid(sourceUri, fileName, fresh);
+    }
+
+    showToast(`Saved to Download/${FOLDER_NAME}/${fileName}`);
+    return true;
+};
+
+/** iOS: copies into the app's documents folder. */
+const saveOnIos = async (sourceUri: string, fileName: string): Promise<boolean> => {
+    const base = FileSystem.documentDirectory;
+    if (!base) return false;
+    const folder = `${base}${FOLDER_NAME}/`;
+    const info = await FileSystem.getInfoAsync(folder);
+    if (!info.exists) await FileSystem.makeDirectoryAsync(folder, { intermediates: true });
+    await FileSystem.copyAsync({ from: sourceUri, to: `${folder}${fileName}` });
+    showToast(`Saved to ${FOLDER_NAME} folder`);
+    return true;
 };
 
 export const savePDFToDevice = async (uri: string, fileName: string): Promise<boolean> => {
     try {
-        if (Platform.OS === 'android') {
-            return await saveFileWithSAF(uri, fileName);
-        }
-
-        // iOS handling
-        const baseDir = FileSystem.documentDirectory;
-        if (!baseDir) return false;
-
-        const finalFolderUri = await ensureDirectoryExists(baseDir, "InvoiceSmarty");
-        const destinationUri = `${finalFolderUri}${fileName}`;
-
-        await FileSystem.copyAsync({
-            from: uri,
-            to: destinationUri
-        });
-
-        showToast(`Saved to InvoiceSmarty folder`);
-        return true;
+        return Platform.OS === 'android' ? await saveOnAndroid(uri, fileName) : await saveOnIos(uri, fileName);
     } catch (e: any) {
-        console.error("PDF Save Error:", e);
-        Alert.alert("Error", "Failed to save PDF: " + (e.message || "Unknown error"));
+        console.error('PDF save error:', e);
+        Alert.alert('Error', `Failed to save PDF: ${e?.message || 'Unknown error'}`);
         return false;
-    }
-};
-
-export const resetSAFDirectory = async (): Promise<void> => {
-    try {
-        await AsyncStorage.removeItem(SAF_DIR_KEY);
-        showToast("Download location reset.");
-    } catch (e) {
-        console.error("Failed to reset directory:", e);
     }
 };

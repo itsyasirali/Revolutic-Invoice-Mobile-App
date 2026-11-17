@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useSidebar } from "@/context/SidebarContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ListPageHeaderProps {
@@ -18,21 +18,21 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   onBackPress,
 }) => {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
 
+  const { openSidebar } = useSidebar();
+
+  // Root lists open the sidebar; pass onBackPress to get a back arrow instead.
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
-    } else if (router.canGoBack()) {
-      router.back();
     } else {
-      router.replace("/screens/home");
+      openSidebar();
     }
   };
 
   return (
     <View
-      className="flex-row items-center justify-between px-4 pb-1 bg-slate-50"
+      className="flex-row items-center justify-between px-4 pb-1 bg-slate-100"
       style={{ paddingTop: insets.top + 3 }}
     >
       <View className="flex-row items-center flex-1 mr-2">
@@ -42,7 +42,7 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
             className="mr-2.5 p-1.5 -ml-1.5 rounded-full active:bg-slate-200"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <MaterialIcons name="arrow-back" size={24} color="#1e293b" />
+            <MaterialIcons name={onBackPress ? "arrow-back" : "menu"} size={24} color="#1e293b" />
           </Pressable>
         )}
         <Text

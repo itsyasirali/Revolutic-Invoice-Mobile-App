@@ -148,7 +148,7 @@ const InvoiceEmailCompose = () => {
                     <View className="p-4">
                         <Text className="text-gray-700 font-semibold mb-2">Message</Text>
                         <TextInput
-                            className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800"
+                            className="bg-gray-50 border border-gray-200 rounded-md p-3 text-gray-800"
                             multiline
                             numberOfLines={15}
                             value={emailData.message}
@@ -198,7 +198,7 @@ const InvoiceEmailCompose = () => {
                             {/* Custom Email Input */}
                             <View className="mb-4">
                                 <TextInput
-                                    className="border border-gray-300 rounded-lg p-3 mb-2"
+                                    className="border border-gray-300 rounded-md p-3 mb-2"
                                     placeholder="Enter email address"
                                     value={newEmailInput}
                                     onChangeText={setNewEmailInput}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Alert, Keyboard } from 'react-native';
+import { Alert } from 'react-native';
 import axios from '@/services/api';
 import { useProfile } from '@/hooks/auth/useProfile';
 
@@ -126,12 +126,12 @@ export const useInvoiceEmail = (passedInvoiceId?: string, passedInitialData?: an
         let formattedDate = 'N/A';
         try {
             formattedDate = invoiceData.invoiceDate ? new Date(invoiceData.invoiceDate).toLocaleDateString() : 'N/A';
-        } catch (e) { }
+        } catch { }
 
         let formattedDueDate = 'N/A';
         try {
             formattedDueDate = invoiceData.dueDate ? new Date(invoiceData.dueDate).toLocaleDateString() : 'N/A';
-        } catch (e) { }
+        } catch { }
 
         const defaultMessage = `Dear ${customerName},
 

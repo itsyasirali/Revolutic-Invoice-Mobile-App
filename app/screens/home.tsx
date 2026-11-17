@@ -11,13 +11,13 @@ const Home: React.FC = () => {
   const { isRefreshing, handleRefresh } = useDashboard();
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       {/* Fixed Dashboard Header */}
       <DashboardHeader />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 28 }}
+        contentContainerStyle={{ paddingBottom: 16 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}

@@ -38,7 +38,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
   const isActionLoading = loading || isFormLoading;
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-100">
       {/* Header */}
       <View className="bg-white border-b border-slate-200 px-4 py-5 flex-row justify-between items-center z-10">
         <Pressable onPress={onCancel}>
@@ -68,7 +68,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
       >
 
         {/* 1. Customer Selection */}
-        <View className="bg-white p-4 rounded-xl mb-4 shadow-sm">
+        <View className="bg-white p-4 rounded-md mb-4 shadow-sm">
           <SearchableDropdown
             label="Customer *"
             placeholder="Select Customer..."
@@ -86,7 +86,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
         <View pointerEvents={paymentData.customerId ? 'auto' : 'none'}>
 
           {/* 2. Payment Details */}
-          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-xl mb-4 shadow-sm">
+          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-md mb-4 shadow-sm">
             <Text className="font-bold text-base mb-3 text-slate-800">Payment Details</Text>
 
             <InputField
@@ -169,10 +169,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
 
           {/* 3. Unpaid Invoices */}
           {unpaidInvoices.length > 0 && (
-            <View className="bg-white p-4 rounded-xl mb-4 shadow-sm">
+            <View className="bg-white p-4 rounded-md mb-4 shadow-sm">
               <Text className="font-bold text-base mb-3 text-slate-800">Unpaid Invoices</Text>
               {unpaidInvoices.map((invoice) => (
-                <View key={invoice.id} className="mb-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                <View key={invoice.id} className="mb-3 p-3 bg-slate-50 rounded-md border border-slate-100">
                   <View className="flex-row justify-between mb-1">
                     <Text className="font-semibold text-slate-700">{invoice.invoiceNumber}</Text>
                     <Text className="text-slate-500 text-xs">{new Date(invoice.dueDate).toLocaleDateString()}</Text>
@@ -200,7 +200,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
           )}
 
           {/* 4. Notes */}
-          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-xl mb-4 shadow-sm">
+          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-md mb-4 shadow-sm">
             <Text className="font-bold text-base mb-3 text-slate-800">Additional Notes</Text>
             <InputField
               value={paymentData.description}
@@ -225,7 +225,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onSave, onCancel, lo
           </View>
 
           {/* 5. Template */}
-          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-xl mb-4 shadow-sm">
+          <View style={{ opacity: paymentData.customerId ? 1 : 0.3 }} className="bg-white p-4 rounded-md mb-4 shadow-sm">
             <SearchableDropdown
               label="Template"
               placeholder="Select Template..."

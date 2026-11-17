@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { getInvoiceStatusStyle } from '@/utils/invoiceStatus';
 import { useRouter } from 'expo-router';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { useOrgCurrency } from '@/hooks/common/useCurrencyExchange';
@@ -12,23 +13,13 @@ export interface InvoiceDisplayItem {
   date: string;
   badgeBg: string;
   badgeText: string;
+  badgeBorder?: string;
   raw?: any;
 }
 
 const getStatusStyle = (status: string) => {
-  const s = (status || '').toLowerCase();
-  switch (s) {
-    case 'paid':
-      return { badgeBg: 'bg-emerald-50', badgeText: 'text-emerald-600' };
-    case 'overdue':
-      return { badgeBg: 'bg-rose-50', badgeText: 'text-rose-600' };
-    case 'sent':
-      return { badgeBg: 'bg-sky-50', badgeText: 'text-sky-600' };
-    case 'partially paid':
-      return { badgeBg: 'bg-amber-50', badgeText: 'text-amber-600' };
-    default:
-      return { badgeBg: 'bg-slate-100', badgeText: 'text-slate-600' };
-  }
+  const { bg, text, border } = getInvoiceStatusStyle(status);
+  return { badgeBg: bg, badgeText: text, badgeBorder: border };
 };
 
 const useRecentInvoices = (overrides?: {
@@ -78,6 +69,7 @@ const useRecentInvoices = (overrides?: {
         date: formattedDate,
         badgeBg: style.badgeBg,
         badgeText: style.badgeText,
+        badgeBorder: style.badgeBorder,
         raw: inv.raw || inv,
       };
     });

@@ -114,7 +114,7 @@ const PaymentEmailCompose = () => {
 
                     {/* Attachment Badge */}
                     <View className="px-4 pb-4">
-                        <View className="flex-row items-center py-2 bg-slate-50 px-3 rounded-lg border border-slate-100 self-start">
+                        <View className="flex-row items-center py-2 bg-slate-50 px-3 rounded-md border border-slate-100 self-start">
                             <Ionicons name="document-text" size={20} color="#ef4444" />
                             <Text className="text-slate-700 ml-2 font-medium">Payment-Receipt.pdf</Text>
                         </View>
@@ -162,7 +162,7 @@ const PaymentEmailCompose = () => {
                                         <Pressable
                                             key={idx}
                                             onPress={() => handleAddEmailFromList(email)}
-                                            className="border-b border-gray-100 py-3.5 px-2 active:bg-slate-50 rounded-lg"
+                                            className="border-b border-gray-100 py-3.5 px-2 active:bg-slate-50 rounded-md"
                                         >
                                             <Text className="text-slate-700 text-base">{email}</Text>
                                         </Pressable>

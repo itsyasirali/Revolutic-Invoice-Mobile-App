@@ -5,6 +5,7 @@ import { useOrganization, updateCachedOrganization } from '@/context/Organizatio
 import { setStoredActiveOrgId } from '@/utils/activeOrg';
 import { getCachedUser } from '@/hooks/auth/useProfile';
 import { showToast } from '@/utils/toast';
+import type { OrganizationData } from '@/types/organization';
 import {
   INDUSTRIES,
   LOCATIONS,
@@ -50,37 +51,42 @@ export interface UseOrganizationFormReturn {
   activePicker: ActivePickerType;
   setActivePicker: (val: ActivePickerType) => void;
   handleSubmit: () => Promise<void>;
+  isEditing: boolean;
 }
 
 export const useOrganizationForm = (
   onCancel?: () => void,
-  onSuccess?: () => void
+  onSuccess?: () => void,
+  editing?: OrganizationData | null
 ): UseOrganizationFormReturn => {
-  const { setOrganization, refreshOrganizations } = useOrganization();
+  const { organization: activeOrg, setOrganization, refreshOrganizations } = useOrganization();
+  const isEditing = !!editing?.id;
+  const initialLocation = editing?.businessLocation || LOCATIONS[0];
 
   // ── Form State ───────────────────────────────────────────────────────────────
-  const [organizationName, setOrganizationName] = useState('');
-  const [industry, setIndustry] = useState(INDUSTRIES[0]);
-  const [location, setLocation] = useState(LOCATIONS[0]);
+  const [organizationName, setOrganizationName] = useState(editing?.name || '');
+  const [industry, setIndustry] = useState(editing?.industry || INDUSTRIES[0]);
+  const [location, setLocation] = useState(initialLocation);
   const [provincesList, setProvincesList] = useState<string[]>(() =>
-    getStatesForCountry(LOCATIONS[0])
+    getStatesForCountry(initialLocation)
   );
   const [province, setProvince] = useState<string>(() => {
-    const states = getStatesForCountry(LOCATIONS[0]);
+    if (editing?.stateProvince) return editing.stateProvince;
+    const states = getStatesForCountry(initialLocation);
     return states[0] || '';
   });
   const [currency, setCurrency] = useState<string>(() =>
-    getCurrencyForCountry(LOCATIONS[0])
+    editing?.currency || getCurrencyForCountry(initialLocation)
   );
   const [timeZone, setTimeZone] = useState<string>(() =>
-    getTimezoneForCountry(LOCATIONS[0])
+    editing?.timeZone || getTimezoneForCountry(initialLocation)
   );
 
   // ── Address Fields ───────────────────────────────────────────────────────────
-  const [showAddress, setShowAddress] = useState(false);
-  const [streetAddress, setStreetAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  const [showAddress, setShowAddress] = useState(!!(editing?.streetAddress || editing?.city || editing?.zipCode));
+  const [streetAddress, setStreetAddress] = useState(editing?.streetAddress || '');
+  const [city, setCity] = useState(editing?.city || '');
+  const [zipCode, setZipCode] = useState(editing?.zipCode || '');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,6 +129,32 @@ export const useOrganizationForm = (
             .join(', ')
         : location;
 
+      if (isEditing && editing) {
+        const res = await axios.put(`/api/organizations/${editing.id}`, {
+          name: organizationName.trim(),
+          industry,
+          currency,
+          address: fullAddress || undefined,
+          businessLocation: location,
+          stateProvince: province || undefined,
+          streetAddress: showAddress ? streetAddress : '',
+          city: showAddress ? city : '',
+          zipCode: showAddress ? zipCode : '',
+          timeZone,
+        });
+        const updated = res.data?.organization;
+        if (updated && activeOrg?.id === updated.id) {
+          updateCachedOrganization(updated);
+          setOrganization(updated);
+        }
+        await refreshOrganizations();
+        DeviceEventEmitter.emit('org.refresh');
+        showToast('success', 'Organization updated');
+        if (onSuccess) onSuccess();
+        else if (onCancel) onCancel();
+        return;
+      }
+
       const response = await axios.post('/api/organizations', {
         name: organizationName.trim(),
         industry,
@@ -156,7 +188,7 @@ export const useOrganizationForm = (
       }
     } catch (err: any) {
       setError(
-        err?.response?.data?.message || 'Failed to create organization. Please try again.'
+        err?.response?.data?.message || isEditing ? 'Failed to update organization. Please try again.' : 'Failed to create organization. Please try again.'
       );
     } finally {
       setLoading(false);
@@ -172,6 +204,9 @@ export const useOrganizationForm = (
     industry,
     currency,
     timeZone,
+    isEditing,
+    editing,
+    activeOrg,
     setOrganization,
     refreshOrganizations,
     onSuccess,
@@ -206,6 +241,7 @@ export const useOrganizationForm = (
     activePicker,
     setActivePicker,
     handleSubmit,
+    isEditing,
   };
 };
 

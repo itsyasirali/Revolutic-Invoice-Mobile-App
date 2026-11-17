@@ -51,7 +51,7 @@ const DownloadPopIn: React.FC<DownloadPopInProps> = ({ visible, fileName, onHide
                 styles.container,
                 { transform: [{ translateY }] }
             ]}
-            className="bg-slate-900 mx-4 rounded-2xl p-4 shadow-xl border border-slate-800"
+            className="bg-slate-900 mx-4 rounded-md p-4 shadow-xl border border-slate-800"
         >
             <View className="flex-row items-center">
                 <View className="bg-primary p-2 rounded-full mr-3">

@@ -1,25 +1,48 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { getInvoiceStatusStyle } from '@/utils/invoiceStatus';
 import { useRouter } from 'expo-router';
+import useSWR, { mutate as globalMutate } from 'swr';
 import axios from '@/services/api';
 import { UIInvoiceListItem } from '@/types/invoice';
 
-// Module-level in-memory cache to guarantee zero-loader screen switches
-let invoiceCache: UIInvoiceListItem[] = [];
-let hasFetchedInvoicesOnce = false;
+// One shared SWR key: every hook/component that lists invoices (the dashboard
+// alone uses it six times) shares a single cached request.
+export const INVOICES_KEY = '/api/invoices';
+
+const fetchInvoices = async (): Promise<UIInvoiceListItem[]> => {
+    const response = await axios.get(INVOICES_KEY);
+    const data = Array.isArray(response.data) ? response.data : response.data.invoices || [];
+    return data.map((inv: any) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        customerName: inv.customer?.displayName || inv.customerDisplayName || inv.customerId?.displayName || inv.customerName || 'Unknown',
+        date: inv.invoiceDate,
+        dueDate: inv.dueDate,
+        amount: inv.total || 0,
+        currency: inv.currency || 'PKR',
+        status: inv.status || 'Draft',
+        raw: inv
+    }));
+};
 
 // Cache mutation helpers for instant in-place updates without refetch flicker
-export const updateInvoiceInCache = (invoice: UIInvoiceListItem) => {
-    const idx = invoiceCache.findIndex(i => i.id === invoice.id);
-    if (idx >= 0) {
-        invoiceCache = [...invoiceCache.slice(0, idx), invoice, ...invoiceCache.slice(idx + 1)];
-    } else {
-        invoiceCache = [invoice, ...invoiceCache];
-    }
-};
+export const updateInvoiceInCache = (invoice: UIInvoiceListItem) =>
+    globalMutate(
+        INVOICES_KEY,
+        (current: UIInvoiceListItem[] | undefined) => {
+            const list = current ?? [];
+            const idx = list.findIndex(i => i.id === invoice.id);
+            return idx >= 0 ? [...list.slice(0, idx), invoice, ...list.slice(idx + 1)] : [invoice, ...list];
+        },
+        { revalidate: false },
+    );
 
-export const removeInvoiceFromCache = (id: string) => {
-    invoiceCache = invoiceCache.filter(i => i.id !== id);
-};
+export const removeInvoiceFromCache = (id: string) =>
+    globalMutate(
+        INVOICES_KEY,
+        (current: UIInvoiceListItem[] | undefined) => (current ?? []).filter(i => i.id !== id),
+        { revalidate: false },
+    );
 
 export const INVOICE_FILTER_TABS = [
     { key: 'all', label: 'All' },
@@ -31,24 +54,18 @@ export const INVOICE_FILTER_TABS = [
     { key: 'Cancelled', label: 'Cancelled' },
 ] as const;
 
-export const getInvoiceStatusStyle = (status: string) => {
-    const s = (status || '').toLowerCase();
-    switch (s) {
-        case 'paid': return { bg: 'bg-primary/10', text: 'text-primary' };
-        case 'sent': return { bg: 'bg-primary/10', text: 'text-primary' };
-        case 'draft': return { bg: 'bg-primary/10', text: 'text-primary' };
-        case 'overdue': return { bg: 'bg-red-100', text: 'text-red-700' };
-        case 'cancelled': return { bg: 'bg-red-100', text: 'text-red-700' };
-        default: return { bg: 'bg-gray-100', text: 'text-gray-700' };
-    }
-};
+export { getInvoiceStatusStyle };
 
 export const useInvoiceList = () => {
     const router = useRouter();
-    // Instant initialization from memory cache
-    const [invoices, setInvoices] = useState<UIInvoiceListItem[]>(invoiceCache);
-    // Loader is ONLY shown on cold first launch when cache is completely empty
-    const [loading, setLoading] = useState<boolean>(!hasFetchedInvoicesOnce && invoiceCache.length === 0);
+    const { data, isLoading, mutate } = useSWR<UIInvoiceListItem[]>(INVOICES_KEY, fetchInvoices, {
+        revalidateOnFocus: false,
+        dedupingInterval: 5000,
+        onError: (error) => console.error('Failed to fetch invoices:', error),
+    });
+    const invoices = data ?? [];
+    // Loader only on a cold first load, when nothing is cached yet
+    const loading = isLoading && !data;
     const [refreshing, setRefreshing] = useState(false);
     const [filter, setFilter] = useState<'all' | 'Draft' | 'Sent' | 'Paid' | 'Overdue' | 'Cancelled' | 'Partially Paid'>('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -58,48 +75,14 @@ export const useInvoiceList = () => {
     const [showEditForm, setShowEditForm] = useState(false);
     const [editingInvoice, setEditingInvoice] = useState<any>(null);
 
-    const fetchInvoices = useCallback(async (isRefresh = false) => {
+    const refreshInvoices = async () => {
+        setRefreshing(true);
         try {
-            if (isRefresh) {
-                setRefreshing(true);
-            } else if (!hasFetchedInvoicesOnce && invoiceCache.length === 0) {
-                setLoading(true);
-            }
-
-            const response = await axios.get('/api/invoices');
-            const data = Array.isArray(response.data) ? response.data : response.data.invoices || [];
-
-            const mapped = data.map((inv: any) => ({
-                id: inv.id,
-                invoiceNumber: inv.invoiceNumber,
-                customerName: inv.customer?.displayName || inv.customerDisplayName || inv.customerId?.displayName || inv.customerName || 'Unknown',
-                date: inv.invoiceDate,
-                dueDate: inv.dueDate,
-                amount: inv.total || 0,
-                currency: inv.currency || 'PKR',
-                status: inv.status || 'Draft',
-                raw: inv
-            }));
-
-            invoiceCache = mapped;
-            hasFetchedInvoicesOnce = true;
-            setInvoices(mapped);
-        } catch (error) {
-            console.error('Failed to fetch invoices:', error);
+            await mutate();
         } finally {
-            setLoading(false);
             setRefreshing(false);
         }
-    }, []);
-
-    const refreshInvoices = async () => {
-        await fetchInvoices(true);
     };
-
-    useEffect(() => {
-        // Silently fetch and sync data in background (SWR)
-        fetchInvoices(false);
-    }, [fetchInvoices]);
 
     const filteredInvoices = invoices.filter((inv) => {
         const matchesFilter = filter === 'all' || inv.status === filter; // Exact match for status
@@ -160,7 +143,7 @@ export const useInvoiceList = () => {
 
         // Actions
         refreshInvoices,
-        refetch: fetchInvoices,
+        refetch: () => mutate(),
         getStatusStyle: getInvoiceStatusStyle,
 
         // UI State & Actions

@@ -32,7 +32,6 @@ const OrganizationSwitcher: React.FC = () => {
     setShowCreateModal(true);
   };
 
-  const initial = organization?.name?.charAt(0)?.toUpperCase() || 'O';
   const orgName = organization?.name || 'Select Organization';
 
   return (
@@ -41,16 +40,11 @@ const OrganizationSwitcher: React.FC = () => {
       <TouchableOpacity
         onPress={() => setIsOpen(true)}
         disabled={isSwitching}
-        className="flex-row items-center gap-2 bg-primary/10 border border-primary/25 rounded-xl px-3 py-1.5 active:bg-primary/20 shadow-xs"
+        className="flex-row items-center gap-1.5 py-1.5 max-w-full active:opacity-70"
       >
-        {/* Avatar */}
-        <View className="w-5 h-5 rounded-md bg-primary items-center justify-center">
-          <Text className="text-white text-[11px] font-bold">{initial}</Text>
-        </View>
-
         {/* Name */}
         <Text
-          className="text-primary text-xs font-bold max-w-[200px]"
+          className="text-slate-900 text-lg font-bold flex-shrink"
           numberOfLines={1}
         >
           {orgName}
@@ -58,9 +52,9 @@ const OrganizationSwitcher: React.FC = () => {
 
         {/* Chevron or Spinner */}
         {isSwitching ? (
-          <ActivityIndicator size="small" color="#1AA3FF" />
+          <ActivityIndicator size="small" color="#64748b" />
         ) : (
-          <Ionicons name="chevron-down" size={13} color="#1AA3FF" />
+          <Ionicons name="chevron-down" size={18} color="#64748b" />
         )}
       </TouchableOpacity>
 

@@ -40,7 +40,7 @@ const RevenueHeroCard: React.FC<RevenueHeroCardProps> = (props) => {
         colors={["#1AA3FF", "#008BE8"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={{ borderRadius: 16, overflow: "hidden" }}
+        style={{ borderRadius: 6, overflow: "hidden" }}
         className="p-5 shadow-md border border-primary/20"
       >
         {/* Card Top Row: Label + Period Pill */}

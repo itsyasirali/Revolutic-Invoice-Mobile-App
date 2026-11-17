@@ -1,13 +1,20 @@
 import React, { useEffect } from 'react';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { View, BackHandler } from 'react-native';
-import BottomNav from '../components/layout/BottomNav';
+import Sidebar from '../components/layout/Sidebar';
+import { SidebarProvider } from '@/context/SidebarContext';
 
 const TAB_LIST_PATHS = [
   '/screens/customer/customer',
   '/screens/customer',
   '/screens/Items/items',
   '/screens/Items',
+  '/screens/organization',
+  '/screens/Projects',
+  '/screens/Expenses',
+  '/screens/TimeTracking',
+  '/screens/Quotes',
+  '/screens/Reports',
   '/screens/Invoice/invoices',
   '/screens/Invoice',
   '/screens/payments',
@@ -54,10 +61,10 @@ export default function ScreensLayout() {
     return () => subscription.remove();
   }, [pathname, router]);
 
-  const hideBottomNav = pathname.includes('/organization-setup');
+  const hideSidebar = pathname.includes('/organization-setup');
 
   return (
-    <View style={{ flex: 1 }}>
+    <SidebarProvider>
       <View style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="home" />
@@ -66,10 +73,16 @@ export default function ScreensLayout() {
           <Stack.Screen name="Items" />
           <Stack.Screen name="customer" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="organization" />
+          <Stack.Screen name="Projects" />
+          <Stack.Screen name="Expenses" />
+          <Stack.Screen name="TimeTracking" />
+          <Stack.Screen name="Quotes" />
+          <Stack.Screen name="Reports" />
           <Stack.Screen name="organization-setup" />
         </Stack>
+        {!hideSidebar && <Sidebar />}
       </View>
-      {!hideBottomNav && <BottomNav />}
-    </View>
+    </SidebarProvider>
   );
 }
