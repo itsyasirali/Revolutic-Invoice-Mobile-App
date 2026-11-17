@@ -30,20 +30,10 @@ export const KIND_ENTITY: Record<ImportKind, string> = {
   payments: 'payments',
 };
 
-export const IMPORT_KINDS: { kind: ImportKind; label: string; icon: string }[] = [
-  { kind: 'contacts', label: 'Customers', icon: 'people-outline' },
-  { kind: 'items', label: 'Items', icon: 'cube-outline' },
-  { kind: 'projects', label: 'Projects', icon: 'briefcase-outline' },
-  { kind: 'expenses', label: 'Expenses', icon: 'wallet-outline' },
-  { kind: 'quotes', label: 'Quotes', icon: 'document-text-outline' },
-  { kind: 'invoices', label: 'Invoices', icon: 'receipt-outline' },
-  { kind: 'payments', label: 'Payments', icon: 'card-outline' },
-];
-
 const errorData = (err: any) => err?.response?.data as { message?: string; errors?: ImportIssue[] } | undefined;
 
-const useImport = () => {
-  const [kind, setKind] = useState<ImportKind>('contacts');
+/** Import flow for one record type. `onDone` runs after records were saved (to refresh the list). */
+const useImport = (kind: ImportKind, onDone?: () => void) => {
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
@@ -61,11 +51,6 @@ const useImport = () => {
     setWarnings([]);
     setFileName('');
     setDone(null);
-  };
-
-  const selectKind = (k: ImportKind) => {
-    setKind(k);
-    reset();
   };
 
   const pickFile = async () => {
@@ -119,6 +104,7 @@ const useImport = () => {
       reset();
       setDone(msg);
       showToast('success', msg);
+      onDone?.();
     } catch (err) {
       const data = errorData(err);
       if (data?.errors?.length) {
@@ -140,7 +126,7 @@ const useImport = () => {
   const toSave = rows.filter((_, i) => statuses[i] !== 'exists').length;
 
   return {
-    kind, selectKind, loading, fileName, rows, statuses, issues, warnings, done,
+    kind, loading, fileName, rows, statuses, issues, warnings, done,
     pickFile, removeRow, confirm, reset, toSave, existing: rows.length - toSave,
   };
 };

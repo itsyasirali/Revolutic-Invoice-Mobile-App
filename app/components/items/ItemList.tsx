@@ -14,6 +14,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import ItemForm from "./ItemForm";
 import InputField from "../ui/InputField";
 import StandardModal from "../ui/StandardModal";
+import { useItemListMenu } from '@/hooks/records/listMenus';
 import ListPageHeader from "../ui/ListPageHeader";
 
 const ItemList: React.FC = () => {
@@ -25,7 +26,7 @@ const ItemList: React.FC = () => {
     showAddForm,
     searchQuery,
     setSearchQuery,
-    displayItems,
+    displayItems: unsorted,
     filterTabs,
     refetch,
     handleItemPress,
@@ -33,10 +34,12 @@ const ItemList: React.FC = () => {
     handleOpenAdd,
     handleSaveSuccess,
   } = useItemList();
+  const { rows: displayItems, menu } = useItemListMenu(unsorted, refetch);
+
 
   return (
     <View className="flex-1 bg-slate-100">
-      <ListPageHeader title="Items" onAddPress={handleOpenAdd} />
+      <ListPageHeader title="Items" onAddPress={handleOpenAdd} menu={menu} />
 
 
       {/* Search Bar */}

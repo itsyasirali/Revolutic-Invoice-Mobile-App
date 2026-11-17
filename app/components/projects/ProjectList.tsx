@@ -4,6 +4,7 @@ import { useRecordList } from '@/hooks/records/useRecordList';
 import { getStatusStyle } from '@/utils/invoiceStatus';
 import { formatMoney } from '@/utils/money';
 import StandardModal from '../ui/StandardModal';
+import { useProjectListMenu } from '@/hooks/records/listMenus';
 import { RecordList, RecordCard } from '../records/RecordList';
 import ProjectForm from './ProjectForm';
 
@@ -24,6 +25,8 @@ const ProjectList = () => {
     matchFilter: (p, f) => String(p.status || '').toLowerCase() === f,
   });
 
+  const { rows, menu } = useProjectListMenu(list.visible, list.refresh);
+
   useFocusEffect(
     useCallback(() => {
       list.reload();
@@ -37,7 +40,7 @@ const ProjectList = () => {
       emptyIcon="work-outline"
       emptyText={`No ${list.filter === 'all' ? '' : list.filter} projects found`}
       searchPlaceholder="Search projects..."
-      data={list.visible}
+      data={rows}
       loading={list.loading}
       refreshing={list.refreshing}
       onRefresh={list.refresh}
@@ -47,6 +50,7 @@ const ProjectList = () => {
       filter={list.filter}
       onFilter={list.setFilter}
       onAdd={() => setShowAdd(true)}
+      menu={menu}
       keyOf={(p) => String(p.id)}
       renderItem={(p) => {
         const st = getStatusStyle(p.status);

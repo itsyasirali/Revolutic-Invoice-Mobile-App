@@ -30,7 +30,6 @@ const MAIN: NavItem[] = [
 const OTHER: NavItem[] = [
   { label: 'Notifications', icon: 'notifications-outline', path: '/screens/Notifications' },
   { label: 'Organizations', icon: 'business-outline', path: '/screens/organization' },
-  { label: 'Import Data', icon: 'cloud-upload-outline', path: '/screens/settings/import' },
   { label: 'Settings', icon: 'settings-outline', path: '/screens/settings' },
 ];
 

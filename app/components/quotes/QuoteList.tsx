@@ -4,6 +4,7 @@ import { useRecordList } from '@/hooks/records/useRecordList';
 import { getStatusStyle } from '@/utils/invoiceStatus';
 import { formatMoney, formatDate } from '@/utils/money';
 import StandardModal from '../ui/StandardModal';
+import { useQuoteListMenu } from '@/hooks/records/listMenus';
 import { RecordList, RecordCard } from '../records/RecordList';
 import QuoteForm from './QuoteForm';
 
@@ -27,6 +28,8 @@ const QuoteList = () => {
     matchFilter: (q, f) => String(q.status || '').toLowerCase() === f,
   });
 
+  const { rows, menu } = useQuoteListMenu(list.visible, list.refresh);
+
   useFocusEffect(
     useCallback(() => {
       list.reload();
@@ -40,7 +43,7 @@ const QuoteList = () => {
       emptyIcon="description"
       emptyText={`No ${list.filter === 'all' ? '' : list.filter} quotes found`}
       searchPlaceholder="Search quotes..."
-      data={list.visible}
+      data={rows}
       loading={list.loading}
       refreshing={list.refreshing}
       onRefresh={list.refresh}
@@ -50,6 +53,7 @@ const QuoteList = () => {
       filter={list.filter}
       onFilter={list.setFilter}
       onAdd={() => setShowAdd(true)}
+      menu={menu}
       keyOf={(q) => String(q.id)}
       renderItem={(q) => {
         const name = q.customer?.displayName || q.customer?.companyName || 'Customer';

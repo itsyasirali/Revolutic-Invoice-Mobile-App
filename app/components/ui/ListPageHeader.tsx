@@ -2,11 +2,15 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useSidebar } from "@/context/SidebarContext";
+import ListMenu from "./ListMenu";
+import type { ListMenuProps } from "@/hooks/records/useListMenu";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ListPageHeaderProps {
   title: string;
   onAddPress: () => void;
+  /** The "..." menu (sort, import, export, refresh), shown next to the add button. */
+  menu?: ListMenuProps;
   showBackButton?: boolean;
   onBackPress?: () => void;
 }
@@ -14,6 +18,7 @@ interface ListPageHeaderProps {
 const ListPageHeader: React.FC<ListPageHeaderProps> = ({
   title,
   onAddPress,
+  menu,
   showBackButton = true,
   onBackPress,
 }) => {
@@ -52,12 +57,15 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
           {title}
         </Text>
       </View>
+      <View className="flex-row items-center">
       <Pressable
         onPress={onAddPress}
         className="w-12 h-12 rounded-md bg-primary items-center justify-center shadow-sm"
       >
         <MaterialIcons name="add" size={22} color="white" />
       </Pressable>
+      {menu && <ListMenu menu={menu} />}
+      </View>
     </View>
   );
 };

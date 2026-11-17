@@ -7,15 +7,15 @@ import { showToast } from './toast';
 const FOLDER_NAME = 'InvoiceSmarty';
 
 /**
- * Saves a PDF automatically, with no prompt.
+ * Saves a file (PDF or CSV) automatically, with no prompt.
  * - Android: Download/InvoiceSmarty through MediaStore (no permission needed on
  *   Android 10+, a one-time storage permission on Android 9 and older).
  * - iOS: the app's documents folder.
  */
-export const savePDFToDevice = async (uri: string, fileName: string): Promise<boolean> => {
+export const saveFileToDevice = async (uri: string, fileName: string, mimeType: string): Promise<boolean> => {
     try {
         if (Platform.OS === 'android') {
-            await InvoiceFiles.saveToDownloads(uri, fileName, FOLDER_NAME, 'application/pdf');
+            await InvoiceFiles.saveToDownloads(uri, fileName, FOLDER_NAME, mimeType);
             showToast(`Saved to Download/${FOLDER_NAME}/${fileName}`);
             return true;
         }
@@ -29,8 +29,10 @@ export const savePDFToDevice = async (uri: string, fileName: string): Promise<bo
         showToast(`Saved to ${FOLDER_NAME} folder`);
         return true;
     } catch (e: any) {
-        console.error('PDF save error:', e);
-        Alert.alert('Error', `Failed to save PDF: ${e?.message || 'Unknown error'}`);
+        console.error('File save error:', e);
+        Alert.alert('Error', `Failed to save file: ${e?.message || 'Unknown error'}`);
         return false;
     }
 };
+
+export const savePDFToDevice = (uri: string, fileName: string) => saveFileToDevice(uri, fileName, 'application/pdf');

@@ -5,11 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import InvoiceForm from './InvoiceForm';
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
+import { useInvoiceListMenu } from '@/hooks/records/listMenus';
 import ListPageHeader from '../ui/ListPageHeader';
 
 const InvoiceList = () => {
     const {
-        invoices,
+        invoices: unsorted,
         loading,
         refreshing,
         filter,
@@ -27,10 +28,12 @@ const InvoiceList = () => {
         handleInvoicePress,
         getStatusStyle,
     } = useInvoiceList();
+  const { rows: invoices, menu } = useInvoiceListMenu(unsorted, refreshInvoices);
+
 
     return (
         <View className="flex-1 bg-slate-100">
-            <ListPageHeader title="Invoices" onAddPress={handleOpenAdd} />
+            <ListPageHeader title="Invoices" onAddPress={handleOpenAdd} menu={menu} />
 
             {/* Search Bar */}
             <View className="px-4 py-3 bg-slate-100">

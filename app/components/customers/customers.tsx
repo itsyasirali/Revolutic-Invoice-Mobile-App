@@ -6,6 +6,7 @@ import CustomerForm from './CustomerForm';
 import useCustomerList from '@/hooks/customers/useCustomerList';
 import InputField from '../ui/InputField';
 import StandardModal from '../ui/StandardModal';
+import { useCustomerListMenu } from '@/hooks/records/listMenus';
 import ListPageHeader from '../ui/ListPageHeader';
 
 const CustomerList = () => {
@@ -17,7 +18,7 @@ const CustomerList = () => {
     showAddForm,
     searchQuery,
     setSearchQuery,
-    displayCustomers,
+    displayCustomers: unsorted,
     filterTabs,
     refetch,
     handleCustomerPress,
@@ -25,10 +26,12 @@ const CustomerList = () => {
     handleOpenAdd,
     handleSaveSuccess,
   } = useCustomerList();
+  const { rows: displayCustomers, menu } = useCustomerListMenu(unsorted, refetch);
+
 
   return (
     <View className="flex-1 bg-slate-100">
-      <ListPageHeader title="Customers" onAddPress={handleOpenAdd} />
+      <ListPageHeader title="Customers" onAddPress={handleOpenAdd} menu={menu} />
 
 
       {/* Search Bar */}

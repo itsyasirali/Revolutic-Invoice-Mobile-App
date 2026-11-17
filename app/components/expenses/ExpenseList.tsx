@@ -4,6 +4,7 @@ import { useRecordList } from '@/hooks/records/useRecordList';
 import { getStatusStyle } from '@/utils/invoiceStatus';
 import { formatMoney, formatDate } from '@/utils/money';
 import StandardModal from '../ui/StandardModal';
+import { useExpenseListMenu } from '@/hooks/records/listMenus';
 import { RecordList, RecordCard } from '../records/RecordList';
 import ExpenseForm from './ExpenseForm';
 
@@ -25,6 +26,8 @@ const ExpenseList = () => {
     matchFilter: (e, f) => String(e.status || '').toLowerCase() === f,
   });
 
+  const { rows, menu } = useExpenseListMenu(list.visible, list.refresh);
+
   useFocusEffect(
     useCallback(() => {
       list.reload();
@@ -38,7 +41,7 @@ const ExpenseList = () => {
       emptyIcon="receipt-long"
       emptyText={`No ${list.filter === 'all' ? '' : list.filter} expenses found`}
       searchPlaceholder="Search expenses..."
-      data={list.visible}
+      data={rows}
       loading={list.loading}
       refreshing={list.refreshing}
       onRefresh={list.refresh}
@@ -48,6 +51,7 @@ const ExpenseList = () => {
       filter={list.filter}
       onFilter={list.setFilter}
       onAdd={() => setShowAdd(true)}
+      menu={menu}
       keyOf={(e) => String(e.id)}
       renderItem={(e) => (
         <RecordCard

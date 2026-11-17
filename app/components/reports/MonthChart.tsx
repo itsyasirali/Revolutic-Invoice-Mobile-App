@@ -12,6 +12,7 @@ interface Props {
   months: Record<string, any>[];
   bars: Bar[];
   currency: string;
+  hideLegend?: boolean;
 }
 
 // Same compact formatter the web chart uses for axis ticks.
@@ -37,7 +38,7 @@ const roundedTop = (x: number, y: number, w: number, h: number, r: number) => {
 };
 
 /** Bar chart matching the web Reports chart: grid, y-axis, rounded bars, tap for values. */
-const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
+const MonthChart: React.FC<Props> = ({ months, bars, currency, hideLegend }) => {
   const [boxW, setBoxW] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -48,14 +49,18 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
   const H = 220;
   const TOP = 12;
   const BOTTOM = 26;
-  const Y_AXIS = 54;
+  const Y_AXIS = 42;
   const plotH = H - TOP - BOTTOM;
-  const GROUP = bars.length * 18 + 22; // one month slot
+  const BAR_GAP = 3;
+  // Narrowest a month slot may get; wider screens spread the months to fill the width.
+  const MIN_SLOT = bars.length * 17 + 10;
   const BAR_W = 14;
 
   const max = niceMax(Math.max(...months.flatMap((m) => bars.map((b) => Number(m[b.key]) || 0))));
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
-  const contentW = Math.max(boxW - Y_AXIS, months.length * GROUP);
+  const available = boxW - Y_AXIS;
+  const slot = Math.max(available / months.length, MIN_SLOT);
+  const contentW = slot * months.length;
   const y = (v: number) => TOP + plotH - (v / max) * plotH;
 
   const sel = selected !== null ? months[selected] : null;
@@ -67,7 +72,7 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
           {/* Fixed y-axis */}
           <Svg width={Y_AXIS} height={H}>
             {ticks.map((t) => (
-              <SvgText key={t} x={Y_AXIS - 6} y={y(t) + 4} fontSize={10} fill="#94A3B8" textAnchor="end">
+              <SvgText key={t} x={Y_AXIS - 4} y={y(t) + 4} fontSize={9} fill="#94A3B8" textAnchor="end">
                 {`${currency} ${compact(t)}`.trim()}
               </SvgText>
             ))}
@@ -82,7 +87,7 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
               {months.map((m, i) => {
                 const slotX = i * (contentW / months.length);
                 const slotW = contentW / months.length;
-                const groupW = bars.length * BAR_W + (bars.length - 1) * 3;
+                const groupW = bars.length * BAR_W + (bars.length - 1) * BAR_GAP;
                 const startX = slotX + (slotW - groupW) / 2;
                 return (
                   <G key={m.month ?? i}>
@@ -91,7 +96,7 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
                       const v = Number(m[b.key]) || 0;
                       const h = (v / max) * plotH;
                       return h > 0 ? (
-                        <Path key={b.key} d={roundedTop(startX + bi * (BAR_W + 3), y(v), BAR_W, h, 4)} fill={b.color} />
+                        <Path key={b.key} d={roundedTop(startX + bi * (BAR_W + BAR_GAP), y(v), BAR_W, h, 4)} fill={b.color} />
                       ) : null;
                     })}
                     <SvgText x={slotX + slotW / 2} y={H - 8} fontSize={11} fill="#94A3B8" textAnchor="middle">
@@ -134,6 +139,7 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
       )}
 
       {/* Legend */}
+      {!hideLegend && (
       <View className="flex-row justify-center mt-3">
         {bars.map((b) => (
           <View key={b.key} className="flex-row items-center mx-2">
@@ -142,6 +148,7 @@ const MonthChart: React.FC<Props> = ({ months, bars, currency }) => {
           </View>
         ))}
       </View>
+      )}
     </View>
   );
 };

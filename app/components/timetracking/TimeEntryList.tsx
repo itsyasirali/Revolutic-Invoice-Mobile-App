@@ -4,6 +4,7 @@ import { useRecordList } from '@/hooks/records/useRecordList';
 import { getStatusStyle } from '@/utils/invoiceStatus';
 import { formatMoney, formatDate, formatDuration } from '@/utils/money';
 import StandardModal from '../ui/StandardModal';
+import { useTimeEntryListMenu } from '@/hooks/records/listMenus';
 import { RecordList, RecordCard } from '../records/RecordList';
 import TimeEntryForm from './TimeEntryForm';
 import TimerCard from './TimerCard';
@@ -27,6 +28,8 @@ const TimeEntryList = () => {
     matchFilter: (t, f) => String(t.status || '').toLowerCase() === f,
   });
 
+  const { rows, menu } = useTimeEntryListMenu(list.visible, list.refresh);
+
   useFocusEffect(
     useCallback(() => {
       list.reload();
@@ -45,7 +48,7 @@ const TimeEntryList = () => {
       emptyIcon="schedule"
       emptyText={`No ${list.filter === 'all' ? '' : list.filter} time entries found`}
       searchPlaceholder="Search time entries..."
-      data={list.visible}
+      data={rows}
       loading={list.loading}
       refreshing={list.refreshing}
       onRefresh={list.refresh}
@@ -55,6 +58,7 @@ const TimeEntryList = () => {
       filter={list.filter}
       onFilter={list.setFilter}
       onAdd={() => setShowAdd(true)}
+      menu={menu}
       header={
         <TimerCard
           onStop={(p) => {

@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView, ActivityIndicator, FlatList, Refresh
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import InputField from '../ui/InputField';
 import ListPageHeader from '../ui/ListPageHeader';
+import type { ListMenuProps } from '@/hooks/records/useListMenu';
 
 interface RecordListProps<T> {
   title: string;
@@ -19,6 +20,7 @@ interface RecordListProps<T> {
   filter?: string;
   onFilter?: (k: string) => void;
   onAdd: () => void;
+  menu?: ListMenuProps;
   renderItem: (item: T) => React.ReactElement;
   keyOf: (item: T) => string;
   /** Optional block shown between the filters and the list (e.g. the timer). */
@@ -30,7 +32,7 @@ interface RecordListProps<T> {
 export function RecordList<T>(p: RecordListProps<T>) {
   return (
     <View className="flex-1 bg-slate-100">
-      <ListPageHeader title={p.title} onAddPress={p.onAdd} />
+      <ListPageHeader title={p.title} onAddPress={p.onAdd} menu={p.menu} />
 
       <View className="px-4 py-3 bg-slate-100">
         <InputField

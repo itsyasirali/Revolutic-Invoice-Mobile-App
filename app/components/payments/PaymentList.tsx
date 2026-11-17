@@ -5,11 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import PaymentForm from './PaymentForm';
 import StandardModal from '../ui/StandardModal';
 import InputField from '../ui/InputField';
+import { usePaymentListMenu } from '@/hooks/records/listMenus';
 import ListPageHeader from '../ui/ListPageHeader';
 
 const PaymentList = () => {
   const {
-    payments,
+    payments: unsorted,
     loading,
     refreshing,
     filter,
@@ -30,10 +31,12 @@ const PaymentList = () => {
     handleCloseEdit,
     handlePaymentPress,
   } = usePaymentList();
+  const { rows: payments, menu } = usePaymentListMenu(unsorted, refreshPayments);
+
 
   return (
     <View className="flex-1 bg-slate-100">
-      <ListPageHeader title="Payments" onAddPress={handleOpenAdd} />
+      <ListPageHeader title="Payments" onAddPress={handleOpenAdd} menu={menu} />
 
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-100">

@@ -3,7 +3,7 @@ import { View, ScrollView, RefreshControl } from "react-native";
 import useDashboard from "@/hooks/dashboard/useDashboard";
 import DashboardHeader from "../components/home/DashboardHeader";
 import RevenueHeroCard from "../components/home/RevenueHeroCard";
-import InvoiceStatusCard from "../components/home/InvoiceStatusCard";
+import IncomeExpenseCard from "../components/home/IncomeExpenseCard";
 import QuickActions from "../components/home/QuickActions";
 import RecentInvoicesList from "../components/home/RecentInvoicesList";
 
@@ -33,7 +33,7 @@ const Home: React.FC = () => {
         {/* 2. Main Content Body */}
         <View className="px-4 mt-4 gap-4">
           <QuickActions />
-          <InvoiceStatusCard />
+          <IncomeExpenseCard />
           <RecentInvoicesList />
         </View>
       </ScrollView>

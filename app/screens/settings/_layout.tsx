@@ -6,7 +6,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="password" />
-      <Stack.Screen name="import" />
     </Stack>
   );
 }
