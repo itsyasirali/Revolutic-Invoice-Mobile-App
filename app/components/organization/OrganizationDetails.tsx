@@ -80,7 +80,7 @@ const OrganizationDetails: React.FC = () => {
               {data.name}
             </Text>
             {isCurrent && (
-              <View className={`ml-2 px-3 py-1.5 rounded-full border ${badge.bg} ${badge.border}`}>
+              <View className={`ml-2 px-3 py-1 rounded-full border ${badge.bg} ${badge.border}`}>
                 <Text className={`text-xs font-bold ${badge.text}`}>Selected</Text>
               </View>
             )}

@@ -43,7 +43,11 @@ const OrganizationList = () => {
 
   return (
     <View className="flex-1 bg-slate-100">
-      <ListPageHeader title="Organizations" onAddPress={() => setShowAddForm(true)} />
+      <ListPageHeader
+        title="Organizations"
+        onAddPress={() => setShowAddForm(true)}
+        onBackPress={() => (router.canGoBack() ? router.back() : router.replace('/screens/settings' as any))}
+      />
 
       {/* Search Bar */}
       <View className="px-4 py-3 bg-slate-100">

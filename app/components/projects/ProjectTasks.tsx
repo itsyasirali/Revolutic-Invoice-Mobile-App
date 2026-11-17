@@ -3,8 +3,9 @@ import { View, Text, Pressable, Modal, Alert, KeyboardAvoidingView, Platform } f
 import { Ionicons } from '@expo/vector-icons';
 import axios from '@/services/api';
 import InputField from '../ui/InputField';
+import TaskTimer, { type TimerPreset } from './TaskTimer';
 
-interface Task {
+export interface Task {
   id: number;
   name: string;
   description?: string | null;
@@ -16,10 +17,14 @@ interface Props {
   tasks: Task[];
   /** Applies a change to the task list locally; no refetch of the project. */
   onTasks: (update: (tasks: Task[]) => Task[]) => void;
+  /** Called with the new task list after every successful change, so the project status can follow it. */
+  onTasksChanged?: (tasks: Task[]) => void;
+  /** Hourly projects can time their tasks; the timer lives on each open task. */
+  timerEnabled?: boolean;
+  onTimerStop?: (task: Task, preset: TimerPreset) => void;
 }
 
-/** Add, rename, complete and delete project tasks (same API as the web). */
-const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
+const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks, onTasksChanged, timerEnabled, onTimerStop }) => {
   const [editing, setEditing] = useState<Task | null>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -27,6 +32,8 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
   const [saving, setSaving] = useState(false);
 
   const fail = (e: any, fallback: string) => Alert.alert('Error', e?.response?.data?.message || fallback);
+  const doneCount = tasks.filter((t) => t.status === 'Completed').length;
+  const pct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0;
 
   const openAdd = () => {
     setEditing(null);
@@ -52,7 +59,10 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
         onTasks((list) => list.map((t) => (t.id === saved.id ? saved : t)));
       } else {
         const res = await axios.post(`/api/projects/${projectId}/tasks`, { name, description });
-        if (res.data?.task) onTasks((list) => [...list, res.data.task]);
+        if (res.data?.task) {
+          onTasks((list) => [...list, res.data.task]);
+          onTasksChanged?.([...tasks, res.data.task]); // a new open task reopens a completed project
+        }
       }
       setOpen(false);
     } catch (e) {
@@ -68,6 +78,7 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
     onTasks((list) => list.map((x) => (x.id === t.id ? { ...x, status: next } : x)));
     try {
       await axios.put(`/api/projects/${projectId}/tasks/${t.id}`, { status: next });
+      onTasksChanged?.(tasks.map((x) => (x.id === t.id ? { ...x, status: next } : x)));
     } catch (e) {
       onTasks((list) => list.map((x) => (x.id === t.id ? { ...x, status: t.status } : x)));
       fail(e, 'Failed to update task');
@@ -84,6 +95,7 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
           try {
             await axios.delete(`/api/projects/${projectId}/tasks/${t.id}`);
             onTasks((list) => list.filter((x) => x.id !== t.id));
+            onTasksChanged?.(tasks.filter((x) => x.id !== t.id));
           } catch (e) {
             fail(e, 'Failed to delete task');
           }
@@ -92,37 +104,89 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
     ]);
 
   return (
-    <View className="bg-white rounded-md shadow-sm mb-4 border border-slate-100 p-4">
-      <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-lg font-semibold text-slate-800">Tasks</Text>
-        <Pressable onPress={openAdd} className="flex-row items-center">
-          <Ionicons name="add-circle-outline" size={20} color="#1AA3FF" />
-          <Text className="text-primary font-bold ml-1">Add Task</Text>
+    <View className="bg-white rounded-md shadow-sm mb-4 border border-slate-100 overflow-hidden">
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 pt-4">
+        <View className="flex-row items-center">
+          <Text className="text-lg font-semibold text-slate-800">Tasks</Text>
+          {tasks.length > 0 && (
+            <View className="ml-2 px-2 py-0.5 rounded-full bg-slate-100">
+              <Text className="text-xs font-bold text-slate-600">
+                {doneCount}/{tasks.length}
+              </Text>
+            </View>
+          )}
+        </View>
+        <Pressable onPress={openAdd} className="flex-row items-center bg-primary/10 rounded-full px-3 py-1.5 active:bg-primary/20">
+          <Ionicons name="add" size={16} color="#1AA3FF" />
+          <Text className="text-primary text-xs font-bold ml-0.5">Add Task</Text>
         </Pressable>
       </View>
 
-      {tasks.length === 0 && <Text className="text-slate-400 py-3">No tasks yet.</Text>}
-
-      {tasks.map((t) => {
-        const done = t.status === 'Completed';
-        return (
-          <View key={t.id} className="flex-row items-center py-2.5 border-b border-slate-50">
-            <Pressable onPress={() => toggle(t)} hitSlop={8} className="mr-3">
-              <Ionicons name={done ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={done ? '#10b981' : '#94a3b8'} />
-            </Pressable>
-            <Pressable className="flex-1 pr-2" onPress={() => openEdit(t)}>
-              <Text className={`text-base ${done ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{t.name}</Text>
-              {!!t.description && <Text className="text-xs text-slate-400" numberOfLines={1}>{t.description}</Text>}
-            </Pressable>
-            <Pressable onPress={() => openEdit(t)} hitSlop={8} className="p-1.5">
-              <Ionicons name="create-outline" size={20} color="#64748b" />
-            </Pressable>
-            <Pressable onPress={() => remove(t)} hitSlop={8} className="p-1.5">
-              <Ionicons name="trash-outline" size={20} color="#dc2626" />
-            </Pressable>
+      {/* Progress */}
+      {tasks.length > 0 && (
+        <View className="px-4 pt-3">
+          <View className="flex-row items-center justify-between mb-1.5">
+            <Text className="text-xs text-slate-400">Progress</Text>
+            <Text className="text-xs font-semibold text-slate-600">{pct}%</Text>
           </View>
-        );
-      })}
+          <View className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+            <View className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+          </View>
+        </View>
+      )}
+
+      {tasks.length === 0 ? (
+        <View className="items-center py-8 px-4">
+          <Ionicons name="checkbox-outline" size={32} color="#cbd5e1" />
+          <Text className="text-slate-400 mt-2">No tasks yet</Text>
+        </View>
+      ) : (
+        <View className="mt-3">
+          {tasks.map((t) => {
+            const done = t.status === 'Completed';
+            return (
+              <View key={t.id} className={`px-4 py-3.5 border-t border-slate-100 ${done ? 'bg-slate-50/70' : ''}`}>
+                {/* Title row */}
+                <View className="flex-row items-start">
+                  <Pressable className="flex-1 pr-2" onPress={() => openEdit(t)}>
+                    <Text className={`text-[15px] font-semibold ${done ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{t.name}</Text>
+                    {!!t.description && (
+                      <Text className="text-xs text-slate-400 mt-0.5" numberOfLines={2}>
+                        {t.description}
+                      </Text>
+                    )}
+                  </Pressable>
+                  <View className={`px-2.5 py-1 rounded-full border ${done ? 'bg-emerald-50 border-emerald-200' : 'bg-sky-50 border-sky-200'}`}>
+                    <Text className={`text-[11px] font-bold ${done ? 'text-emerald-700' : 'text-sky-700'}`}>{done ? 'Completed' : 'Open'}</Text>
+                  </View>
+                </View>
+
+                {/* Actions */}
+                <View className="flex-row items-center mt-3">
+                  {timerEnabled && !done && (
+                    <TaskTimer storageKey={`revolutic:time-tracking:timer:project:${projectId}:task:${t.id}`} onStop={(preset) => onTimerStop?.(t, preset)} />
+                  )}
+                  <Pressable
+                    onPress={() => toggle(t)}
+                    className={`flex-row items-center rounded-full px-3 py-1.5 border ${done ? 'bg-white border-slate-200' : 'bg-emerald-50 border-emerald-200'}`}
+                  >
+                    <Ionicons name={done ? 'refresh-outline' : 'checkmark'} size={14} color={done ? '#475569' : '#047857'} />
+                    <Text className={`text-xs font-bold ml-1 ${done ? 'text-slate-600' : 'text-emerald-700'}`}>{done ? 'Reopen' : 'Complete'}</Text>
+                  </Pressable>
+                  <View className="flex-1" />
+                  <Pressable onPress={() => openEdit(t)} hitSlop={8} className="p-1.5">
+                    <Ionicons name="create-outline" size={19} color="#64748b" />
+                  </Pressable>
+                  <Pressable onPress={() => remove(t)} hitSlop={8} className="p-1.5">
+                    <Ionicons name="trash-outline" size={19} color="#dc2626" />
+                  </Pressable>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      )}
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">

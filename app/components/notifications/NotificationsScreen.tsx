@@ -3,22 +3,24 @@ import { View, Text, Pressable, FlatList, ActivityIndicator } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useNotifications, { formatTimeAgo, NotificationItem } from '@/hooks/notifications/useNotifications';
+import { useNotificationPrefs } from '@/hooks/settings/useNotificationPrefs';
 import DetailPageHeader from '../ui/DetailPageHeader';
 
 const NotificationsScreen: React.FC = () => {
   const router = useRouter();
-  const { items, loading, markAllRead } = useNotifications();
+  const { items, loading, enabled, markAllRead } = useNotifications();
+  const { setPref } = useNotificationPrefs();
   // Counted from the highlighted rows so the number stays while the badge is already cleared.
   const newCount = items.filter((n) => n.unread).length;
   const opened = useRef(false);
 
   // Opening the screen counts as reading: clear the badge once per visit.
   useEffect(() => {
-    if (!opened.current && !loading) {
+    if (!opened.current && !loading && enabled) {
       opened.current = true;
       markAllRead();
     }
-  }, [loading, markAllRead]);
+  }, [loading, enabled, markAllRead]);
 
   const handleBack = () => (router.canGoBack() ? router.back() : router.replace('/screens/home'));
 
@@ -38,7 +40,16 @@ const NotificationsScreen: React.FC = () => {
     <View className="flex-1 bg-slate-100">
       <DetailPageHeader title="Notifications" onBack={handleBack} />
 
-      {loading ? (
+      {!enabled ? (
+        <View className="flex-1 items-center justify-center px-8">
+          <Ionicons name="notifications-off-outline" size={52} color="#94a3b8" />
+          <Text className="text-lg mt-3 text-slate-600 font-semibold">Notifications are off</Text>
+          <Text className="text-sm mt-1 text-slate-400 text-center">Turn them on to see invoice and payment activity here.</Text>
+          <Pressable onPress={() => setPref('enabled', true)} className="mt-5 bg-primary px-6 py-3 rounded-md">
+            <Text className="text-white font-bold">Turn on notifications</Text>
+          </Pressable>
+        </View>
+      ) : loading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#1AA3FF" />
         </View>

@@ -16,11 +16,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const {
     userName,
-    userInitial,
     greeting,
     insets,
     handleGoSettings,
-    handleGoProfile,
   } = useDashboardHeader(customUserName);
   const { openSidebar } = useSidebar();
   const router = useRouter();
@@ -66,16 +64,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             className="w-10 h-10 rounded-full bg-white items-center justify-center border border-slate-200 shadow-sm active:bg-slate-100"
           >
             <Ionicons name="settings-outline" size={20} color="#334155" />
-          </Pressable>
-
-          {/* User Profile Avatar / Initial */}
-          <Pressable
-            onPress={handleGoProfile}
-            className="w-10 h-10 rounded-full bg-primary/10 border border-primary/25 items-center justify-center active:bg-primary/20"
-          >
-            <Text className="text-primary font-bold text-[15px]">
-              {userInitial}
-            </Text>
           </Pressable>
         </View>
       </View>

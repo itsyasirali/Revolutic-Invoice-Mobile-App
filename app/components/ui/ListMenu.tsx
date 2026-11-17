@@ -41,9 +41,9 @@ const ListMenu: React.FC<{ menu: ListMenuProps }> = ({ menu }) => {
       <Pressable
         onPress={() => setOpen(true)}
         accessibilityLabel="More actions"
-        className="w-12 h-12 rounded-md bg-white border border-slate-200 items-center justify-center ml-2 active:bg-slate-50"
+        className="w-10 h-10 rounded-md bg-white border border-slate-200 items-center justify-center ml-2 active:bg-slate-50"
       >
-        <Ionicons name="ellipsis-horizontal" size={20} color="#475569" />
+        <Ionicons name="ellipsis-horizontal" size={18} color="#475569" />
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={close}>

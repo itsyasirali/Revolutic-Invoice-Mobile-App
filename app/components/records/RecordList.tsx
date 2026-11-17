@@ -143,3 +143,5 @@ export const RecordCard: React.FC<{
     </View>
   </Pressable>
 );
+
+export default RecordList;

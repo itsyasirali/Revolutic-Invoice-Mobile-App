@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 import { Item } from '@/types/items';
 import { useItemDelete } from './useItemDelete';
 import axios from '@/services/api';
+import { updateItemInCache } from './useItemList';
 
 export const useItemDetails = () => {
     const { item } = useLocalSearchParams();
@@ -36,6 +37,8 @@ export const useItemDetails = () => {
             const res = await axios.put(`/api/items/${itemData.id}`, { status: newStatus });
             if (res.data.item) {
                 setItemData(res.data.item);
+                updateItemInCache(res.data.item);
+                Alert.alert('Success', `Item marked as ${newStatus === 'Active' ? 'Active' : 'Inactive'}`);
             }
         } catch (error: any) {
             console.error('Failed to update status:', error);

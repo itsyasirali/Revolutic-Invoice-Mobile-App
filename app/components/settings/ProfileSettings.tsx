@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useProfileSettingsForm } from '@/hooks/settings/useProfileSettingsForm';
 import InputField from '../ui/InputField';
 import StandardButton from '../ui/StandardButton';
+import Avatar from '../ui/Avatar';
+import { useAvatarUpload } from '@/hooks/settings/useAvatarUpload';
 
 const ProfileSettings: React.FC = () => {
   const {
@@ -18,6 +20,7 @@ const ProfileSettings: React.FC = () => {
     handleBack,
     handleSave,
   } = useProfileSettingsForm();
+  const { uploading, pickAndUpload } = useAvatarUpload();
 
   return (
     <View className="flex-1 bg-white">
@@ -40,6 +43,19 @@ const ProfileSettings: React.FC = () => {
         </View>
       ) : (
         <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
+          {/* Profile picture: tap to choose a photo from the phone */}
+          <View className="items-center mb-6">
+            <Pressable onPress={pickAndUpload} disabled={uploading} className="active:opacity-80">
+              <Avatar image={user?.image} name={name || user?.name || user?.email || 'U'} size={104} />
+              <View className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary border-2 border-white items-center justify-center">
+                {uploading ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="camera" size={17} color="#fff" />}
+              </View>
+            </Pressable>
+            <Pressable onPress={pickAndUpload} disabled={uploading} className="mt-3">
+              <Text className="text-primary font-semibold text-sm">{uploading ? 'Uploading...' : user?.image ? 'Change photo' : 'Upload photo'}</Text>
+            </Pressable>
+          </View>
+
           <InputField
             label="Full Name"
             value={name}

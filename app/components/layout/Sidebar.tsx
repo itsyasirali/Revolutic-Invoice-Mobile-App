@@ -4,19 +4,23 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSidebar } from '@/context/SidebarContext';
-import useNotifications from '@/hooks/notifications/useNotifications';
+import { useProfile } from '@/hooks/auth/useProfile';
+import Avatar from '../ui/Avatar';
+import { useOrganization } from '@/context/OrganizationContext';
 
-const WIDTH = Math.min(300, Dimensions.get('window').width * 0.8);
+const WIDTH = Math.min(245, Dimensions.get('window').width * 0.66);
 
 interface NavItem {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   path: string;
+  /** Highlight this item for every screen under this prefix (e.g. details screens). */
+  matches?: string;
 }
 
 const MAIN: NavItem[] = [
   { label: 'Home', icon: 'home-outline', path: '/screens/home' },
-  { label: 'Customers', icon: 'people-outline', path: '/screens/customer/customer' },
+  { label: 'Customers', icon: 'people-outline', path: '/screens/customer/list', matches: '/screens/customer' },
   { label: 'Items', icon: 'cube-outline', path: '/screens/Items/items' },
   { label: 'Quotes', icon: 'document-text-outline', path: '/screens/Quotes' },
   { label: 'Invoices', icon: 'receipt-outline', path: '/screens/Invoice/invoices' },
@@ -25,12 +29,7 @@ const MAIN: NavItem[] = [
   { label: 'Expenses', icon: 'wallet-outline', path: '/screens/Expenses' },
   { label: 'Time Tracking', icon: 'time-outline', path: '/screens/TimeTracking' },
   { label: 'Reports', icon: 'bar-chart-outline', path: '/screens/Reports' },
-];
-
-const OTHER: NavItem[] = [
-  { label: 'Notifications', icon: 'notifications-outline', path: '/screens/Notifications' },
-  { label: 'Organizations', icon: 'business-outline', path: '/screens/organization' },
-  { label: 'Settings', icon: 'settings-outline', path: '/screens/settings' },
+  { label: 'Settings', icon: 'settings-outline', path: '/screens/settings', matches: '/screens/settings' },
 ];
 
 const Sidebar: React.FC = () => {
@@ -38,7 +37,10 @@ const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const { unreadCount } = useNotifications();
+  const { user } = useProfile();
+  const { organization } = useOrganization();
+
+  const displayName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'User';
 
   const progress = useRef(new Animated.Value(0)).current;
 
@@ -67,7 +69,7 @@ const Sidebar: React.FC = () => {
     path === '/screens/home'
       ? pathname === path
       : path === '/screens/settings'
-        ? pathname === path || pathname === '/screens/settings/profile' || pathname === '/screens/settings/password'
+        ? pathname.startsWith('/screens/settings') || pathname.startsWith('/screens/organization')
         : pathname === path || pathname.startsWith(path);
 
   const go = (path: string) => {
@@ -77,22 +79,17 @@ const Sidebar: React.FC = () => {
   };
 
   const renderItem = (item: NavItem) => {
-    const active = isActive(item.path);
+    const active = isActive(item.matches ?? item.path);
     return (
       <Pressable
         key={item.path}
         onPress={() => go(item.path)}
-        className={`flex-row items-center px-3 py-3 rounded-md mb-1 ${active ? 'bg-primary' : 'active:bg-slate-100'}`}
+        className={`flex-row items-center px-4 py-3 ${active ? 'bg-primary' : 'active:bg-slate-100'}`}
       >
         <Ionicons name={item.icon} size={20} color={active ? '#ffffff' : '#64748b'} />
         <Text className={`ml-3 text-[15px] ${active ? 'font-bold text-white' : 'font-medium text-slate-700'}`}>
           {item.label}
         </Text>
-        {item.path === '/screens/Notifications' && unreadCount > 0 && (
-          <View className={`ml-auto min-w-[22px] h-[22px] px-1.5 rounded-full items-center justify-center ${active ? 'bg-white' : 'bg-red-500'}`}>
-            <Text className={`text-[11px] font-bold ${active ? 'text-primary' : 'text-white'}`}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
-          </View>
-        )}
       </Pressable>
     );
   };
@@ -115,10 +112,21 @@ const Sidebar: React.FC = () => {
           transform: [{ translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [-WIDTH - 24, 0] }) }],
         }}
       >
-        <ScrollView className="flex-1 px-3 pt-3" showsVerticalScrollIndicator={false}>
+        {/* Profile header: photo, current organization name and email */}
+        <View className="px-4 pb-4 border-b border-slate-200">
+          <Avatar image={user?.image} name={displayName} size={64} />
+          <Text className="text-slate-900 text-xl mt-4" numberOfLines={1}>
+            {organization?.name || 'Organization'}
+          </Text>
+          {!!user?.email && (
+            <Text className="text-slate-600 text-[15px] mt-1" numberOfLines={1}>
+              {user.email}
+            </Text>
+          )}
+        </View>
+
+        <ScrollView className="flex-1 pt-2" showsVerticalScrollIndicator={false}>
           {MAIN.map(renderItem)}
-          <Text className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-4 mb-2 px-3">More</Text>
-          {OTHER.map(renderItem)}
         </ScrollView>
 
       </Animated.View>

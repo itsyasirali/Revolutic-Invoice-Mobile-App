@@ -60,9 +60,9 @@ const ListPageHeader: React.FC<ListPageHeaderProps> = ({
       <View className="flex-row items-center">
       <Pressable
         onPress={onAddPress}
-        className="w-12 h-12 rounded-md bg-primary items-center justify-center shadow-sm"
+        className="w-10 h-10 rounded-md bg-primary items-center justify-center shadow-sm"
       >
-        <MaterialIcons name="add" size={22} color="white" />
+        <MaterialIcons name="add" size={20} color="white" />
       </Pressable>
       {menu && <ListMenu menu={menu} />}
       </View>

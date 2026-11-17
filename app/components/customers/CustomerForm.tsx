@@ -19,7 +19,7 @@ interface CustomerFormProps {
     customerData: Partial<Customer>,
   ) => Promise<{ success: boolean; error?: string }>;
   onCancel: () => void;
-  onSaveSuccess?: () => void;
+  onSaveSuccess?: (saved?: any) => void;
   loading?: boolean;
 }
 

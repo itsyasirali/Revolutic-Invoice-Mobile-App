@@ -129,7 +129,6 @@ const PaymentList = () => {
 
                     {/* Status Badge */}
                     <View className={`px-3 py-1 rounded-full flex-row items-center ${statusStyle.bg}`}>
-                      <Ionicons name={statusStyle.icon} size={12} color={statusStyle.hex} className="mr-1" />
                       <Text className={`text-xs font-bold ${statusStyle.text}`}>
                         {item.paymentMode || item.status}
                       </Text>

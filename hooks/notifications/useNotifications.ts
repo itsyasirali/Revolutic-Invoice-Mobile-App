@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useInvoiceList } from '@/hooks/invoices/useInvoiceList';
 import { usePaymentList } from '@/hooks/payments/usePaymentList';
 import { useOrganization } from '@/context/OrganizationContext';
+import { useNotificationPrefs } from '@/hooks/settings/useNotificationPrefs';
 
 export interface NotificationItem {
   id: string;
@@ -40,6 +41,7 @@ const useNotifications = () => {
   const key = storageKey(organization?.id);
   const { allInvoices = [], loading: invLoading } = useInvoiceList();
   const { allPayments = [], loading: payLoading } = usePaymentList();
+  const { prefs } = useNotificationPrefs();
 
   const [lastSeen, setLastSeen] = useState<number | null>(null);
   // While the screen is open, unread rows stay highlighted even though the badge cleared.
@@ -95,15 +97,25 @@ const useNotifications = () => {
       raw: p,
     }));
 
-    return [...invoices, ...payments].filter((n) => Number.isFinite(n.time) && n.time > 0).sort((a, b) => b.time - a.time);
-  }, [allInvoices, allPayments]);
+    return [...(prefs.invoices ? invoices : []), ...(prefs.payments ? payments : [])].filter((n) => Number.isFinite(n.time) && n.time > 0).sort((a, b) => b.time - a.time);
+  }, [allInvoices, allPayments, prefs.invoices, prefs.payments]);
 
-  const unreadCount = lastSeen ? all.filter((n) => n.time > lastSeen).length : 0;
+  // Depends on primitives only: a new array each render would re-trigger this endlessly.
+  const newestTime = all[0]?.time;
+  useEffect(() => {
+    if (prefs.enabled) return;
+    const now = Date.now();
+    setLastSeen(now);
+    AsyncStorage.setItem(key, String(now)).catch(() => {});
+  }, [prefs.enabled, key, all.length, newestTime]);
+
+  const unreadCount = prefs.enabled && lastSeen ? all.filter((n) => n.time > lastSeen).length : 0;
 
   const items: NotificationItem[] = useMemo(() => {
     const boundary = highlightAfter ?? lastSeen ?? Infinity;
+    if (!prefs.enabled) return [];
     return all.slice(0, NOTIFICATION_LIMIT).map((n) => ({ ...n, unread: n.time > boundary }));
-  }, [all, highlightAfter, lastSeen]);
+  }, [all, highlightAfter, lastSeen, prefs.enabled]);
 
   /** Call when the screen opens: clears the badge but keeps rows highlighted. */
   const markAllRead = useCallback(() => {
@@ -113,7 +125,7 @@ const useNotifications = () => {
     AsyncStorage.setItem(key, String(now)).catch(() => {});
   }, [key, lastSeen]);
 
-  return { items, unreadCount, loading: (invLoading || payLoading) && all.length === 0, markAllRead };
+  return { items, unreadCount, enabled: prefs.enabled, loading: (invLoading || payLoading) && all.length === 0, markAllRead };
 };
 
 export default useNotifications;

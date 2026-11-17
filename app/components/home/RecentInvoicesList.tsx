@@ -36,11 +36,8 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
               className="flex-row items-center justify-between py-3 border-b border-slate-100 active:opacity-75"
             >
 
-              {/* Left: Document Icon + Invoice info */}
+              {/* Left: Invoice info */}
               <View className="flex-row items-center flex-1 mr-2">
-                <View className="w-10 h-10 rounded-full bg-[#1AA3FF]/15 items-center justify-center mr-3">
-                  <Ionicons name="receipt-outline" size={18} color="#1AA3FF" />
-                </View>
                 <View className="flex-1">
                   <Text
                     className="text-slate-900 font-bold text-[13px]"

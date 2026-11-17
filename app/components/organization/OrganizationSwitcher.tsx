@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  Modal,
   FlatList,
-  ActivityIndicator,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import useOrganizationSwitcher from '@/hooks/organization/useOrganizationSwitcher';
 import { OrganizationData } from '@/types/organization';
 import StandardModal from '../ui/StandardModal';
-import OrganizationForm from './OrganizationForm';
 
 const OrganizationSwitcher: React.FC = () => {
-  const insets = useSafeAreaInsets();
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const router = useRouter();
   const {
     organization,
     organizations,
@@ -27,9 +24,10 @@ const OrganizationSwitcher: React.FC = () => {
     handleSelectOrg,
   } = useOrganizationSwitcher();
 
-  const handleOpenAdd = () => {
+  // Opens the full Organizations screen (view details, edit, add).
+  const handleManage = () => {
     setIsOpen(false);
-    setShowCreateModal(true);
+    router.push('/screens/organization' as any);
   };
 
   const orgName = organization?.name || 'Select Organization';
@@ -50,123 +48,68 @@ const OrganizationSwitcher: React.FC = () => {
           {orgName}
         </Text>
 
-        {/* Chevron or Spinner */}
-        {isSwitching ? (
-          <ActivityIndicator size="small" color="#64748b" />
-        ) : (
-          <Ionicons name="chevron-down" size={18} color="#64748b" />
-        )}
+        {/* Spinner only while switching */}
+        {isSwitching && <ActivityIndicator size="small" color="#64748b" />}
       </TouchableOpacity>
 
-      {/* ── Bottom Sheet Modal ── */}
-      <Modal
-        visible={isOpen}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <Pressable
-          className="flex-1 bg-black/40 justify-end"
-          onPress={() => setIsOpen(false)}
-        >
-          {/* Prevent dismiss on inner press */}
-          <Pressable
-            onPress={(e) => e.stopPropagation()}
-            className="bg-white rounded-t-3xl overflow-hidden"
-            style={{ paddingBottom: insets.bottom + 8 }}
-          >
-            {/* Handle bar */}
-            <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 rounded-full bg-slate-200" />
-            </View>
+      {/* ── Switcher sheet (StandardModal: same height as the Customer form) ── */}
+      <StandardModal visible={isOpen} onClose={() => setIsOpen(false)}>
+        <View className="flex-1 bg-slate-100">
+          {/* Header: same bar as the create / edit forms (Cancel, title, action) */}
+          <View className="flex-row justify-between items-center px-4 py-5 border-b border-slate-200 bg-white z-10">
+            <Pressable onPress={() => setIsOpen(false)}>
+              <Text className="text-primary font-semibold text-base">Cancel</Text>
+            </Pressable>
+            <Text className="font-bold text-lg text-slate-800">Switch Organization</Text>
+            <Pressable onPress={handleManage}>
+              <Text className="text-primary font-semibold text-base">Manage</Text>
+            </Pressable>
+          </View>
 
-            {/* Header */}
-            <View className="flex-row items-center justify-between px-5 pt-3 pb-4 border-b border-slate-100">
-              <Text className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-                Switch Organization
-              </Text>
-              <TouchableOpacity
-                onPress={() => setIsOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 items-center justify-center active:bg-slate-200"
-              >
-                <Ionicons name="close" size={14} color="#64748b" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Org List */}
-            <FlatList
-              data={organizations}
-              keyExtractor={(item) => String(item.id)}
-              scrollEnabled={organizations.length > 5}
-              style={{ maxHeight: 280 }}
-              renderItem={({ item }: { item: OrganizationData }) => {
-                const isActive = item.id === organization?.id;
-                const itemInitial = item.name?.charAt(0)?.toUpperCase() || 'O';
-                return (
-                  <TouchableOpacity
-                    onPress={() => handleSelectOrg(item.id)}
-                    disabled={isSwitching}
-                    className={`flex-row items-center justify-between px-5 py-3.5 border-b border-slate-50 active:bg-slate-50 ${isActive ? 'bg-slate-50' : ''}`}
-                  >
-                    <View className="flex-row items-center gap-3 flex-1 pr-3">
-                      {/* Avatar */}
-                      <View
-                        className={`w-8 h-8 rounded-xl items-center justify-center ${isActive ? 'bg-primary' : 'bg-slate-200'}`}
-                      >
-                        <Text
-                          className={`text-xs font-bold ${isActive ? 'text-white' : 'text-slate-600'}`}
-                        >
-                          {itemInitial}
-                        </Text>
-                      </View>
-
-                      {/* Name */}
-                      <Text
-                        className={`text-sm flex-1 ${isActive ? 'font-semibold text-slate-800' : 'font-normal text-slate-600'}`}
-                        numberOfLines={1}
-                      >
-                        {item.name}
+          {/* Organizations */}
+          <FlatList
+            data={organizations}
+            keyExtractor={(item) => String(item.id)}
+            contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+            renderItem={({ item }: { item: OrganizationData }) => {
+              const isActive = item.id === organization?.id;
+              const initial = item.name?.charAt(0)?.toUpperCase() || 'O';
+              const meta = [item.industry, item.currency].filter(Boolean).join(' • ');
+              return (
+                <TouchableOpacity
+                  onPress={() => handleSelectOrg(item.id)}
+                  disabled={isSwitching}
+                  className={`flex-row items-center bg-white rounded-md p-4 mb-3 border shadow-sm ${isActive ? 'border-primary' : 'border-slate-100'}`}
+                >
+                  <View className={`w-12 h-12 rounded-full items-center justify-center mr-3 ${isActive ? 'bg-primary' : 'bg-primary/10'}`}>
+                    <Text className={`text-lg font-extrabold ${isActive ? 'text-white' : 'text-primary'}`}>{initial}</Text>
+                  </View>
+                  <View className="flex-1 pr-2">
+                    <Text className="text-base font-bold text-slate-800" numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    {!!meta && (
+                      <Text className="text-xs text-slate-400 mt-0.5" numberOfLines={1}>
+                        {meta}
                       </Text>
-                    </View>
-
-                    {/* Active dot */}
-                    {isActive && (
-                      <View className="w-2 h-2 rounded-full bg-primary" />
                     )}
-                  </TouchableOpacity>
-                );
-              }}
-            />
+                  </View>
+                  {isActive ? (
+                    <View className="flex-row items-center bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+                      <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+                      <Text className="text-[11px] font-bold text-emerald-700 ml-1">Selected</Text>
+                    </View>
+                  ) : (
+                    <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          />
 
-            {/* Add New Org Button */}
-            <View className="border-t border-slate-100 mx-4 mt-1 pt-2">
-              <TouchableOpacity
-                onPress={handleOpenAdd}
-                className="flex-row items-center gap-3 px-2 py-3 rounded-xl active:bg-primary/5"
-              >
-                <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center">
-                  <Ionicons name="add" size={18} color="#1AA3FF" />
-                </View>
-                <Text className="text-primary text-sm font-semibold flex-1">
-                  Add New Organization
-                </Text>
-                <Ionicons name="sparkles" size={14} color="#1AA3FF" />
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-
-      {/* ── Organization Creation Modal (same like Customer modal) ── */}
-      <StandardModal
-        visible={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      >
-        <OrganizationForm
-          onCancel={() => setShowCreateModal(false)}
-          onSuccess={() => setShowCreateModal(false)}
-        />
+        </View>
       </StandardModal>
+
     </>
   );
 };

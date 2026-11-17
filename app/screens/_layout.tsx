@@ -5,11 +5,10 @@ import Sidebar from '../components/layout/Sidebar';
 import { SidebarProvider } from '@/context/SidebarContext';
 
 const TAB_LIST_PATHS = [
-  '/screens/customer/customer',
+  '/screens/customer/list',
   '/screens/customer',
   '/screens/Items/items',
   '/screens/Items',
-  '/screens/organization',
   '/screens/Projects',
   '/screens/Expenses',
   '/screens/TimeTracking',

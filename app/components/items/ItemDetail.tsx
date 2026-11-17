@@ -86,7 +86,7 @@ const ItemDetails: React.FC = () => {
             <Text className="ml-2 text-2xl font-normal text-slate-800">
               {itemData.name}
             </Text>
-            <View className={`ml-2 px-3 py-1.5 rounded-full ${statusColor}`}>
+            <View className={`ml-2 px-3 py-1 rounded-full ${statusColor}`}>
               <Text className={`text-xs font-bold ${statusTextColor}`}>
                 {itemData.status || "Active"}
               </Text>

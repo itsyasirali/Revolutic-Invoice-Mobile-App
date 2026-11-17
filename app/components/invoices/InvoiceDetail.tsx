@@ -121,11 +121,9 @@ const InvoiceDetail: React.FC = () => {
               </Text>
             </View>
             <View
-              className={`px-3 py-1 rounded-bl-xl rounded-tr-xl border ${statusStyle.bg} ${statusStyle.border}`}
+              className={`px-3 py-1 rounded-full flex-row items-center border ${statusStyle.bg} ${statusStyle.border}`}
             >
-              <Text
-                className={`text-xs font-bold uppercase ${statusStyle.text} tracking-wider`}
-              >
+              <Text className={`text-xs font-bold ${statusStyle.text}`}>
                 {invoiceData.status}
               </Text>
             </View>

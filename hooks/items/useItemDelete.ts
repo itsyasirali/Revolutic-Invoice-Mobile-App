@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from '@/services/api';
+import { removeItemFromCache } from './useItemList';
 
 export const useItemDelete = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -8,6 +9,7 @@ export const useItemDelete = () => {
         setDeleteLoading(true);
         try {
             await axios.delete(`/api/items/${id}`);
+            removeItemFromCache(id);
             setDeleteLoading(false);
             return { success: true };
         } catch (error: any) {

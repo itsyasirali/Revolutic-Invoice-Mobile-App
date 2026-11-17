@@ -40,6 +40,7 @@ const CustomerDetails: React.FC = () => {
     handleStatusToggle,
     handleCreateInvoice,
     handleEditFormCancel,
+    handleEditSuccess,
     handleDelete,
     handleOpenEdit,
     handleOpenNewInvoice,
@@ -146,7 +147,7 @@ const CustomerDetails: React.FC = () => {
 
       {/* Modals */}
       <StandardModal visible={showEditForm} onClose={handleEditFormCancel}>
-        <CustomerForm customer={customerData} onCancel={handleEditFormCancel} />
+        <CustomerForm customer={customerData} onCancel={handleEditFormCancel} onSaveSuccess={handleEditSuccess} />
       </StandardModal>
 
       <StandardModal

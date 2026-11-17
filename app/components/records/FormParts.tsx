@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, Switch } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
+import AppSwitch from '../ui/AppSwitch';
 
 /** Pinned Cancel / Title / Save header + scrolling body, same as ItemForm. */
 export const FormShell: React.FC<{
@@ -72,6 +73,8 @@ export const ToggleRow: React.FC<{ label: string; value: boolean; onChange: (v: 
 }) => (
   <View className="flex-row items-center justify-between mb-5">
     <Text className="text-sm font-semibold text-slate-800">{label}</Text>
-    <Switch value={value} onValueChange={onChange} trackColor={{ true: '#1AA3FF' }} />
+    <AppSwitch value={value} onValueChange={onChange} />
   </View>
 );
+
+export default FormShell;

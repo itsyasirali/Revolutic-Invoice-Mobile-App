@@ -13,6 +13,8 @@ interface User {
     companyName?: string;
     organizationId?: number | null;
     organization?: any;
+    /** Profile picture: an https URL or a path on the server. */
+    image?: string | null;
 }
 
 interface UseProfileReturn {

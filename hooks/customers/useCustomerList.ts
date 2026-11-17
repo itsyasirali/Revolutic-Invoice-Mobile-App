@@ -9,18 +9,28 @@ let hasFetchedCustomersOnce = false;
 let lastCustomersFetchAt = 0;
 const FRESH_MS = 30_000;
 
+// Screens showing the list subscribe here, so a change made anywhere (details,
+// edit form, delete) appears at once without a manual refresh.
+const listeners = new Set<(list: Customer[]) => void>();
+const publish = () => listeners.forEach((fn) => fn(customerCache));
+
 // Cache mutation helpers for instant in-place updates without refetch flicker
 export const updateCustomerInCache = (customer: Customer) => {
+    lastCustomersFetchAt = 0; // next visit re-syncs with the server
     const idx = customerCache.findIndex(c => c.id === customer.id);
     if (idx >= 0) {
-        customerCache = [...customerCache.slice(0, idx), customer, ...customerCache.slice(idx + 1)];
+        // Merge: the server reply can omit computed fields such as receivables.
+        const merged = { ...customerCache[idx], ...customer };
+        customerCache = [...customerCache.slice(0, idx), merged, ...customerCache.slice(idx + 1)];
     } else {
         customerCache = [customer, ...customerCache];
     }
+    publish();
 };
 
 export const removeCustomerFromCache = (id: string) => {
     customerCache = customerCache.filter(c => c.id !== id);
+    publish();
 };
 
 const useCustomerList = () => {
@@ -55,6 +65,13 @@ const useCustomerList = () => {
             setLoading(false);
             setRefreshing(false);
         }
+    }, []);
+
+    useEffect(() => {
+        listeners.add(setCustomers);
+        return () => {
+            listeners.delete(setCustomers);
+        };
     }, []);
 
     useEffect(() => {

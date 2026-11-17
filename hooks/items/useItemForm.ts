@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { Item } from '@/types/items';
 import axios from '@/services/api';
+import { updateItemInCache } from './useItemList';
 
 export const ITEM_UNITS = ["Hour", "Daily", "Monthly", "Project Base", "Contract"];
 
@@ -73,6 +74,7 @@ export const useItemForm = (item?: Item | null, onSaveSuccess?: (item?: any) => 
         }
 
         if (result.success) {
+            if (result.item) updateItemInCache(result.item);
             Alert.alert('Success', isEditing ? 'Item updated successfully' : 'Item created successfully');
             if (onSaveSuccess) onSaveSuccess(result.item);
         } else {

@@ -3,6 +3,7 @@ import { Alert, TextInput } from 'react-native';
 import { Customer, Contact, CustomerType } from '@/types/customer';
 import currenciesData from '@/data/CurrencyData';
 import axios from '@/services/api';
+import { updateCustomerInCache } from './useCustomerList';
 
 const buildCustomerFormData = (data: Partial<Customer>): FormData => {
     const formData = new FormData();
@@ -26,7 +27,7 @@ const buildCustomerFormData = (data: Partial<Customer>): FormData => {
     return formData;
 };
 
-const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void) => {
+const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: (saved?: Customer) => void) => {
     const isEditing = !!customer;
 
     // Form State
@@ -158,8 +159,9 @@ const useCustomerForm = (customer?: Customer | null, onSaveSuccess?: () => void)
         // setLoading(false); // Handled in handleRequest
 
         if (result.success) {
+            if (result.customer) updateCustomerInCache(result.customer);
             Alert.alert('Success', isEditing ? 'Customer updated successfully' : 'Customer created successfully');
-            if (onSaveSuccess) onSaveSuccess();
+            if (onSaveSuccess) onSaveSuccess(result.customer);
         } else {
             Alert.alert('Error', result.error || 'Failed to save customer');
         }

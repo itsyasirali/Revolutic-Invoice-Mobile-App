@@ -7,7 +7,6 @@ import StandardModal from '../ui/StandardModal';
 import { useTimeEntryListMenu } from '@/hooks/records/listMenus';
 import { RecordList, RecordCard } from '../records/RecordList';
 import TimeEntryForm from './TimeEntryForm';
-import TimerCard from './TimerCard';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -19,7 +18,6 @@ const FILTERS = [
 const TimeEntryList = () => {
   const router = useRouter();
   const [showAdd, setShowAdd] = useState(false);
-  const [preset, setPreset] = useState<{ date: string; startTime: string; endTime: string } | null>(null);
   const list = useRecordList<any>({
     url: '/api/time-tracking',
     listKey: 'timeEntries',
@@ -37,10 +35,7 @@ const TimeEntryList = () => {
     }, [])
   );
 
-  const close = () => {
-    setShowAdd(false);
-    setPreset(null);
-  };
+  const close = () => setShowAdd(false);
 
   return (
     <RecordList
@@ -59,14 +54,6 @@ const TimeEntryList = () => {
       onFilter={list.setFilter}
       onAdd={() => setShowAdd(true)}
       menu={menu}
-      header={
-        <TimerCard
-          onStop={(p) => {
-            setPreset(p);
-            setShowAdd(true);
-          }}
-        />
-      }
       keyOf={(t) => String(t.id)}
       renderItem={(t) => (
         <RecordCard
@@ -84,7 +71,6 @@ const TimeEntryList = () => {
     >
       <StandardModal visible={showAdd} onClose={close}>
         <TimeEntryForm
-          preset={preset}
           onCancel={close}
           onSuccess={() => {
             close();

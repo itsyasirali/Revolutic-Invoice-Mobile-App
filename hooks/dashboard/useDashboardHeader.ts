@@ -12,24 +12,16 @@ export const useDashboardHeader = (customUserName?: string) => {
         user?.firstName ||
         (user?.name ? user.name.split(' ')[0] : 'User');
 
-    const userInitial = userName.charAt(0).toUpperCase();
-
     const greeting = 'Welcome,';
 
     const handleGoSettings = () => {
         router.push('/screens/settings');
     };
 
-    const handleGoProfile = () => {
-        router.push('/screens/settings/profile');
-    };
-
     return {
         userName,
-        userInitial,
         greeting,
         insets,
         handleGoSettings,
-        handleGoProfile,
     };
 };

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import axios from '@/services/api';
 import { showToast } from '@/utils/toast';
 import InputField from '../ui/InputField';
+import AppSwitch from '../ui/AppSwitch';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const splitEmails = (text: string) =>
@@ -168,7 +169,7 @@ const QuoteEmail = () => {
             <Ionicons name="document-attach-outline" size={20} color="#64748b" />
             <Text className="ml-2 text-slate-800">Attach quote PDF</Text>
           </View>
-          <Switch value={attachPDF} onValueChange={setAttachPDF} trackColor={{ true: '#1AA3FF' }} />
+          <AppSwitch value={attachPDF} onValueChange={setAttachPDF} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

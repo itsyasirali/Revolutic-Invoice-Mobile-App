@@ -70,7 +70,7 @@ const RecordDetails: React.FC<RecordDetailsProps> = (p) => {
               {p.name}
             </Text>
             {p.badge && (
-              <View className={`ml-2 px-3 py-1.5 rounded-full border ${p.badge.bg} ${p.badge.border}`}>
+              <View className={`ml-2 px-3 py-1 rounded-full border ${p.badge.bg} ${p.badge.border}`}>
                 <Text className={`text-xs font-bold ${p.badge.text}`}>{p.badge.label}</Text>
               </View>
             )}

@@ -9,18 +9,25 @@ let hasFetchedItemsOnce = false;
 let lastItemsFetchAt = 0;
 const FRESH_MS = 30_000;
 
+// Screens showing the list subscribe here, so a change made anywhere appears at once.
+const listeners = new Set<(list: Item[]) => void>();
+const publish = () => listeners.forEach((fn) => fn(itemCache));
+
 // Cache mutation helpers for instant in-place updates without refetch flicker
 export const updateItemInCache = (item: Item) => {
+    lastItemsFetchAt = 0; // next visit re-syncs with the server
     const idx = itemCache.findIndex(i => i.id === item.id);
     if (idx >= 0) {
-        itemCache = [...itemCache.slice(0, idx), item, ...itemCache.slice(idx + 1)];
+        itemCache = [...itemCache.slice(0, idx), { ...itemCache[idx], ...item }, ...itemCache.slice(idx + 1)];
     } else {
         itemCache = [item, ...itemCache];
     }
+    publish();
 };
 
 export const removeItemFromCache = (id: string) => {
     itemCache = itemCache.filter(i => i.id !== id);
+    publish();
 };
 
 export const useItemList = () => {
@@ -55,6 +62,13 @@ export const useItemList = () => {
             setLoading(false);
             setRefreshing(false);
         }
+    }, []);
+
+    useEffect(() => {
+        listeners.add(setItems);
+        return () => {
+            listeners.delete(setItems);
+        };
     }, []);
 
     useEffect(() => {

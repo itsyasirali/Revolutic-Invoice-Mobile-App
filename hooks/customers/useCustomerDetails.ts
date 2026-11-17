@@ -4,6 +4,7 @@ import { Linking, Alert } from 'react-native';
 import { Customer } from '@/types/customer';
 import axios from '@/services/api';
 import useCustomerDelete from './useCustomerDelete';
+import { updateCustomerInCache } from './useCustomerList';
 
 const useCustomerDetails = () => {
     const { customer } = useLocalSearchParams();
@@ -43,27 +44,31 @@ const useCustomerDetails = () => {
 
     const handleStatusToggle = useCallback(async () => {
         if (!customerData) return;
-        const newStatus = customerData.status === 'Active' ? 'Inactive' : 'Active';
+        const makeActive = customerData.status !== 'Active';
 
         try {
-            const formData = new FormData();
-            formData.append('status', newStatus);
-            formData.append('customerType', customerData.customerType || 'Business');
-            formData.append('displayName', customerData.displayName || '');
-
-            const res = await axios.put(`/api/customers/${customerData.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            // Same endpoint the web list uses. A full PUT would also have to resend
+            // every contact, and the server rejects it without at least one.
+            await axios.put('/api/customers/batch-update', {
+                customers: [customerData.id],
+                status: makeActive ? 'active' : 'inactive',
             });
-
-            if (res.data.customer) {
-                setCustomerData(res.data.customer);
-            }
+            const updated = { ...customerData, status: makeActive ? 'Active' : 'inActive' } as Customer;
+            setCustomerData(updated);
+            updateCustomerInCache(updated);
+            Alert.alert('Success', `Customer marked as ${makeActive ? 'Active' : 'Inactive'}`);
         } catch (error: any) {
             console.error('Failed to update status:', error);
-            Alert.alert('Error', 'Failed to update status');
+            Alert.alert('Error', error?.response?.data?.message || 'Failed to update status');
         }
         setShowMenu(false);
     }, [customerData]);
+
+    // After an edit the details screen shows the saved customer straight away.
+    const handleEditSuccess = useCallback((saved?: Customer) => {
+        if (saved) setCustomerData((prev) => (prev ? { ...prev, ...saved } : saved));
+        setShowEditForm(false);
+    }, []);
 
     const handleEditFormCancel = useCallback(() => {
         setShowEditForm(false);
@@ -158,6 +163,7 @@ const useCustomerDetails = () => {
         handleStatusToggle,
         handleCreateInvoice,
         handleEditFormCancel,
+        handleEditSuccess,
         handleDelete,
         handleOpenEdit,
         handleCloseEdit,
