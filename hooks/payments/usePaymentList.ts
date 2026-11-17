@@ -39,7 +39,7 @@ export const usePaymentList = () => {
     // Same key => every caller (dashboard hooks, payments screen) shares one request.
     const { data, isLoading, error: swrError, mutate } = useSWR<Payment[]>(paymentsKey(filter), fetchPayments, {
         revalidateOnFocus: false,
-        dedupingInterval: 5000,
+        dedupingInterval: 30000,
     });
     const payments = data ?? [];
     // Loader is ONLY shown on cold first launch when nothing is cached

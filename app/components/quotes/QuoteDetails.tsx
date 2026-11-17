@@ -8,12 +8,18 @@ import { formatMoney, formatDate } from '@/utils/money';
 import StandardModal from '../ui/StandardModal';
 import RecordDetails, { DetailAction } from '../records/RecordDetails';
 import QuoteForm from './QuoteForm';
+import DownloadPopIn from '../ui/DownloadPopIn';
+import * as Print from 'expo-print';
+import { savePDFToDevice } from '@/utils/fileSystem';
+import { buildQuoteHtml } from '@/utils/quoteDocument';
 
 const QuoteDetails = () => {
   const router = useRouter();
   const { id, record } = useLocalSearchParams();
   const { payload, loading, reload } = useRecord<any>('/api/quotes', id, record, 'quote');
   const [showEdit, setShowEdit] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [savedName, setSavedName] = useState('');
   const quote = payload?.quote;
 
   const handleBack = () => (router.canGoBack() ? router.back() : router.replace('/screens/Quotes' as any));
@@ -34,6 +40,17 @@ const QuoteDetails = () => {
 
   const handleSend = () =>
     router.push({ pathname: '/screens/Quotes/email' as any, params: { id: String(quote.id), record: JSON.stringify(quote) } });
+
+  const handleDownload = () =>
+    run(async () => {
+      const html = await buildQuoteHtml(quote);
+      const { uri } = await Print.printToFileAsync({ html });
+      const name = `Quote-${quote.quoteNumber}.pdf`;
+      if (await savePDFToDevice(uri, name)) {
+        setSavedName(name);
+        setSaved(true);
+      }
+    }, 'Failed to download quote');
 
   const handlePreview = () =>
     router.push({ pathname: '/screens/Quotes/preview' as any, params: { id: String(quote.id) } });
@@ -77,7 +94,9 @@ const QuoteDetails = () => {
   const status: string = quote?.status || '';
   const customerName = quote?.customer?.displayName || quote?.customer?.companyName || '';
 
-  const actions: DetailAction[] = [{ label: 'Preview / PDF', icon: 'picture-as-pdf', onPress: handlePreview }];
+  const actions: DetailAction[] = [{ label: 'Preview', icon: 'visibility', onPress: handlePreview },
+    { label: 'Download PDF', icon: 'file-download', onPress: handleDownload },
+  ];
   if (['Draft', 'Sent', 'Viewed'].includes(status)) actions.push({ label: 'Send by Email', icon: 'mail-outline', onPress: handleSend });
   if (['Sent', 'Viewed'].includes(status)) {
     actions.push({ label: 'Mark as Accepted', icon: 'check-circle-outline', onPress: () => transition('accept', 'accepted') });
@@ -137,6 +156,8 @@ const QuoteDetails = () => {
         { label: 'Invoice', value: quote?.convertedInvoice?.invoiceNumber },
       ]}
       modals={
+        <>
+        <DownloadPopIn visible={saved} fileName={savedName} onHide={() => setSaved(false)} />
         <StandardModal visible={showEdit} onClose={() => setShowEdit(false)}>
           <QuoteForm
             quote={quote}
@@ -147,6 +168,7 @@ const QuoteDetails = () => {
             }}
           />
         </StandardModal>
+        </>
       }
     />
   );

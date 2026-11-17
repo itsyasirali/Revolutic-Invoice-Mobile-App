@@ -1,3 +1,6 @@
+import axios from '@/services/api';
+import { generateInvoiceHTML } from '@/utils/generateInvoiceHTML';
+
 // Invoice-shaped view of a quote so the existing invoice HTML/PDF renderer can
 // be reused (mirrors utils/quotes/quoteInvoiceAdapter.ts on the web).
 
@@ -50,3 +53,14 @@ export const quoteTemplate = (template: any) => ({
   balanceDueLabel: 'Total',
   showPreviousDue: false,
 });
+
+/** Loads the quote's template (falling back to the default) and renders its HTML. */
+export const buildQuoteHtml = async (quote: any): Promise<string> => {
+  let template = quote?.template && Object.keys(quote.template).length > 3 ? quote.template : null;
+  if (!template) {
+    const res = await axios.get('/api/templates');
+    const all: any[] = res.data?.templates ?? res.data ?? [];
+    template = all.find((t) => t.isDefault) || all[0] || null;
+  }
+  return generateInvoiceHTML(quoteToInvoiceDocument(quote), quoteTemplate(template));
+};

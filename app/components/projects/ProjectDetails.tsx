@@ -9,14 +9,17 @@ import StandardModal from '../ui/StandardModal';
 import RecordDetails from '../records/RecordDetails';
 import ProjectForm from './ProjectForm';
 import ProjectTasks from './ProjectTasks';
+import TimerCard from '../timetracking/TimerCard';
+import TimeEntryForm from '../timetracking/TimeEntryForm';
 
 const hours = (minutes?: number) => `${((minutes || 0) / 60).toFixed(1)} h`;
 
 const ProjectDetails = () => {
   const router = useRouter();
   const { id, record } = useLocalSearchParams();
-  const { payload, loading, reload } = useRecord<any>('/api/projects', id, record, 'project');
+  const { payload, setPayload, loading, reload } = useRecord<any>('/api/projects', id, record, 'project');
   const [showEdit, setShowEdit] = useState(false);
+  const [timePreset, setTimePreset] = useState<{ date: string; startTime: string; endTime: string } | null>(null);
   const project = payload?.project;
   const tasks: any[] = payload?.tasks ?? [];
 
@@ -59,7 +62,21 @@ const ProjectDetails = () => {
       name={project?.name || ''}
       badge={project ? { label: project.status, ...st } : undefined}
       description={project?.description}
-      extra={project ? <ProjectTasks projectId={project.id} tasks={tasks} onChanged={reload} /> : null}
+      extra={
+        project ? (
+          <>
+            {/* Hourly projects bill by time, so they get their own timer. */}
+            {project.billingMethod === 'Hourly' && project.status !== 'Completed' && (
+              <TimerCard inline storageKey={`revolutic:time-tracking:timer:project:${project.id}`} onStop={setTimePreset} />
+            )}
+            <ProjectTasks
+              projectId={project.id}
+              tasks={tasks}
+              onTasks={(update) => setPayload((p: any) => (p ? { ...p, tasks: update(p.tasks ?? []) } : p))}
+            />
+          </>
+        ) : null
+      }
       rows={[
         { label: 'Project Number', value: project?.projectNumber },
         { label: 'Customer', value: project?.customer?.displayName || project?.customer?.companyName },
@@ -78,6 +95,17 @@ const ProjectDetails = () => {
         { label: 'End Date', value: formatDate(project?.endDate) },
       ]}
       modals={
+        <>
+        <StandardModal visible={!!timePreset} onClose={() => setTimePreset(null)}>
+          <TimeEntryForm
+            preset={timePreset ? { ...timePreset, projectId: project?.id } : null}
+            onCancel={() => setTimePreset(null)}
+            onSuccess={() => {
+              setTimePreset(null);
+              reload();
+            }}
+          />
+        </StandardModal>
         <StandardModal visible={showEdit} onClose={() => setShowEdit(false)}>
           <ProjectForm
             project={project}
@@ -88,6 +116,7 @@ const ProjectDetails = () => {
             }}
           />
         </StandardModal>
+        </>
       }
     />
   );

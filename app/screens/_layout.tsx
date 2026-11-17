@@ -79,6 +79,7 @@ export default function ScreensLayout() {
           <Stack.Screen name="TimeTracking" />
           <Stack.Screen name="Quotes" />
           <Stack.Screen name="Reports" />
+          <Stack.Screen name="Notifications" />
           <Stack.Screen name="organization-setup" />
         </Stack>
         {!hideSidebar && <Sidebar />}

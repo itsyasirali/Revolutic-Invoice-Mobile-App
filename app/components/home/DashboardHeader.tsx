@@ -1,18 +1,18 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useSidebar } from "@/context/SidebarContext";
+import useNotifications from "@/hooks/notifications/useNotifications";
 import { useDashboardHeader } from "@/hooks/dashboard/useDashboardHeader";
 import OrganizationSwitcher from "../organization/OrganizationSwitcher";
 
 interface DashboardHeaderProps {
   userName?: string;
-  unreadCount?: number;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   userName: customUserName,
-  unreadCount = 0,
 }) => {
   const {
     userName,
@@ -23,6 +23,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     handleGoProfile,
   } = useDashboardHeader(customUserName);
   const { openSidebar } = useSidebar();
+  const router = useRouter();
+  const { unreadCount } = useNotifications();
 
   return (
     <View
@@ -45,14 +47,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <View className="flex-row items-center gap-2">
           {/* Notification Bell */}
           <Pressable
-            onPress={handleGoSettings}
+            onPress={() => router.push('/screens/Notifications' as any)}
             className="w-10 h-10 rounded-full bg-white items-center justify-center relative border border-slate-200 shadow-sm active:bg-slate-100"
           >
             <Ionicons name="notifications-outline" size={20} color="#334155" />
             {unreadCount > 0 && (
               <View className="w-[18px] h-[18px] rounded-full bg-red-500 absolute -top-1 -right-1 items-center justify-center border-2 border-white">
                 <Text className="text-white text-[9px] font-bold">
-                  {unreadCount}
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </Text>
               </View>
             )}

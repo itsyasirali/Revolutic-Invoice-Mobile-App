@@ -25,6 +25,9 @@ interface UseProfileReturn {
 // In-memory module cache for instant zero-loader profile and settings opening
 let cachedUser: User | null = null;
 let hasFetchedProfileOnce = false;
+let lastProfileFetchAt = 0;
+let inflightProfile: Promise<any> | null = null;
+const PROFILE_FRESH_MS = 30_000;
 
 export const updateCachedUser = (user: User | null) => {
     cachedUser = user;
@@ -55,7 +58,12 @@ export const useProfile = (): UseProfileReturn => {
             }
             setError(null);
 
-            const response = await axios.get('/api/auth/me');
+            // Every screen mounts this hook; share one request between them.
+            inflightProfile = inflightProfile ?? axios.get('/api/auth/me').finally(() => {
+                inflightProfile = null;
+            });
+            const response = await inflightProfile;
+            lastProfileFetchAt = Date.now();
 
             if (response.data?.user) {
                 const userData = response.data.user;
@@ -87,8 +95,9 @@ export const useProfile = (): UseProfileReturn => {
     };
 
     useEffect(() => {
-        // Silently revalidate in background if we already have cache
-        fetchProfile({ silent: hasFetchedProfileOnce && cachedUser !== null });
+        // Reuse the cached profile while it is fresh instead of re-requesting it.
+        const fresh = cachedUser !== null && Date.now() - lastProfileFetchAt < PROFILE_FRESH_MS;
+        if (!fresh) fetchProfile({ silent: hasFetchedProfileOnce && cachedUser !== null });
 
         // Silent listener for auth changes
         const subscription = DeviceEventEmitter.addListener(

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSidebar } from '@/context/SidebarContext';
+import useNotifications from '@/hooks/notifications/useNotifications';
 
 const WIDTH = Math.min(300, Dimensions.get('window').width * 0.8);
 
@@ -27,6 +28,7 @@ const MAIN: NavItem[] = [
 ];
 
 const OTHER: NavItem[] = [
+  { label: 'Notifications', icon: 'notifications-outline', path: '/screens/Notifications' },
   { label: 'Organizations', icon: 'business-outline', path: '/screens/organization' },
   { label: 'Import Data', icon: 'cloud-upload-outline', path: '/screens/settings/import' },
   { label: 'Settings', icon: 'settings-outline', path: '/screens/settings' },
@@ -37,6 +39,7 @@ const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const { unreadCount } = useNotifications();
 
   const progress = useRef(new Animated.Value(0)).current;
 
@@ -86,6 +89,11 @@ const Sidebar: React.FC = () => {
         <Text className={`ml-3 text-[15px] ${active ? 'font-bold text-white' : 'font-medium text-slate-700'}`}>
           {item.label}
         </Text>
+        {item.path === '/screens/Notifications' && unreadCount > 0 && (
+          <View className={`ml-auto min-w-[22px] h-[22px] px-1.5 rounded-full items-center justify-center ${active ? 'bg-white' : 'bg-red-500'}`}>
+            <Text className={`text-[11px] font-bold ${active ? 'text-primary' : 'text-white'}`}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
+          </View>
+        )}
       </Pressable>
     );
   };

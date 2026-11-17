@@ -10,8 +10,16 @@ const hhmm = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
  * Start / pause / stop timer. Stopping opens the time-entry form pre-filled
  * with the date and start/end time, so the server prices it like any entry.
  */
-const TimerCard: React.FC<{ onStop: (preset: { date: string; startTime: string; endTime: string }) => void }> = ({ onStop }) => {
-  const timer = useTimer();
+interface TimerCardProps {
+  onStop: (preset: { date: string; startTime: string; endTime: string }) => void;
+  /** Separate timers per project; omit for the general timer. */
+  storageKey?: string;
+  /** Drop the list margins when placed inside another card/screen. */
+  inline?: boolean;
+}
+
+const TimerCard: React.FC<TimerCardProps> = ({ onStop, storageKey, inline }) => {
+  const timer = useTimer(storageKey);
   const [busy, setBusy] = useState(false);
 
   const stop = () => {
@@ -32,7 +40,7 @@ const TimerCard: React.FC<{ onStop: (preset: { date: string; startTime: string; 
   };
 
   return (
-    <View className="mx-4 mt-3 bg-white rounded-md border border-slate-100 shadow-sm p-4">
+    <View className={`${inline ? 'mb-4' : 'mx-4 mt-3'} bg-white rounded-md border border-slate-100 shadow-sm p-4`}>
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Timer</Text>

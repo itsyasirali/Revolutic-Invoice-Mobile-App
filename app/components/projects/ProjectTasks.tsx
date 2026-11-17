@@ -14,11 +14,12 @@ interface Task {
 interface Props {
   projectId: number;
   tasks: Task[];
-  onChanged: () => void;
+  /** Applies a change to the task list locally; no refetch of the project. */
+  onTasks: (update: (tasks: Task[]) => Task[]) => void;
 }
 
 /** Add, rename, complete and delete project tasks (same API as the web). */
-const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onChanged }) => {
+const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks }) => {
   const [editing, setEditing] = useState<Task | null>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -45,10 +46,15 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onChanged }) => {
     if (!name.trim()) return Alert.alert('Task name', 'Enter a task name.');
     setSaving(true);
     try {
-      if (editing) await axios.put(`/api/projects/${projectId}/tasks/${editing.id}`, { name, description });
-      else await axios.post(`/api/projects/${projectId}/tasks`, { name, description });
+      if (editing) {
+        const res = await axios.put(`/api/projects/${projectId}/tasks/${editing.id}`, { name, description });
+        const saved: Task = res.data?.task ?? { ...editing, name, description };
+        onTasks((list) => list.map((t) => (t.id === saved.id ? saved : t)));
+      } else {
+        const res = await axios.post(`/api/projects/${projectId}/tasks`, { name, description });
+        if (res.data?.task) onTasks((list) => [...list, res.data.task]);
+      }
       setOpen(false);
-      onChanged();
     } catch (e) {
       fail(e, 'Failed to save task');
     } finally {
@@ -57,10 +63,13 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onChanged }) => {
   };
 
   const toggle = async (t: Task) => {
+    const next: Task['status'] = t.status === 'Completed' ? 'Open' : 'Completed';
+    // Show the change immediately, then confirm with the server (undo on failure).
+    onTasks((list) => list.map((x) => (x.id === t.id ? { ...x, status: next } : x)));
     try {
-      await axios.put(`/api/projects/${projectId}/tasks/${t.id}`, { status: t.status === 'Completed' ? 'Open' : 'Completed' });
-      onChanged();
+      await axios.put(`/api/projects/${projectId}/tasks/${t.id}`, { status: next });
     } catch (e) {
+      onTasks((list) => list.map((x) => (x.id === t.id ? { ...x, status: t.status } : x)));
       fail(e, 'Failed to update task');
     }
   };
@@ -74,7 +83,7 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onChanged }) => {
         onPress: async () => {
           try {
             await axios.delete(`/api/projects/${projectId}/tasks/${t.id}`);
-            onChanged();
+            onTasks((list) => list.filter((x) => x.id !== t.id));
           } catch (e) {
             fail(e, 'Failed to delete task');
           }

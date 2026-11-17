@@ -6,6 +6,8 @@ import axios from '@/services/api';
 // Module-level in-memory cache to guarantee zero-loader screen switches
 let itemCache: Item[] = [];
 let hasFetchedItemsOnce = false;
+let lastItemsFetchAt = 0;
+const FRESH_MS = 30_000;
 
 // Cache mutation helpers for instant in-place updates without refetch flicker
 export const updateItemInCache = (item: Item) => {
@@ -45,6 +47,7 @@ export const useItemList = () => {
             const safeData = Array.isArray(itemsData) ? itemsData : [];
             itemCache = safeData;
             hasFetchedItemsOnce = true;
+            lastItemsFetchAt = Date.now();
             setItems(safeData);
         } catch (error) {
             console.error('Failed to fetch items:', error);
@@ -55,8 +58,8 @@ export const useItemList = () => {
     }, []);
 
     useEffect(() => {
-        // Silently fetch and sync data in background (SWR)
-        fetchItems(false);
+        // Silently sync in the background, but skip it while the cache is fresh.
+        if (Date.now() - lastItemsFetchAt > FRESH_MS) fetchItems(false);
     }, [fetchItems]);
 
     // Client-side filtering

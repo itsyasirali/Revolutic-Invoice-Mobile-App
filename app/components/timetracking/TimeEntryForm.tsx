@@ -14,7 +14,7 @@ const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 interface Props {
   entry?: any | null;
   /** Prefill from the timer when it is stopped. */
-  preset?: { date?: string; startTime?: string; endTime?: string } | null;
+  preset?: { date?: string; startTime?: string; endTime?: string; projectId?: number | string } | null;
   onCancel: () => void;
   onSuccess: () => void;
 }
@@ -28,7 +28,7 @@ const TimeEntryForm: React.FC<Props> = ({ entry, preset, onCancel, onSuccess }) 
   const [startTime, setStartTime] = useState(entry?.startTime || preset?.startTime || '');
   const [endTime, setEndTime] = useState(entry?.endTime || preset?.endTime || '');
   const [customerId, setCustomerId] = useState<string | number>(entry?.customerId ?? '');
-  const [projectId, setProjectId] = useState<string | number>(entry?.projectId ?? '');
+  const [projectId, setProjectId] = useState<string | number>(entry?.projectId ?? preset?.projectId ?? '');
   const [taskId, setTaskId] = useState<string | number>(entry?.taskId ?? '');
   const [taskOptions, setTaskOptions] = useState<DropdownOption[]>([]);
   const [hourlyRate, setHourlyRate] = useState(entry?.hourlyRate != null ? String(entry.hourlyRate) : '');

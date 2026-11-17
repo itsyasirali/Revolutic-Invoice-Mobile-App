@@ -37,5 +37,5 @@ export function useRecord<T = any>(url: string, id?: string | string[], local?: 
     reload();
   }, [reload]);
 
-  return { payload, loading, reload, recordId };
+  return { payload, setPayload, loading, reload, recordId };
 }

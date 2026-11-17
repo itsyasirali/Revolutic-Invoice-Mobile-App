@@ -6,6 +6,8 @@ import axios from '@/services/api';
 // Module-level in-memory cache to guarantee zero-loader screen switches
 let customerCache: Customer[] = [];
 let hasFetchedCustomersOnce = false;
+let lastCustomersFetchAt = 0;
+const FRESH_MS = 30_000;
 
 // Cache mutation helpers for instant in-place updates without refetch flicker
 export const updateCustomerInCache = (customer: Customer) => {
@@ -45,6 +47,7 @@ const useCustomerList = () => {
             const data = response.data.customers || [];
             customerCache = data;
             hasFetchedCustomersOnce = true;
+            lastCustomersFetchAt = Date.now();
             setCustomers(data);
         } catch (error) {
             console.error('Failed to fetch customers:', error);
@@ -55,8 +58,8 @@ const useCustomerList = () => {
     }, []);
 
     useEffect(() => {
-        // Silently fetch and sync data in the background (SWR)
-        fetchCustomers(false);
+        // Silently sync in the background, but skip it while the cache is fresh.
+        if (Date.now() - lastCustomersFetchAt > FRESH_MS) fetchCustomers(false);
     }, [fetchCustomers]);
 
     const filteredCustomers = useMemo(() => {

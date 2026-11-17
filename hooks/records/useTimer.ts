@@ -16,13 +16,13 @@ const EMPTY: TimerState = { startedAt: null, accumulatedMs: 0, runningSince: nul
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Stopwatch that survives app restarts (stored on the device). */
-export const useTimer = () => {
+export const useTimer = (storageKey: string = KEY) => {
   const [state, setState] = useState<TimerState>(EMPTY);
   const [now, setNow] = useState(() => Date.now());
   const loaded = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY)
+    AsyncStorage.getItem(storageKey)
       .then((raw) => {
         if (raw) setState({ ...EMPTY, ...JSON.parse(raw) });
       })
@@ -30,12 +30,12 @@ export const useTimer = () => {
       .finally(() => {
         loaded.current = true;
       });
-  }, []);
+  }, [storageKey]);
 
   useEffect(() => {
     if (!loaded.current) return;
-    AsyncStorage.setItem(KEY, JSON.stringify(state)).catch(() => {});
-  }, [state]);
+    AsyncStorage.setItem(storageKey, JSON.stringify(state)).catch(() => {});
+  }, [state, storageKey]);
 
   useEffect(() => {
     if (state.runningSince === null) return;

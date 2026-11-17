@@ -60,7 +60,7 @@ export const useInvoiceList = () => {
     const router = useRouter();
     const { data, isLoading, mutate } = useSWR<UIInvoiceListItem[]>(INVOICES_KEY, fetchInvoices, {
         revalidateOnFocus: false,
-        dedupingInterval: 5000,
+        dedupingInterval: 30000,
         onError: (error) => console.error('Failed to fetch invoices:', error),
     });
     const invoices = data ?? [];
