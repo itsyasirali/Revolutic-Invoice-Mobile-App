@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import '../global.css';
 import CustomSplashScreen from './components/CustomSplashScreen';
 import { useAuth } from '../hooks/auth/useAuth';
+import { useIntroSeen } from '../hooks/common/useIntroSeen';
 import { OrganizationProvider, useOrganization } from '../context/OrganizationContext';
 import {
   useFonts,
@@ -29,6 +30,7 @@ function RootLayoutNav() {
   const { organization, loading: orgLoading } = useOrganization();
   const segments = useSegments();
   const params = useGlobalSearchParams<{ mode?: string }>();
+  const { introSeen, introReady } = useIntroSeen();
   const [isReady, setIsReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -37,7 +39,7 @@ function RootLayoutNav() {
     Roboto_700Bold,
   });
 
-  const loading = authLoading || (user ? orgLoading : false) || !fontsLoaded;
+  const loading = authLoading || (user ? orgLoading : false) || !fontsLoaded || !introReady;
 
   useEffect(() => {
     // Hide native splash screen as soon as component mounts
@@ -58,10 +60,15 @@ function RootLayoutNav() {
         segments[0] === undefined || (segments[0] as string) === 'index';
       const isExplicitlyAddingNewOrg = isOrgSetup && params?.mode === 'new';
 
-      if (!user && !inAuthGroup && !atOnboarding) {
-        // Not authenticated -> redirect to /auth
-        router.replace('/auth');
-      } else if (user) {
+      if (!user) {
+        if (!introSeen) {
+          // First launch after install: show the intro once.
+          if (!atOnboarding) router.replace('/');
+        } else if (!inAuthGroup) {
+          // Intro already seen: signed-out users go straight to login.
+          router.replace('/auth');
+        }
+      } else {
         const activeOrg = organization || (user as any)?.organization;
         if (!activeOrg) {
           // Authenticated but no organization set up yet
@@ -85,7 +92,7 @@ function RootLayoutNav() {
     } else {
       performRouting();
     }
-  }, [user, organization, loading, segments, isReady, params?.mode]);
+  }, [user, organization, loading, segments, isReady, params?.mode, introSeen]);
 
   // Show custom splash screen while checking authentication and loading fonts
   if (loading || !isReady) {

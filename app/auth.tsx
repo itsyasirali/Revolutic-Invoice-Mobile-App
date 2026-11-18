@@ -1,18 +1,24 @@
 import React from "react";
 import {
+  ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
   Text,
   Pressable,
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthForm } from "@/hooks/auth/useAuthForm";
 import InputField from "./components/ui/InputField";
-import StandardButton from "./components/ui/StandardButton";
+
+const ICON = "#94a3b8";
 
 const AuthScreen = () => {
+  const insets = useSafeAreaInsets();
   const {
     isSignup,
     name,
@@ -31,72 +37,34 @@ const AuthScreen = () => {
     toggleConfirmVisibility,
     switchToLogin,
     switchToSignup,
-    handleBack,
     handleSubmit,
+    handleGoogle,
+    handleForgotPassword,
+    googleLoading,
   } = useAuthForm();
 
+  const busy = loading || googleLoading;
+
   return (
-    <View className="flex-1 bg-white pt-10">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
+    <View className="flex-1 bg-primary">
+      <StatusBar barStyle="light-content" backgroundColor="#1AA3FF" />
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingBottom: isKeyboardVisible ? 380 : 50,
-          }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: isKeyboardVisible ? 280 : 0 }}
         >
-          <View className="flex-1 px-6 pt-4">
-            {/* Back button */}
-            <Pressable
-              onPress={handleBack}
-              className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center mb-6"
-            >
-              <Ionicons name="chevron-back" size={20} color="#374151" />
-            </Pressable>
-
-            {/* Heading */}
-            <Text className="text-3xl font-bold text-gray-900 mb-1">
-              {isSignup ? "Create Account" : "Welcome back!"}
+          {/* Brand header */}
+          <View className="items-center px-6 pb-14" style={{ paddingTop: insets.top + 28 }}>
+            <Image source={require("../assets/images/adaptive-icon.png")} style={{ width: 84, height: 84 }} resizeMode="contain" />
+            <Text className="text-white text-2xl font-extrabold mt-2 tracking-wide">Invoice Smarty</Text>
+            <Text className="text-white/85 text-sm mt-1 text-center">
+              {isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
             </Text>
-            <Text className="text-sm text-gray-500 mb-8">
-              {isSignup
-                ? "Fill in the details below to get started"
-                : "Login to continue to your account"}
-            </Text>
+          </View>
 
-            {/* Tab Toggle */}
-            <View className="flex-row bg-gray-100 rounded-xl p-1 mb-6">
-              <Pressable
-                onPress={switchToLogin}
-                className={`flex-1 py-3 rounded-lg items-center ${!isSignup ? "bg-primary-light" : ""}`}
-              >
-                <Text
-                  className="font-semibold text-sm"
-                  style={{ color: !isSignup ? "#ffffff" : "#6b7280" }}
-                >
-                  Login
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={switchToSignup}
-                className={`flex-1 py-3 rounded-lg items-center ${
-                  isSignup ? "bg-primary-light" : ""
-                }`}
-              >
-                <Text
-                  className="font-semibold text-sm"
-                  style={{ color: isSignup ? "#ffffff" : "#6b7280" }}
-                >
-                  Sign Up
-                </Text>
-              </Pressable>
-            </View>
-
-            {/* Name field (Sign Up only) */}
+          {/* Form sheet */}
+          <View className="flex-1 bg-white rounded-t-3xl px-6 pt-7" style={{ paddingBottom: insets.bottom + 24 }}>
             {isSignup && (
               <InputField
                 label="Full Name"
@@ -104,65 +72,46 @@ const AuthScreen = () => {
                 value={name}
                 onChangeText={setName}
                 autoCapitalize="words"
-                leftIcon={
-                  <Ionicons name="person-outline" size={18} color="#9ca3af" />
-                }
+                leftIcon={<Ionicons name="person-outline" size={18} color={ICON} />}
                 containerStyle="mb-4"
               />
             )}
 
-            {/* Email */}
             <InputField
               label="Email"
-              placeholder="Enter your email address"
+              placeholder="you@company.com"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              leftIcon={
-                <Ionicons name="mail-outline" size={18} color="#9ca3af" />
-              }
+              autoCorrect={false}
+              leftIcon={<Ionicons name="mail-outline" size={18} color={ICON} />}
               containerStyle="mb-4"
             />
 
-            {/* Password */}
             <InputField
               label="Password"
               placeholder="Enter your password"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
-              leftIcon={
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={18}
-                  color="#9ca3af"
-                />
-              }
+              leftIcon={<Ionicons name="lock-closed-outline" size={18} color={ICON} />}
               rightIcon={
-                <Pressable onPress={togglePasswordVisibility}>
-                  <Ionicons
-                    name={showPassword ? "eye-off-outline" : "eye-outline"}
-                    size={18}
-                    color="#9ca3af"
-                  />
+                <Pressable onPress={togglePasswordVisibility} hitSlop={8}>
+                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color={ICON} />
                 </Pressable>
               }
               containerStyle="mb-2"
             />
 
-            {/* Forgot Password */}
             {!isSignup && (
-              <View className="items-end mb-6">
-                <Pressable>
-                  <Text className="text-primary-light font-semibold text-sm">
-                    Forgot Password?
-                  </Text>
+              <View className="items-end mb-5">
+                <Pressable onPress={handleForgotPassword} hitSlop={8}>
+                  <Text className="text-primary font-semibold text-sm">Forgot password?</Text>
                 </Pressable>
               </View>
             )}
 
-            {/* Confirm Password (Sign Up only) */}
             {isSignup && (
               <InputField
                 label="Confirm Password"
@@ -170,67 +119,57 @@ const AuthScreen = () => {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirm}
-                leftIcon={
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={18}
-                    color="#9ca3af"
-                  />
-                }
+                leftIcon={<Ionicons name="lock-closed-outline" size={18} color={ICON} />}
                 rightIcon={
-                  <Pressable onPress={toggleConfirmVisibility}>
-                    <Ionicons
-                      name={showConfirm ? "eye-off-outline" : "eye-outline"}
-                      size={18}
-                      color="#9ca3af"
-                    />
+                  <Pressable onPress={toggleConfirmVisibility} hitSlop={8}>
+                    <Ionicons name={showConfirm ? "eye-off-outline" : "eye-outline"} size={18} color={ICON} />
                   </Pressable>
                 }
-                containerStyle="mt-4 mb-6"
+                containerStyle="mt-2 mb-6"
               />
             )}
 
-            {/* Submit Button */}
-            <StandardButton
+            {/* Submit */}
+            <Pressable
               onPress={handleSubmit}
-              title={isSignup ? "Sign Up" : "Login"}
-              loading={loading}
-              className="mb-6 shadow-sm"
-              textClassName="text-base font-bold tracking-wide"
-            />
+              disabled={busy}
+              className={`h-14 rounded-md bg-primary items-center justify-center shadow-sm active:bg-primary/90 ${busy ? "opacity-70" : ""}`}
+            >
+              {loading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text className="text-white font-bold text-base tracking-wide">{isSignup ? "Create Account" : "Login"}</Text>
+              )}
+            </Pressable>
 
-            {/* Or continue with */}
-            <View className="flex-row items-center mb-6">
-              <View className="flex-1 h-[1px] bg-gray-200" />
-              <Text className="mx-4 text-gray-400 text-sm">
-                or continue with
-              </Text>
-              <View className="flex-1 h-[1px] bg-gray-200" />
+            {/* Divider */}
+            <View className="flex-row items-center my-6">
+              <View className="flex-1 h-[1px] bg-slate-200" />
+              <Text className="mx-4 text-slate-400 text-xs uppercase tracking-wider">or</Text>
+              <View className="flex-1 h-[1px] bg-slate-200" />
             </View>
 
-            {/* Social Buttons */}
-            <View className="flex-row gap-4 mb-8">
-              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-md border border-gray-200 bg-white shadow-sm">
+            {/* Google */}
+            <Pressable
+              onPress={handleGoogle}
+              disabled={busy}
+              className={`h-14 flex-row items-center justify-center rounded-md border border-slate-200 bg-white active:bg-slate-50 ${googleLoading ? "opacity-60" : ""}`}
+            >
+              {googleLoading ? (
+                <ActivityIndicator size="small" color="#EA4335" />
+              ) : (
                 <Ionicons name="logo-google" size={20} color="#EA4335" />
-                <Text className="font-semibold text-gray-700 text-sm">
-                  Google
-                </Text>
-              </Pressable>
-              <Pressable className="flex-1 flex-row items-center justify-center gap-2 py-3.5 rounded-md border border-gray-200 bg-white shadow-sm">
-                <Ionicons name="logo-apple" size={20} color="#1C1C1E" />
-                <Text className="font-semibold text-gray-700 text-sm">
-                  Apple
-                </Text>
+              )}
+              <Text className="font-semibold text-slate-700 text-base ml-3">Continue with Google</Text>
+            </Pressable>
+
+            {/* Switch between login and sign up */}
+            <View className="flex-row justify-center mt-6">
+              <Text className="text-slate-500 text-sm">{isSignup ? "Already have an account? " : "New to Invoice Smarty? "}</Text>
+              <Pressable onPress={isSignup ? switchToLogin : switchToSignup} hitSlop={6}>
+                <Text className="text-primary font-bold text-sm">{isSignup ? "Login" : "Sign Up"}</Text>
               </Pressable>
             </View>
-
-            {/* Terms */}
-            <Text className="text-center text-gray-400 text-xs pb-2">
-              By continuing, you agree to our{" "}
-              <Text className="text-primary-light font-semibold">
-                Terms & Privacy Policy
-              </Text>
-            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -239,4 +178,3 @@ const AuthScreen = () => {
 };
 
 export default AuthScreen;
-

@@ -1,7 +1,11 @@
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, NativeModules } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
-import InvoiceFiles from '../modules/invoice-files';
 import { showToast } from './toast';
+
+// Native Android module (android/app/src/main/java/com/invoicesmarty/InvoiceFilesModule.kt).
+const InvoiceFiles: {
+    saveToDownloads: (sourceUri: string, fileName: string, folder: string, mimeType: string) => Promise<string>;
+} = NativeModules.InvoiceFiles;
 
 // Folder created inside the phone's Download folder.
 const FOLDER_NAME = 'InvoiceSmarty';
