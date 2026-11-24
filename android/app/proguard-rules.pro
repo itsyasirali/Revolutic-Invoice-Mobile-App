@@ -12,3 +12,6 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # Add any project specific keep options here:
+
+# InvoiceSmarty native file module (called from JS via reflection)
+-keep class com.invoicesmarty.** { *; }

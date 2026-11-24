@@ -68,7 +68,7 @@ const IntroScreen = () => {
           <View className="w-8 h-8 rounded-md bg-primary items-center justify-center">
             <Ionicons name="receipt-outline" size={16} color="#fff" />
           </View>
-          <Text className="ml-2 text-base font-bold text-slate-800">Invoice Smarty</Text>
+          <Text className="ml-2 text-base font-bold text-slate-800">InvoiceSmarty</Text>
         </View>
         {!isLast && (
           <Pressable onPress={finish} hitSlop={10}>

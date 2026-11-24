@@ -57,7 +57,7 @@ const AuthScreen = () => {
           {/* Brand header */}
           <View className="items-center px-6 pb-14" style={{ paddingTop: insets.top + 28 }}>
             <Image source={require("../assets/images/adaptive-icon.png")} style={{ width: 84, height: 84 }} resizeMode="contain" />
-            <Text className="text-white text-2xl font-extrabold mt-2 tracking-wide">Invoice Smarty</Text>
+            <Text className="text-white text-2xl font-extrabold mt-2 tracking-wide">InvoiceSmarty</Text>
             <Text className="text-white/85 text-sm mt-1 text-center">
               {isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
             </Text>
@@ -165,7 +165,7 @@ const AuthScreen = () => {
 
             {/* Switch between login and sign up */}
             <View className="flex-row justify-center mt-6">
-              <Text className="text-slate-500 text-sm">{isSignup ? "Already have an account? " : "New to Invoice Smarty? "}</Text>
+              <Text className="text-slate-500 text-sm">{isSignup ? "Already have an account? " : "New to InvoiceSmarty? "}</Text>
               <Pressable onPress={isSignup ? switchToLogin : switchToSignup} hitSlop={6}>
                 <Text className="text-primary font-bold text-sm">{isSignup ? "Login" : "Sign Up"}</Text>
               </Pressable>

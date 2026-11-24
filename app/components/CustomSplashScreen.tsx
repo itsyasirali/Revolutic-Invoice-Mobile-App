@@ -36,7 +36,7 @@ export default function CustomSplashScreen() {
           transform: [{ translateY: text.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
         }}
       >
-        <Text style={{ color: '#ffffff', fontSize: 30, fontWeight: '800', letterSpacing: 0.5 }}>Invoice Smarty</Text>
+        <Text style={{ color: '#ffffff', fontSize: 30, fontWeight: '800', letterSpacing: 0.5 }}>InvoiceSmarty</Text>
         <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '500', marginTop: 6, textAlign: 'center' }}>
           Smarter Invoicing for Your Business
         </Text>

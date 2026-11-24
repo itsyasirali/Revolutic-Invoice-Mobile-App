@@ -10,7 +10,7 @@ interface TimerState {
   runningSince: number | null;
 }
 
-const KEY = 'revolutic:time-tracking:timer';
+const KEY = 'invoicesmarty:time-tracking:timer';
 const EMPTY: TimerState = { startedAt: null, accumulatedMs: 0, runningSince: null };
 
 const pad = (n: number) => String(n).padStart(2, '0');

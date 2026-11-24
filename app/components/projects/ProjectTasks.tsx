@@ -165,7 +165,7 @@ const ProjectTasks: React.FC<Props> = ({ projectId, tasks, onTasks, onTasksChang
                 {/* Actions */}
                 <View className="flex-row items-center mt-3">
                   {timerEnabled && !done && (
-                    <TaskTimer storageKey={`revolutic:time-tracking:timer:project:${projectId}:task:${t.id}`} onStop={(preset) => onTimerStop?.(t, preset)} />
+                    <TaskTimer storageKey={`invoicesmarty:time-tracking:timer:project:${projectId}:task:${t.id}`} onStop={(preset) => onTimerStop?.(t, preset)} />
                   )}
                   <Pressable
                     onPress={() => toggle(t)}

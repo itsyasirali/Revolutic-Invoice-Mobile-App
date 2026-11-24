@@ -77,7 +77,7 @@ export default function OrganizationSetupScreen() {
             <Text className="text-white font-extrabold text-base">IS</Text>
           </View>
           <View>
-            <Text className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Invoice Smarty</Text>
+            <Text className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">InvoiceSmarty</Text>
             <Text className="text-[14px] font-bold text-slate-800 leading-tight">
               {isAddingNewOrg ? 'New Organization' : 'Organization Setup'}
             </Text>
@@ -113,7 +113,7 @@ export default function OrganizationSetupScreen() {
               <Text className="text-sm text-slate-500">
                 {isAddingNewOrg
                   ? 'Set up a separate business profile, currency, and address for this workspace.'
-                  : 'Enter your organization details to get started with Invoice Smarty.'}
+                  : 'Enter your organization details to get started with InvoiceSmarty.'}
               </Text>
             </View>
 

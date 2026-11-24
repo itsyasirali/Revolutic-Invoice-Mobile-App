@@ -1,6 +1,6 @@
-# Invoice Smarty Mobile App
+# InvoiceSmarty Mobile App
 
-Welcome to the **Invoice Smarty Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
+Welcome to the **InvoiceSmarty Mobile App**! This application is a comprehensive invoice and billing management solution built with modern mobile development technologies, offering an intuitive interface to handle customers, items, invoices, and payments on the go.
 
 ## Features
 
@@ -40,7 +40,7 @@ Before you begin, ensure you have the following installed on your machine:
 1. **Clone the repository** (if you haven't already):
    ```bash
    git clone <repository-url>
-   cd Revolutic-Invoice-Mobile-App
+   cd InvoiceSmarty
    ```
 
 2. **Install dependencies**:
