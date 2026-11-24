@@ -41,6 +41,13 @@ const AuthScreen = () => {
     handleGoogle,
     handleForgotPassword,
     googleLoading,
+    step,
+    otp,
+    setOtp,
+    resendIn,
+    handleVerifyOtp,
+    handleResendOtp,
+    backToForm,
   } = useAuthForm();
 
   const busy = loading || googleLoading;
@@ -59,12 +66,50 @@ const AuthScreen = () => {
             <Image source={require("../assets/images/adaptive-icon.png")} style={{ width: 84, height: 84 }} resizeMode="contain" />
             <Text className="text-white text-2xl font-extrabold mt-2 tracking-wide">InvoiceSmarty</Text>
             <Text className="text-white/85 text-sm mt-1 text-center">
-              {isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
+              {step === "otp" ? "Verify your email" : isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
             </Text>
           </View>
 
           {/* Form sheet */}
           <View className="flex-1 bg-white rounded-t-3xl px-6 pt-7" style={{ paddingBottom: insets.bottom + 24 }}>
+            {step === "otp" ? (
+              <>
+                <Text className="text-slate-800 text-lg font-bold mb-1">Enter verification code</Text>
+                <Text className="text-slate-500 text-sm mb-5">We sent a 6-digit code to {email.trim()}. It expires in 5 minutes.</Text>
+                <InputField
+                  label="Verification code"
+                  placeholder="123456"
+                  value={otp}
+                  onChangeText={(t) => setOtp(t.replace(/\D/g, "").slice(0, 6))}
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  autoFocus
+                  textContentType="oneTimeCode"
+                  autoComplete="one-time-code"
+                  leftIcon={<Ionicons name="keypad-outline" size={18} color={ICON} />}
+                  containerStyle="mb-6"
+                />
+                <Pressable
+                  onPress={handleVerifyOtp}
+                  disabled={busy}
+                  className={`h-14 rounded-md bg-primary items-center justify-center ${busy ? "opacity-70" : ""}`}
+                >
+                  {loading ? <ActivityIndicator color="#ffffff" /> : <Text className="text-white font-bold text-base">Verify & Continue</Text>}
+                </Pressable>
+                <View className="flex-row justify-center mt-6">
+                  <Text className="text-slate-500 text-sm">{"Didn't get it? "}</Text>
+                  <Pressable onPress={handleResendOtp} disabled={busy || resendIn > 0} hitSlop={6}>
+                    <Text className={`font-bold text-sm ${resendIn > 0 ? "text-slate-400" : "text-primary"}`}>
+                      {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+                    </Text>
+                  </Pressable>
+                </View>
+                <Pressable onPress={backToForm} className="items-center mt-4" hitSlop={6}>
+                  <Text className="text-slate-500 text-sm">Back</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
             {isSignup && (
               <InputField
                 label="Full Name"
@@ -170,6 +215,8 @@ const AuthScreen = () => {
                 <Text className="text-primary font-bold text-sm">{isSignup ? "Login" : "Sign Up"}</Text>
               </Pressable>
             </View>
+              </>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

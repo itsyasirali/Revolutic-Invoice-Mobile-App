@@ -80,7 +80,9 @@ axios.interceptors.response.use(
     if (error.response?.status === 401) {
       await Promise.all([clearStoredToken(), clearStoredActiveOrgId()]);
     } else {
-      console.error('Response error:', error.response?.status, error.response?.data);
+      // 4xx are expected user errors (validation, unverified email): log quietly, no red error screen.
+      const log = !error.response || error.response.status >= 500 ? console.error : console.log;
+      log('Response error:', error.response?.status, error.response?.data);
 
       if (error.response?.status === 404) {
         console.error('404 Error - Route not found:', error.config.url);
