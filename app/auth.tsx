@@ -48,6 +48,7 @@ const AuthScreen = () => {
     handleVerifyOtp,
     handleResendOtp,
     backToForm,
+    openForgot,
   } = useAuthForm();
 
   const busy = loading || googleLoading;
@@ -66,13 +67,62 @@ const AuthScreen = () => {
             <Image source={require("../assets/images/adaptive-icon.png")} style={{ width: 84, height: 84 }} resizeMode="contain" />
             <Text className="text-white text-2xl font-extrabold mt-2 tracking-wide">InvoiceSmarty</Text>
             <Text className="text-white/85 text-sm mt-1 text-center">
-              {step === "otp" ? "Verify your email" : isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
+              {step === "otp" ? "Verify your email" : step === "forgot" || step === "forgotSent" ? "Reset your password" : isSignup ? "Create your account to get started" : "Sign in to manage your invoices"}
             </Text>
           </View>
 
           {/* Form sheet */}
           <View className="flex-1 bg-white rounded-t-3xl px-6 pt-7" style={{ paddingBottom: insets.bottom + 24 }}>
-            {step === "otp" ? (
+            {step === "forgot" ? (
+              <>
+                <Text className="text-slate-800 text-lg font-bold mb-1">Forgot your password?</Text>
+                <Text className="text-slate-500 text-sm mb-5">Enter your account email and we will send you a link to choose a new password.</Text>
+                <InputField
+                  label="Email"
+                  placeholder="you@company.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoFocus
+                  leftIcon={<Ionicons name="mail-outline" size={18} color={ICON} />}
+                  containerStyle="mb-6"
+                />
+                <Pressable
+                  onPress={handleForgotPassword}
+                  disabled={busy}
+                  className={`h-14 rounded-md bg-primary items-center justify-center ${busy ? "opacity-70" : ""}`}
+                >
+                  {loading ? <ActivityIndicator color="#ffffff" /> : <Text className="text-white font-bold text-base">Send reset link</Text>}
+                </Pressable>
+                <Pressable onPress={backToForm} className="items-center mt-6" hitSlop={6}>
+                  <Text className="text-primary font-bold text-sm">Back to login</Text>
+                </Pressable>
+              </>
+            ) : step === "forgotSent" ? (
+              <>
+                <View className="items-center mb-4">
+                  <Ionicons name="mail-open-outline" size={48} color="#1AA3FF" />
+                </View>
+                <Text className="text-slate-800 text-lg font-bold text-center mb-2">Check your email</Text>
+                <Text className="text-slate-500 text-sm text-center mb-6">
+                  If an account exists for {email.trim()}, we sent a password reset link. Open it, choose a new password, then come back and log in. The link expires in 1 hour.
+                </Text>
+                <Pressable onPress={backToForm} className="h-14 rounded-md bg-primary items-center justify-center">
+                  <Text className="text-white font-bold text-base">Back to login</Text>
+                </Pressable>
+                <View className="flex-row justify-center mt-6">
+                  <Text className="text-slate-500 text-sm">{"Didn't get it? "}</Text>
+                  <Pressable onPress={handleForgotPassword} disabled={busy || resendIn > 0} hitSlop={6}>
+                    <Text className={`font-bold text-sm ${resendIn > 0 ? "text-slate-400" : "text-primary"}`}>
+                      {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend link"}
+                    </Text>
+                  </Pressable>
+                </View>
+              </>
+            ) : null}
+            {step === "forgot" || step === "forgotSent" ? null : step === "otp" ? (
               <>
                 <Text className="text-slate-800 text-lg font-bold mb-1">Enter verification code</Text>
                 <Text className="text-slate-500 text-sm mb-5">We sent a 6-digit code to {email.trim()}. It expires in 5 minutes.</Text>
@@ -151,7 +201,7 @@ const AuthScreen = () => {
 
             {!isSignup && (
               <View className="items-end mb-5">
-                <Pressable onPress={handleForgotPassword} hitSlop={8}>
+                <Pressable onPress={openForgot} hitSlop={8}>
                   <Text className="text-primary font-semibold text-sm">Forgot password?</Text>
                 </Pressable>
               </View>

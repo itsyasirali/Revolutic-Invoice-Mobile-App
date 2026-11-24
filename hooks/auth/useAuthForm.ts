@@ -35,7 +35,7 @@ export const useAuthForm = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   // Email verification (OTP) step shown after signup, or after a login on an unverified account.
-  const [step, setStep] = useState<'form' | 'otp'>('form');
+  const [step, setStep] = useState<'form' | 'otp' | 'forgot' | 'forgotSent'>('form');
   const [otp, setOtp] = useState('');
   const [resendIn, setResendIn] = useState(0);
 
@@ -63,7 +63,7 @@ export const useAuthForm = () => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (step === 'otp') {
+        if (step !== 'form') {
           setStep('form');
           setOtp('');
           return true;
@@ -149,15 +149,23 @@ export const useAuthForm = () => {
     }
   };
 
+  // Opens the forgot-password step (email is kept if it was already typed).
+  const openForgot = () => setStep('forgot');
+
   // Sends the reset link by email (the reset itself happens on the web page it opens).
   const handleForgotPassword = async () => {
     const address = email.trim();
-    if (!address) return Alert.alert('Forgot password', 'Enter your email address above first.');
+    if (!address) return Alert.alert('Forgot password', 'Enter your email address.');
+    if (!/^\S+@\S+\.\S+$/.test(address)) return Alert.alert('Forgot password', 'Enter a valid email address.');
+    setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/forgot-password', { email: address });
-      Alert.alert('Check your email', data?.message || 'If that email exists, a password reset link has been sent.');
+      await axios.post('/api/auth/forgot-password', { email: address });
+      setStep('forgotSent');
+      setResendIn(30);
     } catch (err: any) {
-      Alert.alert('Forgot password', err?.response?.data?.message || 'Could not send the reset link. Please try again.');
+      Alert.alert('Forgot password', err?.response?.data?.message || `Could not send the reset link (${err?.message || 'no response'}). Please try again.`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,7 +186,7 @@ export const useAuthForm = () => {
         await startVerification();
         return;
       }
-      const errorMessage = err.response?.data?.message || 'Login failed. Try again.';
+      const errorMessage = err.response?.data?.message || `Login failed (${err?.message || 'no response'}). Try again.`;
       Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
@@ -215,7 +223,7 @@ export const useAuthForm = () => {
     try {
       await requestSignupCode();
     } catch (err: any) {
-      Alert.alert('Signup Failed', err?.response?.data?.message || 'Signup failed. Try again.');
+      Alert.alert('Signup Failed', err?.response?.data?.message || `Signup failed (${err?.message || 'no response'}). Try again.`);
     } finally {
       setLoading(false);
     }
@@ -277,6 +285,7 @@ export const useAuthForm = () => {
     handleVerifyOtp,
     handleResendOtp,
     backToForm,
+    openForgot,
     // states
     isSignup,
     name,
