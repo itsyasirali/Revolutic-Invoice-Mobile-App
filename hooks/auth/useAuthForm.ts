@@ -143,7 +143,7 @@ export const useAuthForm = () => {
           return Alert.alert('Google Sign-In', 'Google Play services are not available on this phone.');
         }
       }
-      Alert.alert('Google Sign-In', err?.response?.data?.message || 'Google sign-in failed. Please try again.');
+      Alert.alert('Google Sign-In', err?.response?.data?.message || `Google sign-in failed (${err?.code ?? ''} ${err?.message ?? 'unknown'}). Please try again.`);
     } finally {
       setGoogleLoading(false);
     }
